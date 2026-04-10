@@ -1,0 +1,1 @@
+architecture,building,boat,dock,city,outdoor,urban,morning-afternoon,overcast,low contrast,natural light

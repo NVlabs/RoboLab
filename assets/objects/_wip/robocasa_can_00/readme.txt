@@ -1,0 +1,1 @@
+All source assets should be in 'source' directory. All other assets     in this root asset directory should be prepared for ingest.

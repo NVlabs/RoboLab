@@ -1,0 +1,1 @@
+garage,warehouse,industrial,car,workshop,indoor,urban,low contrast,artificial light

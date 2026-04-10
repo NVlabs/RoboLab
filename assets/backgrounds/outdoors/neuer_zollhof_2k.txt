@@ -1,0 +1,1 @@
+lamp,architecture,europe,building,street,city,square,outdoor,urban,night,partly cloudy,high contrast,artificial light

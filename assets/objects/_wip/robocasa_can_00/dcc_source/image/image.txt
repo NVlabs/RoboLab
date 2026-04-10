@@ -1,0 +1,1 @@
+Input images like masks and logos and output images like renders.     Choose the most appropriate subdirectory.

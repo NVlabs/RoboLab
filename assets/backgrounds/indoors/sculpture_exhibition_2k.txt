@@ -1,0 +1,1 @@
+horse,art,exhibition,museum,indoor,urban,medium contrast,artificial light

@@ -1,0 +1,1 @@
+Intermediate fbx files used to shuttle between apps (e.g. to QuadRemsher     or to Substance tools). It is OK to create subdirectories here if there are many fbx files.

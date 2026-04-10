@@ -1,0 +1,1 @@
+alley,city,narrow,europe,asphalt,outdoor,urban,morning-afternoon,clear,medium contrast,natural light

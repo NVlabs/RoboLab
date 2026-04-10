@@ -1,0 +1,119 @@
+{
+    "version": "1.0",
+    "file_records": [
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000008.png",
+            "source_hash": "2b33c657ca5f8b8e26ab3cdbdd35f93ccba57d61",
+            "target_url": "./textures/obj_000008.png",
+            "target_hash": "f016324e8a9536813800472f38c91e15fa559124"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000009.png",
+            "source_hash": "239df24c76feca4023b2d171ab8c3cb3219b3d36",
+            "target_url": "./textures/obj_000009.png",
+            "target_hash": "7d469b257bc1826c722a4355b586d5b982d31de7"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000017.png",
+            "source_hash": "9728264ca85cdc7e6e369be9a789c6b57bb359b5",
+            "target_url": "./textures/obj_000017.png",
+            "target_hash": "9a14abc9764132678c9f1d972f4198b4c6034c64"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000011.png",
+            "source_hash": "755c0691992e14736a5ea38bf680fdc286bdc0b4",
+            "target_url": "./textures/obj_000011.png",
+            "target_hash": "d7ff6ad4585b3418be6f02b562241a7fa5ccf1d9"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000001.png",
+            "source_hash": "a9cff72f9b33af561bc420f5efc7a46aedf73061",
+            "target_url": "./textures/obj_000001.png",
+            "target_hash": "0994cd390a36a413544d7f4c14651b633abad08d"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000015.png",
+            "source_hash": "1cf01b0a993d7f006211e3b4aed87b11da618f4d",
+            "target_url": "./textures/obj_000015.png",
+            "target_hash": "50fb9d3ec9b86ec0fb2b3e356bfee5d6f12ce990"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000006.png",
+            "source_hash": "5597c58e87faafb47abc1be153632818c2fdcf64",
+            "target_url": "./textures/obj_000006.png",
+            "target_hash": "5dd216a70c7ee38a72c324f187d9b2320575265f"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000016.png",
+            "source_hash": "a16b6a8fb909f8e8a372875b16e7ff718ec0e79c",
+            "target_url": "./textures/obj_000016.png",
+            "target_hash": "f0f97bfbfa90b2449311245fee944d493c9d13ae"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000002.png",
+            "source_hash": "26a9149f5fbaad5635adc3e1195b4c2bacf645c4",
+            "target_url": "./textures/obj_000002.png",
+            "target_hash": "2cce125279c9cd24678d08ae3e518c36545b2b58"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000018.png",
+            "source_hash": "1f988e2c158cdaf94965ee1cc15cb2899e5e82d7",
+            "target_url": "./textures/obj_000018.png",
+            "target_hash": "f6d9acf250fc175ac8ba4d980608bb3c03268b10"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000014.png",
+            "source_hash": "ae10c8ade717734218e9244af71c0ba3942a0be5",
+            "target_url": "./textures/obj_000014.png",
+            "target_hash": "b57827be45479b4dabcb1bc6ded8d0ed0fd02de3"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000003.png",
+            "source_hash": "e3c307af9475b0482cf70bdfc3caa6d5af68b171",
+            "target_url": "./textures/obj_000003.png",
+            "target_hash": "ec1593724e00f2982008e7379e75bd6acd70ddf4"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000010.png",
+            "source_hash": "8f4892cadbd8f72c2a04d180c5edc3addb3a5bfb",
+            "target_url": "./textures/obj_000010.png",
+            "target_hash": "b72d49170ad51a1669b48fe41c6c364df25c4783"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000019.png",
+            "source_hash": "c382e812d0913425dcb781e762dfcf14828cd9ac",
+            "target_url": "./textures/obj_000019.png",
+            "target_hash": "2382f93b876926b7c164feb9e12fdae2d44217a2"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000013.png",
+            "source_hash": "ae6c39d24b709b8db5b6d023849df11b623943a7",
+            "target_url": "./textures/obj_000013.png",
+            "target_hash": "aa77fa97987e50f66483996276aaf88c0be5952c"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000007.png",
+            "source_hash": "8dc039b83cf6932b4ba671444282ab81cd3c1ea5",
+            "target_url": "./textures/obj_000007.png",
+            "target_hash": "e2cc887d5d10bf241b4027fcf20eddfa98ac2d9b"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000005.png",
+            "source_hash": "2f8839bb12db5c31e5a65c1641de4ee313b293f8",
+            "target_url": "./textures/obj_000005.png",
+            "target_hash": "3f3d5ccf3890d95486f270a55de74faf8cb4d5a1"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000012.png",
+            "source_hash": "d50d15e64371a999c89e7e2eb1a201e66e783d19",
+            "target_url": "./textures/obj_000012.png",
+            "target_hash": "bb4ffc80f0e76f1207404ee444cf73a4c0ed5b6c"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/handal/usd/textures/obj_000004.png",
+            "source_hash": "a1fb2628f5a78c07c0099511c9a901b34bf2b143",
+            "target_url": "./textures/obj_000004.png",
+            "target_hash": "93fdbcc3244f704a3b3ae3363db845dc52884493"
+        }
+    ]
+}

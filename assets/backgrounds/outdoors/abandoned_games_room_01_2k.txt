@@ -1,0 +1,1 @@
+abandoned,room,window,tile,rubble,indoor,urban,midday,low contrast,natural light

@@ -1,0 +1,76 @@
+[project]
+name = "robolab"
+version = "0.1.0"
+description = "A benchmark for simulation"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "CC-BY-NC-4.0"}
+authors = [{name = "Xuning Yang"}]
+dependencies = [
+    # Core
+    "isaaclab==2.2.0",
+    "torch",
+    "numpy",
+    "gymnasium",
+    # Remote inference
+    "requests",
+    "json_numpy",
+    "pyzmq",
+    "msgpack",
+    # Computer vision and image processing
+    "opencv-python",
+    "Pillow",
+    # Scientific computing
+    "scipy",
+    "matplotlib",
+    # Data handling
+    "h5py",
+    "PyYAML",
+    "pandas",
+    # Misc
+    "tqdm",
+    "tyro",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+analysis = ["sbi"]
+all = ["sbi"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["robolab", "robolab.*"]
+
+# -- uv configuration --
+
+[tool.uv]
+prerelease = "allow"
+index-strategy = "unsafe-best-match"
+no-build-isolation-package = ["flatdict"]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "nvidia"
+url = "https://pypi.nvidia.com"
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+torchvision = { index = "pytorch-cu128" }
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["robolab"]
+known-third-party = ["isaaclab", "isaaclab_assets", "isaaclab_mimic", "isaaclab_rl", "isaaclab_tasks"]

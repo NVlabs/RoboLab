@@ -1,0 +1,1 @@
+brick,architecture,tunnel,passage,indoor,urban,medium contrast,natural light

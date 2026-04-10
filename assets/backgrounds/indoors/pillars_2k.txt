@@ -1,0 +1,1 @@
+column,architecture,monument,indoor,urban,morning-afternoon,low contrast,natural light

@@ -1,0 +1,1 @@
+tree,flower,hill,river,park,outdoor,nature,morning-afternoon,partly cloudy,low contrast,natural light

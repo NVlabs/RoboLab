@@ -1,0 +1,1 @@
+warehouse,derelict,fluorescent,concrete,industrial,indoor,urban,morning-afternoon,medium contrast,artificial light

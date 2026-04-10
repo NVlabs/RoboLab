@@ -1,0 +1,1 @@
+bed,tv,hotel,cabin,boat,ship,cruise,indoor,urban,high contrast,artificial light

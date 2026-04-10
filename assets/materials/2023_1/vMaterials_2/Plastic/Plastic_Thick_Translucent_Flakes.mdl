@@ -1,0 +1,1025 @@
+/******************************************************************************
+ *     Copyright 2023 NVIDIA Corporation. All rights reserved.
+ ******************************************************************************
+ 
+Permission is hereby granted by NVIDIA Corporation ("NVIDIA"), free of charge,
+to any person obtaining a copy of the sample definition code that uses our 
+Material Definition Language (the "MDL Materials"), to reproduce and distribute
+the MDL Materials, including without limitation the rights to use, copy, merge,
+publish, distribute, and sell modified and unmodified copies of the MDL 
+Materials, and to permit persons to whom the MDL Materials is furnished to do
+so, in all cases solely for use with NVIDIA's Material Definition Language,
+subject to the following further conditions:
+
+1. The above copyright notices, this list of conditions, and the disclaimer
+that follows shall be retained in all copies of one or more of the MDL
+Materials, including in any software with which the MDL Materials are bundled,
+redistributed, and/or sold, and included either as stand-alone text files,
+human-readable headers or in the appropriate machine-readable metadata fields
+within text or binary files as long as those fields can be easily viewed by the
+user, as applicable.
+2. The name of NVIDIA shall not be used to promote, endorse or advertise any 
+Modified Version without specific prior written permission, except a) to comply
+ with the notice requirements otherwise contained herein; or b) to acknowledge
+the contribution(s) of NVIDIA.
+
+THE MDL MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT,
+TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR 
+ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY GENERAL, SPECIAL, 
+INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN AN ACTION OF 
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR INABILITY TO USE
+THE MDL MATERIALS OR FROM OTHER DEALINGS IN THE MDL MATERIALS.
+*/
+
+// This file contains samples of very fast rendering SSS plastics for iray
+// 
+
+mdl 1.4;
+import ::df::*;
+import ::math::*;
+import ::anno::*;
+import ::state::*;
+import ::base::*;
+import ::nvidia::core_definitions::dimension;
+
+
+const string COPYRIGHT = 
+" Copyright 2023 NVIDIA Corporation. All rights reserved.\n"
+" MDL MATERIALS ARE PROVIDED PURSUANT TO AN END USER LICENSE  AGREEMENT,\n"
+" WHICH WAS ACCEPTED IN ORDER TO GAIN ACCESS TO THIS FILE.  IN PARTICULAR,\n" 
+" THE MDL MATERIALS ARE PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\n"
+" EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF\n"
+" MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF\n" 
+" COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL NVIDIA\n"
+" CORPORATION BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY\n"
+" GENERAL, SPECIAL,  INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN\n"
+" AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR\n"
+" INABILITY TO USE THE MDL MATERIALS OR FROM OTHER DEALINGS IN THE MDL MATERIALS.\n";
+
+
+const string DESCRIPTION = 
+"Translucent plastic material with integrated metal flakes. Features: Effective light scattering for dense "
+"plastic materials and metal flakes. The material was built to scatter light within the range of a few "
+"centimeters. If light scattering cannot be seen (which can be verified by setting 'Diffuse Weight' to 0.0), "
+"check the scene units scale or increase 'Distance Scale'.";
+
+
+//
+// flake noise utilities
+//
+int hash(int seed, int i)
+{
+    return (i ^ seed) * 1075385539;
+}
+int rnd_init(int3 pos)
+{
+    return hash(hash(hash(0, pos.x), pos.y), pos.z);
+}
+
+int rnd_next(int seed) {
+    // xorshift32 using signed int
+    seed ^= seed << 13;
+    seed ^= seed >>> 17;
+    seed ^= seed << 5;
+    return seed;
+}
+
+float rnd_value(int seed)
+{
+    return ::math::abs(float(seed) * 4.6566e-10f);
+}
+
+// apply random rotation (using "Fast Random Rotation Matrices" by James Arvo)
+float3 rotate_pos(float3 pos, float3 xi)
+{
+    float theta = ::math::PI * 2.0f * xi.x;
+    float phi = ::math::PI * 2.0f * xi.y;
+    float z = xi.z * 2.0f;
+
+    float r = ::math::sqrt(z);
+    float[2] sp_cp = ::math::sincos(phi);
+    float Vx = sp_cp[0] * r;
+    float Vy = sp_cp[1] * r;
+    float Vz = ::math::sqrt(2.0f - z);
+
+    float[2] st_ct = ::math::sincos(theta);
+    float Sx = Vx * st_ct[1] - Vy * st_ct[0];
+    float Sy = Vx * st_ct[0] + Vy * st_ct[1];
+
+    float3x3 M(
+        Vx * Sx - st_ct[1], Vx * Sy - st_ct[0], Vx * Vz,
+        Vy * Sx + st_ct[0], Vy * Sy - st_ct[1], Vy * Vz,
+        Vz * Sx, Vz * Sy, 1.0f - z);
+
+    return M * pos;
+}
+
+struct flake_noise_value {    
+    // flake priority (in [0..1], 0: no flake, flakes with higher priority shadow flakes "below" them)
+    float priority;
+	// Stores values from the functions (once normal, another time the color)
+    // current pseudo random number generator seed
+    int   rnd_seed;
+	float4 carrier; 
+};
+
+// flake noise function with controllable regularity, flake size, and probability
+flake_noise_value flake_noise(
+    float3 pos,
+    float jitter_scale      = 1.0f,
+    float flake_diameter    = 0.75f,
+    float flake_probability = 1.0f)
+{
+    float3 base_pos = ::math::floor(pos);
+    int3 base_pos_i = int3(base_pos);
+
+    // limit the flake size to the allowed maximum (such that looking at all neighbors is sufficient)
+    flake_diameter = ::math::min(flake_diameter, (1.5f - 0.5f * jitter_scale) / ::math::sqrt(3.0f));
+    
+    flake_noise_value val(0.0f, 0, float4(0.0));
+
+    for (int i = -1; i < 2; ++i) {
+        for (int j = -1; j < 2; ++j) {
+            for (int k = -1; k < 2; ++k) {
+
+                int seed = rnd_init(base_pos_i + int3(i, j, k));
+
+                seed = rnd_next(seed);
+                if (rnd_value(seed) > flake_probability)
+                    continue;
+
+                seed = rnd_next(seed);
+                float priority = rnd_value(seed);
+                if (priority < val.priority)
+                    continue;                
+
+                float3 flake_pos = base_pos + float3(i, j, k) + float3(0.5f);
+
+                if (jitter_scale > 0.0f) {
+                    seed = rnd_next(seed);
+                    flake_pos.x += (rnd_value(seed) - 0.5f) * jitter_scale;
+                    seed = rnd_next(seed);
+                    flake_pos.y += (rnd_value(seed) - 0.5f) * jitter_scale;
+                    seed = rnd_next(seed);
+                    flake_pos.z += (rnd_value(seed) - 0.5f) * jitter_scale;
+                }
+
+                float3 p = pos - flake_pos;
+                if (::math::dot(p, p) >= flake_diameter * flake_diameter * 4.0f)
+                    continue;
+
+                float3 xi_rot;
+                seed = rnd_next(seed);
+                xi_rot.x = rnd_value(seed);
+                seed = rnd_next(seed);
+                xi_rot.y = rnd_value(seed);
+                seed = rnd_next(seed);
+                xi_rot.z = rnd_value(seed);
+                p = rotate_pos(p, xi_rot);
+                
+                if (::math::abs(p.x) <= flake_diameter &&
+                    ::math::abs(p.y) <= flake_diameter &&
+                    ::math::abs(p.z) <= flake_diameter)
+                {
+                    val.priority = priority;
+                    val.rnd_seed = seed;
+                }
+            }
+        }
+    }
+
+    return val;
+}
+
+
+// constants for numerical fitted curve to observed flake noise density behavior
+// 1. no jitter, maximum flake diameter
+const float4 ABCD = float4(-26.19771808f, 26.39663835f, 85.53857017f, -102.35069432f);
+const float2 EF = float2(-101.42634862f, 118.45082288f);
+// 2. jitter scale of 0.5f, maximum flake diameter
+const float4 ABCD_J = float4(-0.87962159f, 0.91006603f, 0.76088203f, -0.24953308f);
+const float2 EF_J = float2(-3.11456809f, 2.63430594f);
+// compute a flake probability for a given flake coverage density x
+float density_to_probability(
+    float4 abcd,
+    float2 ef,
+    float x)
+{
+    float xx = x * x;
+    return (abcd.x * xx + abcd.y * x) / (abcd.z * xx * x + abcd.w * xx  + ef.x * x + ef.y);
+}
+
+// statistically controlled (area/volume coverage density) flake noise 
+flake_noise_value flake_noise(
+    float3 position,
+    float density = 0.5f,
+    bool jittered = false) // jittered: slightly slower and slightly less uniform
+{
+    float probability = density_to_probability(jittered ? ABCD_J : ABCD, jittered ? EF_J : EF, ::math::saturate(density));
+
+    return flake_noise(pos: position, jitter_scale: jittered ? 0.5f : 0.0f, flake_diameter: (jittered ? 1.25f : 1.5f) / ::math::sqrt(3.0f), flake_probability: probability);
+}
+
+// create a flake normal by importance sampling the Beckmann distribution with given roughness
+flake_noise_value flake_normal(
+    flake_noise_value val,
+    float spread)
+{
+    if (val.priority <= 0.0f)
+	{
+		val.carrier = float4(::state::normal().x, ::state::normal().y, ::state::normal().z, 1.0);
+        return val;
+	}
+
+    // int seed0 = rnd_next(val.rnd_seed);
+    // float xi0 = rnd_value(seed0);
+    // float xi1 = rnd_value(rnd_next(seed0)); 
+	
+	int seed  = rnd_next(val.rnd_seed);
+    float xi0 = rnd_value(seed);
+	seed = rnd_next(seed);
+    float xi1 = rnd_value(seed);
+    
+    float phi = ::math::PI * 2.0f * xi0;
+
+    float roughness = spread * spread;
+
+    float tantheta = ::math::sqrt(-roughness * roughness * ::math::log(1.0f - xi1));
+    float sintheta = tantheta / ::math::sqrt(1.0f + tantheta * tantheta);
+    float costheta = ::math::sqrt(1.0f - sintheta * sintheta);
+
+    float[2] scphi = ::math::sincos(phi);
+	
+	val.rnd_seed = seed;
+	
+    // return
+        // ::state::texture_tangent_u(0) * scphi[1] * sintheta +
+        // ::state::texture_tangent_v(0) * scphi[0] * sintheta +
+        // ::state::normal() * costheta;
+	float3 normal = ::state::texture_tangent_u(0) * scphi[1] * sintheta +
+        ::state::texture_tangent_v(0) * scphi[0] * sintheta +
+        ::state::normal() * costheta;
+	
+	val.carrier = float4(normal.x, normal.y, normal.z, 1.0);
+		
+	
+	return val;	
+}
+
+flake_noise_value random_flake_color(flake_noise_value val)
+{
+	int seed = rnd_next(val.rnd_seed);
+	float r = rnd_value(seed);
+	seed = rnd_next(seed);
+	float g = rnd_value(seed);
+	seed = rnd_next(seed);
+	float b = rnd_value(seed);
+	seed = rnd_next(seed);
+	float a = rnd_value(seed);
+	
+	val.carrier = float4(r, g, b, a);
+	return val;
+}
+
+
+// Template for absorption and scattering, do not use directly
+material volume_absorption(
+	color absorption 		= color(0.8665, 0.7769, 0.1559),
+	color scattering 		= color(.5),
+	float distance_scale 	= .03, 
+	float directional_bias 	= 0.0,
+	uniform float ior 		= 1.2
+	
+) 
+[[
+	::anno::author("NVIDIA vMaterials"),
+    ::anno::display_name("Volume Absorption"),
+    ::anno::description("Pure volume absorption material"),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.volume_absorption.png"),
+	::anno::copyright_notice(COPYRIGHT),
+	::anno::hidden()
+	
+]]  = material (
+	ior: color(ior),
+    surface: material_surface (
+        scattering: ::df::specular_bsdf (
+            tint: color (1.0, 1.0, 1.0),
+			mode: ::df::scatter_reflect_transmit
+        )
+    ),
+	volume:  material_volume (
+		scattering: ::df::anisotropic_vdf(
+			directional_bias: directional_bias 
+		),
+		absorption_coefficient: (distance_scale <= 0)? color(0): ::math::log(absorption) / -distance_scale,
+		scattering_coefficient: (distance_scale <= 0)? color(0): ::math::log(scattering) / -distance_scale
+	)
+);
+
+// metallic_plastic_full_weighted_mix(	)
+// Plastic material using diffuse reflection, diffuse transmission
+// and SSS. Due to the diffuse transmission the volume absorption will
+// render faster and converge smoother than when using specular transmission.
+export material Plastic_Thick_Translucent_Flakes(	
+	color diffuse_color			= color(0.6940f, 0.5831f, 0.0493f)
+	[[
+		::anno::display_name("Diffuse Color"),
+		::anno::description("The diffuse color of the plastic material"),
+		::anno::in_group("Appearance")
+	]],
+	float diffuse_weight		= 0.3f
+	[[
+		::anno::display_name("Diffuse Weight"),
+		::anno::description("The weight of the diffuse color of the plastic material. It is recommended to keep "
+		"the value around 0.5, lower values make the material appear more transparent while higher values make "
+		"it more opaque."),
+		::anno::in_group("Appearance"),
+		::anno::hard_range(0.f, 1.f)
+	]],
+	color absorption 			= color(0.8665f, 0.7769f, 0.1559f)
+	[[
+		::anno::display_name("Absorption Color"),
+		::anno::description("Sets the absorption color (this is color when light goes extinct)of the plastic material"),
+		::anno::in_group("Appearance")
+	]],
+	color scattering 			= color(.5f)
+	[[
+		::anno::display_name("Scattering Color"),
+		::anno::description("Sets the absorption color (this is color when light goes extinct)of the plastic material"),
+		::anno::in_group("Appearance")
+	]],
+	float distance_scale 		= 1.5f
+	[[
+		::anno::display_name("Distance Scale"),
+		::anno::description("Scales how quickly light is absorbed. Set this value low enough to see "
+		"some light extinction taking place. Tip: Set 'diffuse_weight' to 0.0 while adjusting this "
+		"material parameter for your scene"),
+		::anno::in_group("Appearance")
+	]],
+	
+	color diffuse_transmission_tint = color(1.0000f, 0.7249f, 0.1972f)
+	[[
+		::anno::display_name("Diffuse Transmission Color"),
+		::anno::description("The tinting of light scattering through the plastic material"),
+		::anno::in_group("Appearance")
+	]],	
+
+	float reflection_roughness 	= 0.0f
+	[[
+		::anno::display_name("Roughness"),
+		::anno::description("The roughness of the reflection on the plastic"),
+		::anno::in_group("Appearance"),
+		::anno::hard_range(0.f, 1.f)
+	]],
+	
+	// Flakes Controls
+	color flake_color_1 = color(1.0f, 1.0f, 1.0f)
+	[[
+		::anno::display_name("Flakes Color"),
+		::anno::description("Flakes Color"),
+		::anno::in_group("Flakes")
+	]],
+	bool enable_color_randomization = true
+	[[
+		::anno::display_name("Flakes Color Randomization"),
+		::anno::description("Enables that a random flakes color will be chosen. Using 'Flakes Color Randomness' allows "
+		"to blend between the chosen reflection color for the flakes and an purely random chosen color."),
+		::anno::in_group("Flakes")
+	]],
+	float flake_color_randomness = 1.0f
+	[[
+		::anno::display_name("Flakes Color Randomness"),
+		::anno::description("Incresing this value will blend towards a randomly chosen flakes color."),
+		::anno::in_group("Flakes"),
+		::anno::hard_range(0.f, 1.f),
+		::anno::enable_if("enable_color_randomization == true")
+	]],
+	uniform float flake_size = 0.1f
+	[[
+		::anno::display_name("Flakes Size"),
+		::anno::description("The size of the flakes in the material"),
+		::anno::in_group("Flakes")
+	]],
+	uniform float3 texture_scale =  float3 ( 1.f , 1.f, 1.f)
+	[[
+		//::anno::hidden(),
+		::anno::display_name("Scale"),
+		::anno::description("Larger numbers increase the texture size."),
+		::nvidia::core_definitions::dimension(float3(1.0f, 1.0f, 1.0f)),
+		::anno::in_group("Transform")
+	]],
+	uniform float flake_amount = 0.1f
+	[[
+		::anno::display_name("Flakes Amount"),
+		::anno::description("The number of flakes used in the material, 0 meaning no flakes, 1 meaning that flakes "
+		"cover the entire surface"),
+		::anno::in_group("Flakes"),
+		::anno::hard_range(0.f, 1.f)
+	]],
+
+	float flake_spread = 0.7f
+	[[
+		::anno::display_name("Flakes Spread"),
+		::anno::description("The amount of randomness in the orientation of the flakes. When set to zero, flakes are "
+		"oriented along the surface normal. Higher values tilt the flakes stronger in a random direction."),
+		::anno::in_group("Flakes"),
+		::anno::hard_range(0.f, 1.f)
+	]]
+) 
+[[
+	::anno::author("NVIDIA vMaterials"),
+    ::anno::display_name("Plastic Full Control"),
+    ::anno::description(DESCRIPTION),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.Plastic_Thick_Translucent_Flakes.png"),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment")),
+	::anno::copyright_notice(COPYRIGHT),
+	::anno::hidden()
+]] = let {
+	// Hardcoded plastic parameters
+	float reflection_weight 	= 1.0f;
+	float normal_reflectivity 	= 0.04f;
+	float grazing_reflectivity 	= 1.0f;
+	float reflectivity_exponent = 5.0f;
+	uniform float ior 			= 1.4f;
+	
+	// Hardcoded flake parameters
+	uniform float flake_roughness 		= 0.4f;
+	float flake_transparency_randomness = 1.0f;
+	float flakes_opacity 				= 0.8;
+
+	// Flakes 
+	
+	float3 flake_uvw_scale = float3(1.0f);
+	::base::texture_coordinate_info uvw = ::base::coordinate_source(
+								coordinate_system: ::base::texture_coordinate_world,
+								texture_space: 0
+	);
+	
+	::base::texture_coordinate_info  transformed_uvw = uvw;
+	float3 flake_uvw 		= (texture_scale * transformed_uvw.position * flake_uvw_scale) / (flake_size * 0.001f);
+	
+	flake_noise_value val 	= flake_noise(flake_uvw, flake_amount, true);
+    bool is_flake 			= val.priority > 0.0f;
+	flake_noise_value val2 	= flake_normal(val, flake_spread);
+	float3 flake_normal 	= float3(val2.carrier.x, val2.carrier.y, val2.carrier.z);
+	flake_noise_value val3 	= random_flake_color(val2);
+	
+	color random_color 		= color(val3.carrier.x, val3.carrier.y, val3.carrier.z);
+	float flakes_transparency_value = ::math::lerp(flakes_opacity, val3.carrier.w * flakes_opacity, flake_transparency_randomness);
+	
+	color flake_color 		= enable_color_randomization ? 
+								::math::lerp(flake_color_1, random_color, flake_color_randomness) :  flake_color_1;
+	
+	bsdf flakes 			= ::df::simple_glossy_bsdf(mode: ::df::scatter_reflect, roughness_u: flake_roughness * flake_roughness, tint: flake_color);
+	
+	
+	// Plastic
+
+	material plastic = volume_absorption(
+		absorption: absorption,
+		scattering: scattering,
+		distance_scale: distance_scale,
+		ior: ior
+	);
+	
+	bsdf transdiff = ::df::diffuse_transmission_bsdf(
+		tint: diffuse_transmission_tint
+	);
+	
+	bsdf diffuse = ::df::diffuse_reflection_bsdf(
+		tint: diffuse_color
+	);
+	
+	bsdf diffuse_mix_layer = ::df::weighted_layer(
+		base: transdiff,
+		layer: diffuse,
+		weight: diffuse_weight
+	
+	);
+	
+	bsdf plastic_with_flakes = ::df::weighted_layer(
+		base: diffuse_mix_layer,
+		layer: flakes,
+		weight: is_flake ? flakes_transparency_value : 0.0f,
+		normal: flake_normal
+	);
+
+	bsdf glossy_reflection = ::df::simple_glossy_bsdf(
+		tint: 				color(1.0),
+		roughness_u: 		reflection_roughness,
+		mode: 				::df::scatter_reflect
+	);
+	
+	bsdf final_layer = ::df::custom_curve_layer(
+		normal_reflectivity: 	normal_reflectivity,
+		grazing_reflectivity: 	grazing_reflectivity,
+		layer: 					glossy_reflection,
+		base:					plastic_with_flakes,
+		weight: 				reflection_weight,
+		exponent: 				reflectivity_exponent
+	);
+	
+} in material (
+	surface: material_surface(
+		scattering: final_layer
+	),
+	
+	volume: plastic.volume
+);
+
+
+export material metallic_plastic_simple_controls(	
+	color diffuse_color			= color(0.6940, 0.5831, 0.0493)
+	[[
+		::anno::display_name("Diffuse Color"),
+		::anno::description("The diffuse color of the plastic material"),
+		::anno::in_group("Appearance")
+	]],
+	float diffuse_weight		= 0.5
+	[[
+		::anno::display_name("Diffuse Weight"),
+		::anno::description("The weight of the diffuse color of the plastic material. It is recommended to keep "
+		"the value around 0.5, lower values make the material appear more transparent while higher values make "
+		"it more opaque."),
+		::anno::in_group("Appearance"),
+		::anno::hard_range(0.f, 1.f)
+	]],
+	color transmissive_color	= color(0.8665, 0.7769, 0.1559)
+	[[
+		::anno::display_name("Transmissive Color"),
+		::anno::description("The tinting of light scattering through the plastic material"),
+		::anno::in_group("Appearance")
+	]],
+	float reflection_roughness 	= 0.0
+	[[
+		::anno::display_name("Roughness"),
+		::anno::description("The roughness of the reflection on the plastic"),
+		::anno::in_group("Appearance"),
+		::anno::hard_range(0.f, 1.f)
+	]],
+	float distance_scale 		= 0.005
+	[[
+		::anno::display_name("Distance Scale"),
+		::anno::description("Scales how quickly light is absorbed. Set this value low enough to see "
+		"some light extinction taking place. Tip: Set 'diffuse_weight' to 0.0 while adjusting this "
+		"material parameter for your scene"),
+		::anno::in_group("Appearance")
+	]],
+	
+	// Flakes Controls
+	color flake_color_1 = color(1.0f, 1.0f, 1.0f)
+	[[
+		::anno::display_name("Flakes Color"),
+		::anno::description("Flakes Color"),
+		::anno::in_group("Flakes")
+	]],
+	bool enable_color_randomization = true
+	[[
+		::anno::display_name("Flakes Color Randomization"),
+		::anno::description("Enables that a random flakes color will be chosen. Using 'Flakes Color Randomness' allows "
+		"to blend between the chosen reflection color for the flakes and an purely random chosen color."),
+		::anno::in_group("Flakes")
+	]],
+	float flake_color_randomness = 1.0
+	[[
+		::anno::display_name("Flakes Color Randomness"),
+		::anno::description("Incresing this value will blend towards a randomly chosen flakes color."),
+		::anno::in_group("Flakes"),
+		::anno::hard_range(0.f, 1.f),
+		::anno::enable_if("enable_color_randomization == true")
+	]],
+	uniform float flake_size = 0.1f
+	[[
+		::anno::display_name("Flakes Size"),
+		::anno::description("The size of the flakes in the material"),
+		::anno::in_group("Flakes")
+	]],
+	uniform float3 texture_scale =  float3 ( 1.f , 1.f, 1.f)
+	[[
+		//::anno::hidden(),
+		::anno::display_name("Scale"),
+		::anno::description("Larger numbers increase the texture size."),
+		::nvidia::core_definitions::dimension(float3(1.0f, 1.0f, 1.0f)),
+		::anno::in_group("Transform")
+	]],
+	uniform float flake_amount = 0.1f
+	[[
+		::anno::display_name("Flakes Amount"),
+		::anno::description("The number of flakes used in the material, 0 meaning no flakes, 1 meaning that flakes cover the entire surface"),
+		::anno::in_group("Flakes"),
+		::anno::hard_range(0.f, 1.f)
+	]],
+	float flake_spread = 0.7f
+	[[
+		::anno::display_name("Flakes Spread"),
+		::anno::description("The amount of randomness in the orientation of the flakes. When set to zero, flakes are oriented along the surface normal. Higher values tilt the flakes stronger in a random direction."),
+		::anno::in_group("Flakes"),
+		::anno::hard_range(0.f, 1.f)
+	]]
+	
+)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.metallic_plastic_simple_controls.png"),
+    ::anno::copyright_notice(COPYRIGHT),
+	::anno::hidden()
+]] = Plastic_Thick_Translucent_Flakes(
+		absorption: 				::math::pow(transmissive_color, 0.2),
+		scattering:					color(0.5),
+		distance_scale: 			distance_scale,
+		diffuse_transmission_tint: 	::math::pow(transmissive_color, 0.2),
+		diffuse_color: 				diffuse_color,
+		diffuse_weight:				diffuse_weight,
+		reflection_roughness:		reflection_roughness,
+		
+		flake_color_1:				flake_color_1,
+		enable_color_randomization:	enable_color_randomization,
+		flake_color_randomness:		flake_color_randomness,
+		flake_size:					flake_size,
+		texture_scale:				texture_scale,
+		flake_amount:				flake_amount,
+		flake_spread:				flake_spread
+);
+
+
+// 01 - Black
+export material plastic_black(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Black"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "dark", "black", "neutral")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_black.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.034230),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.034230),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 02 - Dark Gray
+export material plastic_dark_gray(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Dark Gray"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "dark", "gray", "neutral")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_dark_gray.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.127530),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.089194),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 03 - Light Gray
+export material plastic_light_gray(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Light Gray"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "light", "gray", "neutral")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_light_gray.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.464741),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.358654),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 04 - White
+export material plastic_white(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic White"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "light", "white", "neutral")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_white.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.915750),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.812241),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 05 - Ivory White
+export material plastic_ivory_white(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Ivory White"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "white", "bright", "ivory", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_ivory_white.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.899385, 0.843370, 0.694081),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.722672, 0.708298, 0.547994),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 06 - Lemon
+export material plastic_lemon(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Lemon"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "lemon", "yellow", "light", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_lemon.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.859174, 0.875138, 0.039947),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.98211, 0.843370, 0.031551),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 07 - Yellow Orange
+export material plastic_yellow_orange(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Yellow"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "light", "orange", "yellow", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_yellow_orange.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.875138, 0.612066, 0.039947),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.899385, 0.373615, 0.030257),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 08 - Orange
+export material plastic_orange(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Orange"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "orange", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_orange.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.875138, 0.353741, 0.030257),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.891262, 0.420508, 0.022013),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 09 - Dark Orange
+export material plastic_dark_orange(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Dark Orange"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "dark", "orange", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_dark_orange.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.535642, 0.127530, 0.022013),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.827726, 0.267358, 0.022013),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 10 - Red
+export material plastic_red(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Red"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "red", "cherry", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_red.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.547994, 0.027755, 0.027755),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.875138, 0.022013, 0.022013),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 11 - Magenta
+export material plastic_magenta(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Magenta"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "magenta")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_magenta.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.547994, 0.047776, 0.554227),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.722672, 0.030257, 0.566810),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 12 - Purple
+export material plastic_purple(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Purple"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "purple")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_purple.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.193972, 0.017936, 0.464741),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.701170, 0.018913, 0.645555),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 13 - Dark Blue
+export material plastic_dark_blue(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Dark Blue"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "dark", "blue", "cool")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_dark_blue.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.027755, 0.058187, 0.311180),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.027755, 0.058187, 0.311180),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 14 - Blue
+export material plastic_blue(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Blue"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "blue", "cool")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_blue.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.034230, 0.173439, 0.843370),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.034230, 0.124741, 0.659224),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 15 - Sky Blue
+export material plastic_sky_blue(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Sky Blue"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "blue", "sky", "cool")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_sky_blue.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.061907, 0.535642, 0.875138),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.028991, 0.358654, 0.673049),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 16 - Light Blue
+export material plastic_light_blue(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Light Blue"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "light", "blue", "cool")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_light_blue.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.263175, 0.774227, 0.827726),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.163641, 0.592438, 0.759300),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 17 - Teal
+export material plastic_teal(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Teal"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "teal", "cool")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_teal.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.037029, 0.579547, 0.329729),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.022013, 0.476177, 0.353741),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 18 - Dark Green
+export material plastic_dark_green(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Dark Green"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "dark", "green")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_dark_green.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.034230, 0.141980, 0.034230),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.016988, 0.141980, 0.016988),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 19 - Green
+export material plastic_green(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Green"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "green")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_green.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.016988, 0.311180, 0.016988),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.012664, 0.358654, 0.012664),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 20 - Light Green
+export material plastic_light_green(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Light Green"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "light", "green")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_light_green.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.030257, 0.687031, 0.027755),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.030257, 0.701170, 0.027755),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);
+
+
+// 21 - Lime Green
+export material plastic_lime_green(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Metallic Plastic Lime Green"),
+    ::anno::description(DESCRIPTION),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "flakes", "metallic", "glitter", "pigment", "lime", "green", "light")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent_Flakes.plastic_lime_green.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = metallic_plastic_simple_controls(
+	diffuse_color:			color(0.186989, 0.605484, 0.027755),
+	diffuse_weight:			.5,
+	transmissive_color:		color(0.204710, 0.701170, 0.022013),
+	distance_scale:			0.002,
+	reflection_roughness:	0.05
+);

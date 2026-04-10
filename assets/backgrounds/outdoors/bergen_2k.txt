@@ -1,0 +1,1 @@
+tree,winter,grass,rock,snow,sun,outdoor,nature,morning-afternoon,clear,high contrast,natural light

@@ -1,0 +1,1 @@
+train,station,bench,hall,tracks,fluorescent,indoor,urban,night,medium contrast,artificial light

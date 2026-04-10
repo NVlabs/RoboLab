@@ -1,0 +1,1 @@
+tree,grass,field,outdoor,nature,midday,overcast,low contrast,natural light

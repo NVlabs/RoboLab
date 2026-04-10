@@ -1,0 +1,1 @@
+hall,mall,europe,architecture,london,cobblestone,street,road,indoor,urban,morning-afternoon,medium contrast,natural light,artificial light

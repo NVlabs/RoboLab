@@ -1,0 +1,1 @@
+lot,building,dirt,construction,rubble,brick,outdoor,urban,morning-afternoon,partly cloudy,high contrast,natural light

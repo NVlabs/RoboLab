@@ -1,0 +1,1 @@
+window,room,couch,lamp,carpet,table,indoor,urban,medium contrast,natural light,artificial light

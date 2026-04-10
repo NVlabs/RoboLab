@@ -1,0 +1,1 @@
+painting,art,workshop,window,indoor,urban,medium contrast,natural light,artificial light

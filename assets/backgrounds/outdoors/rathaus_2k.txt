@@ -1,0 +1,1 @@
+building,architecture,europe,square,lamp,outdoor,urban,night,overcast,medium contrast,natural light

@@ -1,0 +1,1 @@
+ramp,pipe,building,europe,outdoor,urban,morning-afternoon,overcast,low contrast,natural light

@@ -1,0 +1,1 @@
+road,hill,bush,view,ocean,outdoor,nature,sunrise-sunset,partly cloudy,medium contrast,natural light

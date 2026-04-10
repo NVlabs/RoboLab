@@ -1,0 +1,1 @@
+tree,forest,maze,pattern,bench,path,outdoor,nature,overcast,low contrast,natural light

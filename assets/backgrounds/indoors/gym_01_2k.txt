@@ -1,0 +1,1 @@
+fluorescent,gym,indoor,urban,medium contrast,artificial light

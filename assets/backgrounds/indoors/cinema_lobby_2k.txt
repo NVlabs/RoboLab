@@ -1,0 +1,1 @@
+couch,seat,bench,fluorescent,indoor,urban,medium contrast,artificial light

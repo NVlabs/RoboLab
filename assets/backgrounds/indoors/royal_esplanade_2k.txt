@@ -1,0 +1,1 @@
+mall,cruise,screen,balcony,stair,tile,indoor,urban,high contrast,artificial light

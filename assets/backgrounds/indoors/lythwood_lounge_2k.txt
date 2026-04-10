@@ -1,0 +1,1 @@
+couch,warm,lounge,lamp,room,indoor,urban,midday,overcast,medium contrast,natural light,artificial light

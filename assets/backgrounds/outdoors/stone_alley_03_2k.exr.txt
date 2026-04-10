@@ -1,0 +1,1 @@
+alley,cobblestone,narrow,europe,outdoor,urban,morning-afternoon,medium contrast,natural light

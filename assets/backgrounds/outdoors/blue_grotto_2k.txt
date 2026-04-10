@@ -1,0 +1,1 @@
+tree,waterfall,river,rock,cave,forest,outdoor,nature,morning-afternoon,clear,low contrast,natural light

@@ -1,0 +1,1 @@
+tree,path,road,pillar,statue,sun,city,view,building,architecture,rome,europe,outdoor,urban,morning-afternoon,partly cloudy,high contrast,natural light

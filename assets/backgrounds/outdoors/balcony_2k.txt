@@ -1,0 +1,1 @@
+house,tree,car,solar,balcony,outdoor,nature,urban,partly cloudy,morning-afternoon,medium contrast,natural light

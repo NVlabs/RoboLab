@@ -1,0 +1,1 @@
+bath,basin,tiles,sink,indoor,urban,medium contrast,artificial light

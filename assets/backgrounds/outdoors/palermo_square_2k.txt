@@ -1,0 +1,1 @@
+city,town,europe,square,street,cobblestone,outdoor,urban,sunrise-sunset,partly cloudy,low contrast,natural light

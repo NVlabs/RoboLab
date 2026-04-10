@@ -1,0 +1,1 @@
+cave,forest,rock,indoor,nature,morning-afternoon,medium contrast,natural light

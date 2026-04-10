@@ -1,0 +1,1 @@
+hangar,plane,industrial,europe,indoor,urban,morning-afternoon,medium contrast,natural light

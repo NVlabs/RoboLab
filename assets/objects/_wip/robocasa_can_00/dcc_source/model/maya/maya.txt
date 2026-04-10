@@ -1,0 +1,1 @@
+Maya files used in creation of geometry.

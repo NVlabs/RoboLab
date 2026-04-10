@@ -1,0 +1,1 @@
+architecture,building,street,outdoor,urban,midday,overcast,low contrast,natural light

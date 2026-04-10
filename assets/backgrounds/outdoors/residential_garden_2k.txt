@@ -1,0 +1,1 @@
+building,grass,apartment,outdoor,urban,midday,overcast,low contrast,natural light

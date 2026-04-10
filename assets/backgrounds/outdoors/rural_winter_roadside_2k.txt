@@ -1,0 +1,1 @@
+road,grass,field,snow,winter,outdoor,skies,nature,sunrise-sunset,partly cloudy,low contrast,natural light

@@ -1,0 +1,1 @@
+bridge,canal,city,building,outdoor,urban,sunrise-sunset,clear,medium contrast,natural light

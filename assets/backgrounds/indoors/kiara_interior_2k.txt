@@ -1,0 +1,1 @@
+tile,table,fridge,window,door,glass,kitchen,lounge,indoor,urban,sunrise-sunset,medium contrast,natural light,artificial light

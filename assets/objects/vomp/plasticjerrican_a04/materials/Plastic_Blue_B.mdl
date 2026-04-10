@@ -1,0 +1,22 @@
+mdl 1.4;
+
+using ::OmniPBR import OmniPBR;
+import ::tex::gamma_mode;
+import ::state::normal;
+import ::base::mono_mode;
+
+export material Plastic_Blue_B(*)
+ = OmniPBR(
+	diffuse_color_constant: color(0.2, 0.2, 0.2),
+	diffuse_texture: texture_2d("../textures/T_Plastic_Blue_A_Albedo.png", ::tex::gamma_srgb),
+	albedo_desaturation: 0.0,
+	albedo_add: 0.0,
+	albedo_brightness: 0.78,
+	diffuse_tint: color(0.57865864, 0.7281282, 0.87644786),
+	reflection_roughness_constant: 0.5,
+	reflection_roughness_texture_influence: 1.0,
+	specular_level: 0.5,
+	enable_ORM_texture: true,
+	ORM_texture: texture_2d("../textures/T_Plastic_Blue_A_ORM.png", ::tex::gamma_linear),
+	bump_factor: 1.0,
+	normalmap_texture: texture_2d("../textures/T_Plastic_Blue_A_Normal.png", ::tex::gamma_linear));

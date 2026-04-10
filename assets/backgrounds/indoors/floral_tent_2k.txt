@@ -1,0 +1,1 @@
+bush,plant,sun,tiles,tent,canopy,indoor,nature,urban,midday,medium contrast,natural light

@@ -1,0 +1,553 @@
+
+================================================================================
+ROBOLAB TASK STATISTICS — FULL REPORT
+Total tasks: 120
+================================================================================
+
+## TASKS BY SUBFOLDER
+----------------------------------------
+  benchmark                : 120 tasks (100.0%)
+
+====================================================================================================
+TASK ATTRIBUTES SUMMARY
+Total unique attributes: 11
+Total tasks scanned: 120
+Untagged tasks: 3
+====================================================================================================
+Attribute       | Count
+-------------------------
+visual          |    84
+  color         |    26
+  semantics     |    60
+  size          |     6
+relational      |    42
+  conjunction   |     8
+  counting      |     7
+  spatial       |    29
+procedural      |    34
+  affordance    |    12
+  reorientation |     6
+  sorting       |    12
+  stacking      |     6
+-------------------------
+vague           |     7
+-------------------------
+
+====================================================================================================
+DETAILED BREAKDOWN BY ATTRIBUTE
+====================================================================================================
+AFFORDANCE (12 tasks):
+   1. AppleAndYogurtInBowlTask (benchmark/apple_and_yogurt_in_bowl_task.py)
+   2. MarkerInMugTask (benchmark/marker_in_mug_task.py)
+   3. PickUpBluePitcherTask (benchmark/pick_up_blue_pitcher.py)
+   4. PinkSpoonInPotTask (benchmark/pink_spoon_in_pot.py)
+   5. PutMugsOnShelfTask (benchmark/put_mugs_on_shelf.py)
+   6. PutTwoMugsOnShelfTask (benchmark/put_two_mugs_on_shelf.py)
+   7. ReorientJugTask (benchmark/reorient_jug.py)
+   8. SpoonInMugTask (benchmark/spoon_in_mug_task.py)
+   9. SpoonsInPotTask (benchmark/spoons_in_pot.py)
+  10. TakeMugsOffOfShelfTask (benchmark/take_mugs_off_of_shelf.py)
+  11. TakeSpatulaOffShelfTask (benchmark/take_spatula_off_shelf.py)
+  12. UtensilsInMugTask (benchmark/utensils_in_mug.py)
+COLOR (26 tasks):
+   1. BBQSauceInBinTask (benchmark/bbq_sauce_in_bin_task.py)
+   2. BlackItemsInBinTask (benchmark/black_items_in_bin.py)
+   3. BlockStackingSpecifiedOrderTask (benchmark/block_stacking_specified_order_task.py)
+   4. CookingClearPlateTask (benchmark/cooking_clear_plate_specific.py)
+   5. CookingPickPastaToolTask (benchmark/cooking_pick_pasta_tool.py)
+   6. FoodPackingByColorTask (benchmark/food_packing_by_color_task.py)
+   7. FruitsGreenLimesOnPlateTask (benchmark/fruits_green_limes_on_plate.py)
+   8. FruitsMovingTask (benchmark/fruits_move_orange.py)
+   9. GreenSpoonsInPotTask (benchmark/green_spoons_in_pot.py)
+  10. HammersInLeftBinTask (benchmark/tool_organization_left_task.py)
+  11. PickOrangeObjectTask (benchmark/cooking_orange_object.py)
+  12. PickUpBluePitcherTask (benchmark/pick_up_blue_pitcher.py)
+  13. PickUpGreenObjectTask (benchmark/pick_up_green_object.py)
+  14. PinkSpoonInPotTask (benchmark/pink_spoon_in_pot.py)
+  15. RedDishesInBinTask (benchmark/red_dishes_in_bin.py)
+  16. RedItemsInBinTask (benchmark/red_items_in_bin.py)
+  17. ReorientRedMugTask (benchmark/reorient_red_mugs_task.py)
+  18. ReorientWhiteMugsTask (benchmark/reorient_white_mugs.py)
+  19. SauceBottlesCrateTask (benchmark/sauce_bottles_crate_task.py)
+  20. StackWhiteMugsTask (benchmark/stack_white_mugs_task.py)
+  21. ToolOrganizationTask (benchmark/tool_organization_task.py)
+  22. ToolsPickingHammerTask (benchmark/tools_picking_hammer.py)
+  23. WhiteMugInCenterOfTableTask (benchmark/white_mug_in_center_of_table.py)
+  24. WhiteMugsInBinTask (benchmark/white_mugs_in_bin.py)
+  25. YellowAndWhiteObjectsInBinTask (benchmark/yellow_and_white_objects_in_bin.py)
+  26. YogurtInBowlTask (benchmark/yogurt_in_bowl.py)
+CONJUNCTION (8 tasks):
+   1. BananaThenRubiksCubeTask (benchmark/banana_then_rubiks_cube.py)
+   2. CubesAndBlocksInBinTask (benchmark/cubes_and_blocks_in_bin.py)
+   3. FruitsMovingOrangeOrLimeTask (benchmark/fruits_move_orange_or_lime.py)
+   4. PhoneOrRemoteInBinTask (benchmark/phone_or_remote_in_bin_task.py)
+   5. RubiksCubeAndBananaTask (benchmark/rubiks_cube_and_banana_task.py)
+   6. RubiksCubeOrBananaTask (benchmark/rubiks_cube_or_banana_task.py)
+   7. RubiksCubeThenBananaTask (benchmark/rubiks_cube_then_banana.py)
+   8. YellowAndWhiteObjectsInBinTask (benchmark/yellow_and_white_objects_in_bin.py)
+COUNTING (7 tasks):
+   1. BananasInBinOneMoreTask (benchmark/bananas_in_bin_one_more.py)
+   2. BananasInBinThreeTotalTask (benchmark/bananas_in_bin_three.py)
+   3. BananasInCrateTask (benchmark/bananas_in_crate.py)
+   4. FruitsOnPlate3Task (benchmark/fruits_to_plate_3.py)
+   5. FruitsOrangesOnPlateTask (benchmark/fruits_oranges_on_plate.py)
+   6. PutMugsOnShelfTask (benchmark/put_mugs_on_shelf.py)
+   7. PutTwoMugsOnShelfTask (benchmark/put_two_mugs_on_shelf.py)
+REORIENTATION (6 tasks):
+   1. GreenSpoonsInPotTask (benchmark/green_spoons_in_pot.py)
+   2. ReorientAllMugsTask (benchmark/reorient_all_mugs_task.py)
+   3. ReorientJugTask (benchmark/reorient_jug.py)
+   4. ReorientRedMugTask (benchmark/reorient_red_mugs_task.py)
+   5. ReorientWhiteMugsTask (benchmark/reorient_white_mugs.py)
+   6. SpoonsInPotTask (benchmark/spoons_in_pot.py)
+SEMANTICS (60 tasks):
+   1. AnimalsInBinTask (benchmark/animals_in_bin.py)
+   2. BBQSauceInBinTask (benchmark/bbq_sauce_in_bin_task.py)
+   3. BagelsOnPlateTask (benchmark/bagel_on_plate_task.py)
+   4. BananaInBowlTask (benchmark/banana_in_bowl_task.py)
+   5. BananasInBinOneMoreTask (benchmark/bananas_in_bin_one_more.py)
+   6. BananasInBinThreeTotalTask (benchmark/bananas_in_bin_three.py)
+   7. BananasOutOfBinTask (benchmark/bananas_out_of_bin.py)
+   8. CannedFoodInBinTask (benchmark/canned_food_in_bin_task.py)
+   9. ClampInRightBinTask (benchmark/clamp_in_right_bin.py)
+  10. CleanUpToysTask (benchmark/clean_up_toys.py)
+  11. ClearOrganicObjectsTask (benchmark/clutter_organic_objects_task.py)
+  12. ClutterPlasticTask (benchmark/clutter_plastic_task.py)
+  13. ClutterPumpkinTask (benchmark/clutter_pumpkin_task.py)
+  14. CoffeePotInBinTask (benchmark/coffee_pot_in_bin.py)
+  15. CondimentsInBinTask (benchmark/condiments_in_bin_task.py)
+  16. DishesInBinTask (benchmark/dishes_in_bin.py)
+  17. ElectronicsInBinTask (benchmark/electronics_in_bin_task.py)
+  18. FoodPacking1BoxesTask (benchmark/foodpacking_1bin_1box.py)
+  19. FoodPacking1CansTask (benchmark/foodpacking_1bin_1can.py)
+  20. FoodPacking2BoxesTask (benchmark/foodpacking_1bin_2box.py)
+  21. FoodPacking2CansTask (benchmark/foodpacking_1bin_2can.py)
+  22. FoodPacking3BoxesTask (benchmark/foodpacking_1bin_3box.py)
+  23. FoodPacking3CansTask (benchmark/foodpacking_1bin_3can.py)
+  24. FruitsOnPlate3Task (benchmark/fruits_to_plate_3.py)
+  25. FruitsOnPlateTask (benchmark/fruits_to_plate.py)
+  26. FruitsOnionTask (benchmark/fruits_onion_to_bowl.py)
+  27. FruitsOnionToPlateTask (benchmark/fruits_onion_to_plate.py)
+  28. FruitsOrangesOnPlateTask (benchmark/fruits_oranges_on_plate.py)
+  29. GrabABagelTask (benchmark/grab_a_bagel.py)
+  30. GrabAFruitTask (benchmark/grab_a_fruit.py)
+  31. HammersInLeftBinTask (benchmark/tool_organization_left_task.py)
+  32. JugsOnShelfTask (benchmark/jugs_on_shelf_task.py)
+  33. MouseOnKeyboardTask (benchmark/mouse_on_keyboard.py)
+  34. MoveBananaToBagelPlateTask (benchmark/move_banana_to_bagel_plate.py)
+  35. NonHammerToolsInRightBinTask (benchmark/non_hammer_tools_in_right_bin.py)
+  36. OneBottleInSquarePailTask (benchmark/one_bottle_in_square_pail.py)
+  37. OneBottleOnShelfTask (benchmark/one_bottle_on_shelf_task.py)
+  38. PickDrillTask (benchmark/pick_drill.py)
+  39. PickGlassesTask (benchmark/pick_glasses_task.py)
+  40. PlasticBottlesInSquarePailTask (benchmark/bottles_on_shelf_task.py)
+  41. RecycleCartonTask (benchmark/recycle_cartons.py)
+  42. RecycleCartonsOnBoxTask (benchmark/recycle_cartons_on_box.py)
+  43. RecycleCartonsVerticalCrateTask (benchmark/recycle_cartons_vertical_crate.py)
+  44. RedDishesInBinTask (benchmark/red_dishes_in_bin.py)
+  45. ReorientJugTask (benchmark/reorient_jug.py)
+  46. SauceBottlesCrateTask (benchmark/sauce_bottles_crate_task.py)
+  47. SmartphoneInBinTask (benchmark/smartphone_in_bin_task.py)
+  48. SpoonsInPotTask (benchmark/spoons_in_pot.py)
+  49. TakeMeasuringSpoonOutTask (benchmark/take_measuring_spoon_out.py)
+  50. TakeMugsOffOfShelfTask (benchmark/take_mugs_off_of_shelf.py)
+  51. ThrowAwayAppleTask (benchmark/throw_away_apple_task.py)
+  52. ThrowAwaySnacksTask (benchmark/throw_away_snacks_task.py)
+  53. ToolOrganizationBothTask (benchmark/tool_organization_both_task.py)
+  54. ToolOrganizationTask (benchmark/tool_organization_task.py)
+  55. ToolsPickingAllHammersTask (benchmark/tools_picking_all_hammers.py)
+  56. ToolsPickingDrillTask (benchmark/tools_picking_drill.py)
+  57. ToolsPickingHammerTask (benchmark/tools_picking_hammer.py)
+  58. ToyInBinTask (benchmark/lizard_in_bin_task.py)
+  59. UtensilsInMugTask (benchmark/utensils_in_mug.py)
+  60. WoodSpatulaToBowlTask (benchmark/wood_spatula_to_bowl.py)
+SIZE (6 tasks):
+   1. BigPumpkinInBinTask (benchmark/clutter_big_pumpkin_task.py)
+   2. LargerObjectRaisinBoxInBinTask (benchmark/bigger_object.py)
+   3. PlasticBottlesInSquarePailTask (benchmark/bottles_on_shelf_task.py)
+   4. SmallPumpkinInBinTask (benchmark/clutter_small_pumpkin_task.py)
+   5. SmallerObjectButterInBinTask (benchmark/smaller_object.py)
+   6. YogurtInBowlTask (benchmark/yogurt_in_bowl.py)
+SORTING (12 tasks):
+   1. BlackItemsInBinTask (benchmark/black_items_in_bin.py)
+   2. BlocksInBinTask (benchmark/blocks_in_bin.py)
+   3. CleanUpToysTask (benchmark/clean_up_toys.py)
+   4. CondimentsInBinTask (benchmark/condiments_in_bin_task.py)
+   5. CookingClearPlateTask (benchmark/cooking_clear_plate_specific.py)
+   6. CubesAndBlocksInBinTask (benchmark/cubes_and_blocks_in_bin.py)
+   7. ElectronicsInBinTask (benchmark/electronics_in_bin_task.py)
+   8. FoodPackingByColorTask (benchmark/food_packing_by_color_task.py)
+   9. NonHammerToolsInRightBinTask (benchmark/non_hammer_tools_in_right_bin.py)
+  10. PlasticBottlesInSquarePailTask (benchmark/bottles_on_shelf_task.py)
+  11. RedItemsInBinTask (benchmark/red_items_in_bin.py)
+  12. RubiksCubesInBinTask (benchmark/rubiks_cubes_in_bin.py)
+SPATIAL (29 tasks):
+   1. BananasOutOfBinTask (benchmark/bananas_out_of_bin.py)
+   2. BowlStackingLeftOnRightTask (benchmark/bowl_stacking_left_on_right.py)
+   3. BowlStackingRightOnLeftTask (benchmark/bowl_stacking_right_on_left.py)
+   4. ButterAboveRaisinTask (benchmark/butter_above_raisin_task.py)
+   5. ClampInRightBinTask (benchmark/clamp_in_right_bin.py)
+   6. CookingPickPastaToolTask (benchmark/cooking_pick_pasta_tool.py)
+   7. FoodPackingByColorTask (benchmark/food_packing_by_color_task.py)
+   8. HammersInLeftBinTask (benchmark/tool_organization_left_task.py)
+   9. KeyboardOutOfBinTask (benchmark/keyboard_out_of_bin_task.py)
+  10. MustardAboveRaisinTask (benchmark/mustard_above_raisin_task.py)
+  11. MustardInLeftBinTask (benchmark/mustard_in_left_bin.py)
+  12. MustardInRightBinTask (benchmark/mustard_in_right_bin.py)
+  13. NonHammerToolsInRightBinTask (benchmark/non_hammer_tools_in_right_bin.py)
+  14. PutBowlOnShelfTopTask (benchmark/put_bowl_on_shelf.py)
+  15. PutMugsOnShelfTask (benchmark/put_mugs_on_shelf.py)
+  16. PutTwoMugsOnShelfTask (benchmark/put_two_mugs_on_shelf.py)
+  17. RecycleCartonsVerticalCrateTask (benchmark/recycle_cartons_vertical_crate.py)
+  18. RubiksCubeBehindBowlTask (benchmark/rubiks_cube_behind_bowl.py)
+  19. RubiksCubeInFrontOfBowlTask (benchmark/rubiks_cube_in_front_of_bowl.py)
+  20. RubiksCubeLeftOfBowlTask (benchmark/rubiks_cube_left_of_bowl.py)
+  21. RubiksCubeRightOfBowlTask (benchmark/rubiks_cube_right_of_bowl.py)
+  22. SpoonInMugTask (benchmark/spoon_in_mug_task.py)
+  23. TakeSpatulaOffShelfTask (benchmark/take_spatula_off_shelf.py)
+  24. ToolOrganizationBothTask (benchmark/tool_organization_both_task.py)
+  25. ToolOrganizationTask (benchmark/tool_organization_task.py)
+  26. ToolsPickingAllHammersTask (benchmark/tools_picking_all_hammers.py)
+  27. ToolsPickingDrillTask (benchmark/tools_picking_drill.py)
+  28. ToolsPickingHammerTask (benchmark/tools_picking_hammer.py)
+  29. WhiteMugInCenterOfTableTask (benchmark/white_mug_in_center_of_table.py)
+STACKING (6 tasks):
+   1. BlockStackingOrderAgnosticTask (benchmark/block_stacking_order_agnostic_task.py)
+   2. BlockStackingSpecifiedOrderTask (benchmark/block_stacking_specified_order_task.py)
+   3. Stack3RubiksCubeTask (benchmark/rubiks_cube_stacking_task.py)
+   4. StackWhiteMugsTask (benchmark/stack_white_mugs_task.py)
+   5. StackYellowOnRedTask (benchmark/stack_yellow_on_red.py)
+   6. UnstackRubiksCubeTask (benchmark/unstack_rubiks_cube.py)
+VAGUE (7 tasks):
+   1. CookingPickPastaToolTask (benchmark/cooking_pick_pasta_tool.py)
+   2. DishesInBinTask (benchmark/dishes_in_bin.py)
+   3. FruitsOnPlate3Task (benchmark/fruits_to_plate_3.py)
+   4. FruitsOnPlateTask (benchmark/fruits_to_plate.py)
+   5. FruitsOnionToPlateTask (benchmark/fruits_onion_to_plate.py)
+   6. FruitsOrangesOnPlateTask (benchmark/fruits_oranges_on_plate.py)
+   7. RecycleCartonTask (benchmark/recycle_cartons.py)
+UNTAGGED (3 tasks):
+   1. BananaOnPlateTask (benchmark/banana_on_plate_task.py)
+   2. BowlInBinTask (benchmark/bowl_in_bin_task.py)
+   3. RubiksCubeTask (benchmark/rubiks_cube_task.py)
+
+================================================================================
+ATTRIBUTE BREAKDOWN BY CATEGORY
+================================================================================
+
+  Visual:
+    semantics      :  60 ( 65.2%)
+    color          :  26 ( 28.3%)
+    size           :   6 (  6.5%)
+
+  Relational:
+    spatial        :  29 ( 65.9%)
+    conjunction    :   8 ( 18.2%)
+    counting       :   7 ( 15.9%)
+
+  Procedural:
+    affordance     :  12 ( 33.3%)
+    sorting        :  12 ( 33.3%)
+    stacking       :   6 ( 16.7%)
+    reorientation  :   6 ( 16.7%)
+
+================================================================================
+OBJECT STATISTICS
+================================================================================
+Unique objects (exact): 144
+Unique objects (normalized, excl. duplicates like mug_01/mug_02): 120
+Total object instances across all tasks: 1071
+Average objects per task: 8.9
+Min objects in a task: 1
+Max objects in a task: 19
+
+  Top 20 Most Used Objects (normalized names):
+    banana                   :  43 tasks
+    bowl                     :  36 tasks
+    rubiks_cube              :  33 tasks
+    grey_bin                 :  30 tasks
+    ceramic_mug              :  28 tasks
+    lemon                    :  28 tasks
+    lime01                   :  28 tasks
+    orange                   :  28 tasks
+    mug                      :  25 tasks
+    spatula                  :  23 tasks
+    lizard_figurine          :  22 tasks
+    wooden_bowl              :  21 tasks
+    serving_bowl             :  20 tasks
+    bagel                    :  19 tasks
+    spoon_big                :  18 tasks
+    yogurt_cup               :  18 tasks
+    smartphone               :  17 tasks
+    storage_box              :  15 tasks
+    mustard                  :  14 tasks
+    pomegranate01            :  14 tasks
+
+  Objects Used in Multiple Tasks (top 30):
+    bowl                          : appears in  32 tasks
+    grey_bin                      : appears in  30 tasks
+    ceramic_mug                   : appears in  28 tasks
+    banana                        : appears in  22 tasks
+    wooden_bowl                   : appears in  21 tasks
+    mug                           : appears in  21 tasks
+    serving_bowl                  : appears in  20 tasks
+    rubiks_cube                   : appears in  19 tasks
+    spoon_big                     : appears in  18 tasks
+    yogurt_cup                    : appears in  18 tasks
+    smartphone                    : appears in  17 tasks
+    lizard_figurine               : appears in  16 tasks
+    mustard                       : appears in  14 tasks
+    lemon_01                      : appears in  14 tasks
+    lemon_02                      : appears in  14 tasks
+    lime01                        : appears in  14 tasks
+    lime01_01                     : appears in  14 tasks
+    orange_01                     : appears in  14 tasks
+    orange_02                     : appears in  14 tasks
+    pomegranate01                 : appears in  14 tasks
+    pumpkinlarge                  : appears in  14 tasks
+    pumpkinsmall                  : appears in  14 tasks
+    cordless_drill                : appears in  14 tasks
+    glasses                       : appears in  13 tasks
+    keyboard                      : appears in  13 tasks
+    marker                        : appears in  13 tasks
+    remote_control                : appears in  13 tasks
+    computer_mouse                : appears in  13 tasks
+    right_bin                     : appears in  13 tasks
+    redonion                      : appears in  12 tasks
+
+================================================================================
+SUBTASK COMPLEXITY
+================================================================================
+Average sequential stages per task: 1.07
+Average atomic conditions per task: 3.70
+
+Sequential stage count distribution:
+    1 stage(s): 113 tasks
+    2 stage(s): 5 tasks
+    3 stage(s): 2 tasks
+
+================================================================================
+SUBTASK COUNTS
+================================================================================
+num_subtasks = number of distinct manipulation actions required,
+accounting for logical mode (all/any/choose).
+
+Average subtasks per task: 2.01
+Min: 1
+Max: 11
+
+Distribution:
+    1 subtask(s):  53 tasks
+    2 subtask(s):  41 tasks
+    3 subtask(s):  17 tasks
+    4 subtask(s):   4 tasks
+    5 subtask(s):   1 tasks
+    7 subtask(s):   2 tasks
+    9 subtask(s):   1 tasks
+    11 subtask(s):   1 tasks
+
+Tasks with most subtasks:
+   1. ClearOrganicObjectsTask                       11 subtask(s)  (benchmark/clutter_organic_objects_task.py)
+   2. CleanUpToysTask                               9 subtask(s)  (benchmark/clean_up_toys.py)
+   3. CubesAndBlocksInBinTask                       7 subtask(s)  (benchmark/cubes_and_blocks_in_bin.py)
+   4. FruitsOnPlateTask                             7 subtask(s)  (benchmark/fruits_to_plate.py)
+   5. BlackItemsInBinTask                           5 subtask(s)  (benchmark/black_items_in_bin.py)
+   6. BlocksInBinTask                               4 subtask(s)  (benchmark/blocks_in_bin.py)
+   7. CondimentsInBinTask                           4 subtask(s)  (benchmark/condiments_in_bin_task.py)
+   8. ElectronicsInBinTask                          4 subtask(s)  (benchmark/electronics_in_bin_task.py)
+   9. ToolsPickingAllHammersTask                    4 subtask(s)  (benchmark/tools_picking_all_hammers.py)
+  10. BlockStackingOrderAgnosticTask                3 subtask(s)  (benchmark/block_stacking_order_agnostic_task.py)
+  11. BlockStackingSpecifiedOrderTask               3 subtask(s)  (benchmark/block_stacking_specified_order_task.py)
+  12. ClutterPlasticTask                            3 subtask(s)  (benchmark/clutter_plastic_task.py)
+  13. DishesInBinTask                               3 subtask(s)  (benchmark/dishes_in_bin.py)
+  14. FoodPacking3BoxesTask                         3 subtask(s)  (benchmark/foodpacking_1bin_3box.py)
+  15. FoodPacking3CansTask                          3 subtask(s)  (benchmark/foodpacking_1bin_3can.py)
+  16. FruitsOnPlate3Task                            3 subtask(s)  (benchmark/fruits_to_plate_3.py)
+  17. GreenSpoonsInPotTask                          3 subtask(s)  (benchmark/green_spoons_in_pot.py)
+  18. PlasticBottlesInSquarePailTask                3 subtask(s)  (benchmark/bottles_on_shelf_task.py)
+  19. ReorientAllMugsTask                           3 subtask(s)  (benchmark/reorient_all_mugs_task.py)
+  20. RubiksCubeBehindBowlTask                      3 subtask(s)  (benchmark/rubiks_cube_behind_bowl.py)
+
+================================================================================
+DIFFICULTY SCORING
+================================================================================
+score = num_subtasks + max(skill_weight)
+Thresholds: simple <= 2, moderate <= 4, complex > 4
+Skill weights: {'color': 0, 'semantics': 0, 'size': 0, 'conjunction': 0, 'vague': 0, 'spatial': 1, 'counting': 2, 'sorting': 2, 'stacking': 2, 'affordance': 2, 'reorientation': 3}
+
+Average difficulty score: 2.90
+Score range: 1 – 11
+
+Distribution by label:
+    simple    :  64 tasks ( 53.3%)
+    moderate  :  39 tasks ( 32.5%)
+    complex   :  17 tasks ( 14.2%)
+
+Score histogram:
+    score  1:  31 ###############################
+    score  2:  33 #################################
+    score  3:  16 ################
+    score  4:  23 #######################
+    score  5:   6 ######
+    score  6:   6 ######
+    score  7:   2 ##
+    score  9:   1 #
+    score 11:   2 ##
+
+All tasks by difficulty (highest first):
+    1. CleanUpToysTask                               score=11  num_subtasks=9  [complex]  (sorting, semantics)
+    2. ClearOrganicObjectsTask                       score=11  num_subtasks=11  [complex]  (semantics)
+    3. CubesAndBlocksInBinTask                       score= 9  num_subtasks=7  [complex]  (sorting, conjunction)
+    4. BlackItemsInBinTask                           score= 7  num_subtasks=5  [complex]  (color, sorting)
+    5. FruitsOnPlateTask                             score= 7  num_subtasks=7  [complex]  (semantics, vague)
+    6. BlocksInBinTask                               score= 6  num_subtasks=4  [complex]  (sorting)
+    7. CondimentsInBinTask                           score= 6  num_subtasks=4  [complex]  (semantics, sorting)
+    8. ElectronicsInBinTask                          score= 6  num_subtasks=4  [complex]  (semantics, sorting)
+    9. GreenSpoonsInPotTask                          score= 6  num_subtasks=3  [complex]  (reorientation, color)
+   10. ReorientAllMugsTask                           score= 6  num_subtasks=3  [complex]  (reorientation)
+   11. SpoonsInPotTask                               score= 6  num_subtasks=3  [complex]  (reorientation, semantics, affordance)
+   12. BlockStackingOrderAgnosticTask                score= 5  num_subtasks=3  [complex]  (stacking)
+   13. BlockStackingSpecifiedOrderTask               score= 5  num_subtasks=3  [complex]  (stacking, color)
+   14. FruitsOnPlate3Task                            score= 5  num_subtasks=3  [complex]  (semantics, vague, counting)
+   15. PlasticBottlesInSquarePailTask                score= 5  num_subtasks=3  [complex]  (semantics, sorting, size)
+   16. RubiksCubesInBinTask                          score= 5  num_subtasks=3  [complex]  (sorting)
+   17. ToolsPickingAllHammersTask                    score= 5  num_subtasks=4  [complex]  (semantics, spatial)
+   18. AppleAndYogurtInBowlTask                      score= 4  num_subtasks=2  [moderate]  (affordance)
+   19. CookingClearPlateTask                         score= 4  num_subtasks=2  [moderate]  (color, sorting)
+   20. FoodPackingByColorTask                        score= 4  num_subtasks=2  [moderate]  (spatial, sorting, color)
+   21. FruitsOrangesOnPlateTask                      score= 4  num_subtasks=2  [moderate]  (counting, vague, semantics)
+   22. NonHammerToolsInRightBinTask                  score= 4  num_subtasks=2  [moderate]  (semantics, spatial, sorting)
+   23. PickUpBluePitcherTask                         score= 4  num_subtasks=2  [moderate]  (color, affordance)
+   24. PutMugsOnShelfTask                            score= 4  num_subtasks=2  [moderate]  (affordance, spatial, counting)
+   25. PutTwoMugsOnShelfTask                         score= 4  num_subtasks=2  [moderate]  (affordance, spatial, counting)
+   26. RedItemsInBinTask                             score= 4  num_subtasks=2  [moderate]  (color, sorting)
+   27. ReorientJugTask                               score= 4  num_subtasks=1  [moderate]  (semantics, reorientation, affordance)
+   28. ReorientRedMugTask                            score= 4  num_subtasks=1  [moderate]  (reorientation, color)
+   29. ReorientWhiteMugsTask                         score= 4  num_subtasks=1  [moderate]  (reorientation, color)
+   30. RubiksCubeBehindBowlTask                      score= 4  num_subtasks=3  [moderate]  (spatial)
+   31. RubiksCubeInFrontOfBowlTask                   score= 4  num_subtasks=3  [moderate]  (spatial)
+   32. RubiksCubeLeftOfBowlTask                      score= 4  num_subtasks=3  [moderate]  (spatial)
+   33. RubiksCubeRightOfBowlTask                     score= 4  num_subtasks=3  [moderate]  (spatial)
+   34. Stack3RubiksCubeTask                          score= 4  num_subtasks=2  [moderate]  (stacking)
+   35. StackWhiteMugsTask                            score= 4  num_subtasks=2  [moderate]  (stacking, color)
+   36. StackYellowOnRedTask                          score= 4  num_subtasks=2  [moderate]  (stacking)
+   37. TakeMugsOffOfShelfTask                        score= 4  num_subtasks=2  [moderate]  (semantics, affordance)
+   38. UnstackRubiksCubeTask                         score= 4  num_subtasks=2  [moderate]  (stacking)
+   39. UtensilsInMugTask                             score= 4  num_subtasks=2  [moderate]  (semantics, affordance)
+   40. WhiteMugInCenterOfTableTask                   score= 4  num_subtasks=3  [moderate]  (color, spatial)
+   41. BananasInBinOneMoreTask                       score= 3  num_subtasks=1  [moderate]  (semantics, counting)
+   42. BananasInBinThreeTotalTask                    score= 3  num_subtasks=1  [moderate]  (semantics, counting)
+   43. BananasInCrateTask                            score= 3  num_subtasks=1  [moderate]  (counting)
+   44. BananasOutOfBinTask                           score= 3  num_subtasks=2  [moderate]  (semantics, spatial)
+   45. ClutterPlasticTask                            score= 3  num_subtasks=3  [moderate]  (semantics)
+   46. DishesInBinTask                               score= 3  num_subtasks=3  [moderate]  (vague, semantics)
+   47. FoodPacking3BoxesTask                         score= 3  num_subtasks=3  [moderate]  (semantics)
+   48. FoodPacking3CansTask                          score= 3  num_subtasks=3  [moderate]  (semantics)
+   49. HammersInLeftBinTask                          score= 3  num_subtasks=2  [moderate]  (semantics, spatial, color)
+   50. MarkerInMugTask                               score= 3  num_subtasks=1  [moderate]  (affordance)
+   51. PinkSpoonInPotTask                            score= 3  num_subtasks=1  [moderate]  (color, affordance)
+   52. RecycleCartonsVerticalCrateTask               score= 3  num_subtasks=2  [moderate]  (semantics, spatial)
+   53. SpoonInMugTask                                score= 3  num_subtasks=1  [moderate]  (affordance, spatial)
+   54. TakeSpatulaOffShelfTask                       score= 3  num_subtasks=1  [moderate]  (affordance, spatial)
+   55. ToolOrganizationBothTask                      score= 3  num_subtasks=2  [moderate]  (semantics, spatial)
+   56. ToolOrganizationTask                          score= 3  num_subtasks=2  [moderate]  (semantics, spatial, color)
+   57. AnimalsInBinTask                              score= 2  num_subtasks=2  [simple]  (semantics)
+   58. BBQSauceInBinTask                             score= 2  num_subtasks=2  [simple]  (color, semantics)
+   59. BagelsOnPlateTask                             score= 2  num_subtasks=2  [simple]  (semantics)
+   60. BananaThenRubiksCubeTask                      score= 2  num_subtasks=2  [simple]  (conjunction)
+   61. BowlStackingLeftOnRightTask                   score= 2  num_subtasks=1  [simple]  (spatial)
+   62. BowlStackingRightOnLeftTask                   score= 2  num_subtasks=1  [simple]  (spatial)
+   63. ButterAboveRaisinTask                         score= 2  num_subtasks=1  [simple]  (spatial)
+   64. ClampInRightBinTask                           score= 2  num_subtasks=1  [simple]  (semantics, spatial)
+   65. ClutterPumpkinTask                            score= 2  num_subtasks=2  [simple]  (semantics)
+   66. CookingPickPastaToolTask                      score= 2  num_subtasks=1  [simple]  (spatial, vague, color)
+   67. FoodPacking2BoxesTask                         score= 2  num_subtasks=2  [simple]  (semantics)
+   68. FoodPacking2CansTask                          score= 2  num_subtasks=2  [simple]  (semantics)
+   69. FruitsGreenLimesOnPlateTask                   score= 2  num_subtasks=2  [simple]  (color)
+   70. JugsOnShelfTask                               score= 2  num_subtasks=2  [simple]  (semantics)
+   71. KeyboardOutOfBinTask                          score= 2  num_subtasks=1  [simple]  (spatial)
+   72. MoveBananaToBagelPlateTask                    score= 2  num_subtasks=2  [simple]  (semantics)
+   73. MustardAboveRaisinTask                        score= 2  num_subtasks=1  [simple]  (spatial)
+   74. MustardInLeftBinTask                          score= 2  num_subtasks=1  [simple]  (spatial)
+   75. MustardInRightBinTask                         score= 2  num_subtasks=1  [simple]  (spatial)
+   76. PickGlassesTask                               score= 2  num_subtasks=2  [simple]  (semantics)
+   77. PickOrangeObjectTask                          score= 2  num_subtasks=2  [simple]  (color)
+   78. PickUpGreenObjectTask                         score= 2  num_subtasks=2  [simple]  (color)
+   79. PutBowlOnShelfTopTask                         score= 2  num_subtasks=1  [simple]  (spatial)
+   80. RecycleCartonTask                             score= 2  num_subtasks=2  [simple]  (semantics, vague)
+   81. RecycleCartonsOnBoxTask                       score= 2  num_subtasks=2  [simple]  (semantics)
+   82. RedDishesInBinTask                            score= 2  num_subtasks=2  [simple]  (color, semantics)
+   83. RubiksCubeAndBananaTask                       score= 2  num_subtasks=2  [simple]  (conjunction)
+   84. RubiksCubeThenBananaTask                      score= 2  num_subtasks=2  [simple]  (conjunction)
+   85. ThrowAwaySnacksTask                           score= 2  num_subtasks=2  [simple]  (semantics)
+   86. ToolsPickingDrillTask                         score= 2  num_subtasks=1  [simple]  (spatial, semantics)
+   87. ToolsPickingHammerTask                        score= 2  num_subtasks=1  [simple]  (semantics, spatial, color)
+   88. WhiteMugsInBinTask                            score= 2  num_subtasks=2  [simple]  (color)
+   89. YellowAndWhiteObjectsInBinTask                score= 2  num_subtasks=2  [simple]  (color, conjunction)
+   90. BananaInBowlTask                              score= 1  num_subtasks=1  [simple]  (semantics)
+   91. BananaOnPlateTask                             score= 1  num_subtasks=1  [simple]  ()
+   92. BigPumpkinInBinTask                           score= 1  num_subtasks=1  [simple]  (size)
+   93. BowlInBinTask                                 score= 1  num_subtasks=1  [simple]  ()
+   94. CannedFoodInBinTask                           score= 1  num_subtasks=1  [simple]  (semantics)
+   95. CoffeePotInBinTask                            score= 1  num_subtasks=1  [simple]  (semantics)
+   96. FoodPacking1BoxesTask                         score= 1  num_subtasks=1  [simple]  (semantics)
+   97. FoodPacking1CansTask                          score= 1  num_subtasks=1  [simple]  (semantics)
+   98. FruitsMovingOrangeOrLimeTask                  score= 1  num_subtasks=1  [simple]  (conjunction)
+   99. FruitsMovingTask                              score= 1  num_subtasks=1  [simple]  (color)
+  100. FruitsOnionTask                               score= 1  num_subtasks=1  [simple]  (semantics)
+  101. FruitsOnionToPlateTask                        score= 1  num_subtasks=1  [simple]  (semantics, vague)
+  102. GrabABagelTask                                score= 1  num_subtasks=1  [simple]  (semantics)
+  103. GrabAFruitTask                                score= 1  num_subtasks=1  [simple]  (semantics)
+  104. LargerObjectRaisinBoxInBinTask                score= 1  num_subtasks=1  [simple]  (size)
+  105. MouseOnKeyboardTask                           score= 1  num_subtasks=1  [simple]  (semantics)
+  106. OneBottleInSquarePailTask                     score= 1  num_subtasks=1  [simple]  (semantics)
+  107. OneBottleOnShelfTask                          score= 1  num_subtasks=1  [simple]  (semantics)
+  108. PhoneOrRemoteInBinTask                        score= 1  num_subtasks=1  [simple]  (conjunction)
+  109. PickDrillTask                                 score= 1  num_subtasks=1  [simple]  (semantics)
+  110. RubiksCubeOrBananaTask                        score= 1  num_subtasks=1  [simple]  (conjunction)
+  111. RubiksCubeTask                                score= 1  num_subtasks=1  [simple]  ()
+  112. SauceBottlesCrateTask                         score= 1  num_subtasks=1  [simple]  (color, semantics)
+  113. SmallPumpkinInBinTask                         score= 1  num_subtasks=1  [simple]  (size)
+  114. SmallerObjectButterInBinTask                  score= 1  num_subtasks=1  [simple]  (size)
+  115. SmartphoneInBinTask                           score= 1  num_subtasks=1  [simple]  (semantics)
+  116. TakeMeasuringSpoonOutTask                     score= 1  num_subtasks=1  [simple]  (semantics)
+  117. ThrowAwayAppleTask                            score= 1  num_subtasks=1  [simple]  (semantics)
+  118. ToyInBinTask                                  score= 1  num_subtasks=1  [simple]  (semantics)
+  119. WoodSpatulaToBowlTask                         score= 1  num_subtasks=1  [simple]  (semantics)
+  120. YogurtInBowlTask                              score= 1  num_subtasks=1  [simple]  (color, size)
+
+================================================================================
+EPISODE LENGTH ANALYSIS
+================================================================================
+Average episode length: 91.2 seconds
+Min episode length: 20 seconds
+Max episode length: 300 seconds
+
+Average episode length by difficulty:
+    simple         :   60.8 seconds (n=64)
+    moderate       :  101.8 seconds (n=39)
+    complex        :  181.2 seconds (n=17)
+
+================================================================================
+SCENE USAGE
+================================================================================
+Total unique scenes: 47
+
+Most used scenes (top 15):
+    rubiks_cube_banana_bowl.usda                 :   7 tasks
+    workdesk_bin.usda                            :   7 tasks
+    toys_cleanup.usda                            :   6 tasks
+    clutter_fruit_bottle_bluebin.usda            :   5 tasks
+    tools_container.usda                         :   5 tasks
+    fruits_in_basket.usda                        :   5 tasks
+    breakfast_table.usda                         :   5 tasks
+    shelf_with_cleaning_products.usda            :   5 tasks
+    bin_condiments.usda                          :   4 tasks
+    fruits_out_of_basket.usda                    :   4 tasks
+    mugs4_measuringcup_drill_bowl.usda           :   4 tasks
+    workdesk_snacks.usda                         :   3 tasks
+    bananas_5_grey_bin.usda                      :   3 tasks
+    cooking_table.usda                           :   3 tasks
+    ladle_pot.usda                               :   3 tasks
+
+================================================================================

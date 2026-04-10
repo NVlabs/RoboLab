@@ -1,0 +1,1 @@
+tunnel,plant,tree,lamp,enclosure,indoor,nature,urban,low contrast,natural light,artificial light

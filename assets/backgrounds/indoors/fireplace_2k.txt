@@ -1,0 +1,1 @@
+fire,couch,room,lounge,indoor,urban,night,high contrast,artificial light

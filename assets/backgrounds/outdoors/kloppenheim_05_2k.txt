@@ -1,0 +1,1 @@
+cloud,field,grass,sun,outdoor,skies,nature,midday,partly cloudy,high contrast,natural light

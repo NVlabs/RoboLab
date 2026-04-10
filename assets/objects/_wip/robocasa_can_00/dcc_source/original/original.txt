@@ -1,0 +1,1 @@
+If there is an original file i.e. a 3d vehicle file used as source,     put it in this directory.

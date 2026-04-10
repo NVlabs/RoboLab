@@ -1,0 +1,1 @@
+workshop,hall,warehouse,industrial,machine,metal,indoor,urban,medium contrast,natural light

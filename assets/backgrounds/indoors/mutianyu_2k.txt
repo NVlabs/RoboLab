@@ -1,0 +1,1 @@
+arch,brick,window,mountain,great wall,indoor,urban,morning-afternoon,clear,low contrast,natural light

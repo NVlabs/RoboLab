@@ -1,0 +1,38 @@
+mdl 1.4;
+import ::anno::*;
+
+export const string TRANSFORM_NONE = "NONE";
+export const string TRANSFORM_UNORM_VECTOR = "UNORM_VECTOR";
+
+export const string FORMAT_RGBA8_UNORM = "RGBA8_UNORM";
+export const string FORMAT_R8_UNORM = "R8_UNORM";
+export const string FORMAT_RGBA16_SFLOAT = "RGBA16_SFLOAT";
+
+export const string BLEND_MODE_OPACITY = "opacity_blend";
+export const string BLEND_MODE_REPLACE = "replace";
+
+// This annotation is used to mark a material as target material for baking.
+// It is that is detected by the MDL SDK and neuray.
+export annotation target_material_model();
+
+export annotation target_material_rendering(
+    string rendering_material_override = "" // if set, the baked material will be rendering using this material, 
+                                            // otherwise the target itself is used
+);
+
+export annotation target_baked_argument(
+    // the name of the baked texture parameter in the rendering material
+    string baked_name,
+
+    // the name of the constant parameter in the rendering material in case baking was not necessary
+    string constant_name = "",
+
+    // texture format to bake to
+    string format = "",
+
+    // transformations, like encoding normals into [0,1] range
+    string transform = TRANSFORM_NONE,
+
+    // blending, e.g., based on alpha or replace
+    string blend_mode = BLEND_MODE_OPACITY
+);

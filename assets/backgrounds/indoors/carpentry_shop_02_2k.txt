@@ -1,0 +1,1 @@
+lamp,fluorescent,workshop,indoor,urban,high contrast,artificial light

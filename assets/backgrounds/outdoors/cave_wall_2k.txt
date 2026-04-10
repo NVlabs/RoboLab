@@ -1,0 +1,1 @@
+rock,tree,wall,river,vine,ledge,cave,outdoor,indoor,nature,morning-afternoon,medium contrast,natural light

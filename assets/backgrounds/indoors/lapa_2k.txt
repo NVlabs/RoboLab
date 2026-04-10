@@ -1,0 +1,1 @@
+thatch,couch,garden,plant,gazebo,indoor,urban,medium contrast,natural light,artificial light

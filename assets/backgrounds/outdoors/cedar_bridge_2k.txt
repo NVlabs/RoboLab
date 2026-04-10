@@ -1,0 +1,1 @@
+road,storm,path,rail,overpass,bridge,outdoor,skies,urban,partly cloudy,morning-afternoon,low contrast,natural light

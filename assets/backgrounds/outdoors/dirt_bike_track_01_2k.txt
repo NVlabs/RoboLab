@@ -1,0 +1,1 @@
+track,road,offroad,dirt,race,course,tire,outdoor,skies,nature,morning-afternoon,partly cloudy,high contrast,natural light

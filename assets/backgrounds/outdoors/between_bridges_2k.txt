@@ -1,0 +1,1 @@
+field,bridge,underpass,pillar,sun,outdoor,urban,sunrise-sunset,partly cloudy,medium contrast,natural light

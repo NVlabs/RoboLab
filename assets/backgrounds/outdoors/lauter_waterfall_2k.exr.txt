@@ -1,0 +1,1 @@
+forest,river,dirt,root,outdoor,nature,low contrast,natural light

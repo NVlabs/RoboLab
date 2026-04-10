@@ -1,0 +1,1 @@
+tree,sun,rail,track,rock,forest,outdoor,nature,midday,clear,high contrast,natural light

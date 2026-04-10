@@ -1,0 +1,1 @@
+lamp,studio,photo,reflector,dish,indoor,urban,studio,high contrast,artificial_light

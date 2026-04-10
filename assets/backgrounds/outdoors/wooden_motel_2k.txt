@@ -1,0 +1,1 @@
+tree,sun,building,cabin,path,outdoor,urban,morning-afternoon,clear,high contrast,natural light

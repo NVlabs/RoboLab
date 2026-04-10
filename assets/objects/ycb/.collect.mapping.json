@@ -1,0 +1,131 @@
+{
+    "version": "1.0",
+    "file_records": [
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000008.png",
+            "source_hash": "375ea568b1f34cf508fa1916b6f1f261cb8167f0",
+            "target_url": "./textures/obj_000008.png",
+            "target_hash": "adc21cd65b0c3741dac5d197cf1dabd8c3abe55c"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000020.png",
+            "source_hash": "4f0f61feb210843c6a15623635054112631c5443",
+            "target_url": "./textures/obj_000020.png",
+            "target_hash": "6388cc5d1dd27f0f630485d6aa2cc8f5ef70bacb"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000009.png",
+            "source_hash": "d72182a225c2a006a87ae06f3f16ff2778e998c6",
+            "target_url": "./textures/obj_000009.png",
+            "target_hash": "9c0566c39a9b72a3e18e42a8dee5ceac442f1fdb"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000017.png",
+            "source_hash": "0660b797f7c75bc97a8999602ebbc066cadd0bf1",
+            "target_url": "./textures/obj_000017.png",
+            "target_hash": "264a8c8224a8892207d3b07f9ccaa41446374c9d"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000011.png",
+            "source_hash": "2e3d2e5a88648eb249c897d47bc91a9e1ded6f78",
+            "target_url": "./textures/obj_000011.png",
+            "target_hash": "64bed298296ade9acffc0d6bac7cd6530775b99e"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000001.png",
+            "source_hash": "2affc03d50b59435811f474a5ad874ceaeb11e18",
+            "target_url": "./textures/obj_000001.png",
+            "target_hash": "c3e46a712f32fc5d2b9ddf80badbaf371605348c"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000021.png",
+            "source_hash": "b825b7d34348af0b7fd65d4e94d94bf0cdf36159",
+            "target_url": "./textures/obj_000021.png",
+            "target_hash": "79db7d6678bd140831989ff42caf3ec2d08ae038"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000015.png",
+            "source_hash": "f63af5cc5fd9652388e557d77020ea59c621e046",
+            "target_url": "./textures/obj_000015.png",
+            "target_hash": "8c4619da1dbc6b11ab479ff67ac1efdfb126aeee"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000006.png",
+            "source_hash": "a01053629b73d38490ea3392203c25cace945063",
+            "target_url": "./textures/obj_000006.png",
+            "target_hash": "5d2dc2fa76c89832e111eafd564b071fdfdf844c"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000016.png",
+            "source_hash": "0bb1e4b929cc61bd0c1aa49b66465cae8172cb06",
+            "target_url": "./textures/obj_000016.png",
+            "target_hash": "501c4f76e4a8c4d06fa5bea491dad1626a2be299"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000002.png",
+            "source_hash": "499df378f163e10bc5c9ceaf542d5688f5f2a70d",
+            "target_url": "./textures/obj_000002.png",
+            "target_hash": "367092315e8cdb751225dbf4e3c234ad32384bc3"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000018.png",
+            "source_hash": "32451d12a803a31683701fa68dc4f795764873b7",
+            "target_url": "./textures/obj_000018.png",
+            "target_hash": "a4be397ca4010ac4fb0c8e9c0a482d3cb0c575ec"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000014.png",
+            "source_hash": "39aec4e87e7764a7995227132d5d2233a5568462",
+            "target_url": "./textures/obj_000014.png",
+            "target_hash": "d273de9bc368a2c041ce7e6edc584613db9ddcb5"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000003.png",
+            "source_hash": "f023928dc0a4d898911f08ca1e8d48ae9e8ffb08",
+            "target_url": "./textures/obj_000003.png",
+            "target_hash": "1eecb741795011ad1728f582df0b778747766fad"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000010.png",
+            "source_hash": "fa6feb5d8bd3a00725001e836393ba7b53945be8",
+            "target_url": "./textures/obj_000010.png",
+            "target_hash": "21e6a3ed4c33b4d3d8c34d6a7065f793fb599078"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000019.png",
+            "source_hash": "c20d8196d32ef31baa6e93cc2873c69a776846ec",
+            "target_url": "./textures/obj_000019.png",
+            "target_hash": "c0c4ddf9b45328b36a2b514728e66357590e2796"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000013.png",
+            "source_hash": "33d0d8764d20169288a8c440e55179afbe96c913",
+            "target_url": "./textures/obj_000013.png",
+            "target_hash": "dfe6a4c1b8e08c3759b9dabed3669750c6f934d1"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000007.png",
+            "source_hash": "73c07359756e09e9d64eeda7855474ef1cc15e0b",
+            "target_url": "./textures/obj_000007.png",
+            "target_hash": "89664e7627760e3fe0e77205a100dad09e4817b5"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000005.png",
+            "source_hash": "690965115c1e53d1543533a918a25efb575d1bf8",
+            "target_url": "./textures/obj_000005.png",
+            "target_hash": "6f4f664d413242d028a8aba2a55f86402657ba97"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000012.png",
+            "source_hash": "ba0d7402b14fe2cab70d10eabd9c33509fcff9c4",
+            "target_url": "./textures/obj_000012.png",
+            "target_hash": "ae68f804a27a27c8aed108f50cda7b87559e734b"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/ycb/usd/textures/obj_000004.png",
+            "source_hash": "5f6a68f03b62c339a17185ce508671a103240d63",
+            "target_url": "./textures/obj_000004.png",
+            "target_hash": "f93095849b26cb65b06e18d5263c7f0f1628065d"
+        }
+    ]
+}

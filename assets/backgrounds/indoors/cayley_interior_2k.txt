@@ -1,0 +1,1 @@
+lamp,table,window,glass,balcony,view,log,indoor,urban,sunrise-sunset,artificial light,natural light,high contrast

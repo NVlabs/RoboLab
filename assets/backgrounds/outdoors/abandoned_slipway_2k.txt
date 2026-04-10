@@ -1,0 +1,1 @@
+ocean,bay,lake,industrial,abandoned,outdoor,urban,midday,overcast,low contrast,natural light

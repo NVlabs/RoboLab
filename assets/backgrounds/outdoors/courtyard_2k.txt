@@ -1,0 +1,1 @@
+house,dog,kennel,garage,brick,outdoor,urban,morning-afternoon,clear,medium contrast,natural light

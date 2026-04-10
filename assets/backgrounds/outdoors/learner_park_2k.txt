@@ -1,0 +1,1 @@
+parking,road,roof,outdoor,skies,urban,sunrise-sunset,partly cloudy,low contrast,natural light

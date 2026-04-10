@@ -1,0 +1,1 @@
+building,path,bank,statue,outdoor,urban,morning-afternoon,partly cloudy,high contrast,natural light

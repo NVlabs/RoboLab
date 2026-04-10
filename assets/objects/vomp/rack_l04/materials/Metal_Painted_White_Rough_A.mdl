@@ -1,0 +1,15 @@
+mdl 1.4;
+
+using ::OmniPBR import OmniPBR;
+import ::tex::gamma_mode;
+import ::state::normal;
+import ::base::mono_mode;
+
+export material Metal_Painted_White_Rough_A(*)
+ = OmniPBR(
+	diffuse_texture: texture_2d("../textures/Metal_Painted_White_Rough_A/T_Metal_Painted_White_Rough_A_Albedo.png", ::tex::gamma_srgb),
+	enable_ORM_texture: true,
+	metallic_texture_influence: 1.0,
+	normalmap_texture: texture_2d("../textures/Metal_Painted_White_Rough_A/T_Metal_Painted_White_Rough_A_Normal.png", ::tex::gamma_linear),
+	ORM_texture: texture_2d("../textures/Metal_Painted_White_Rough_A/T_Metal_Painted_White_Rough_A_ORM.png", ::tex::gamma_linear),
+	reflection_roughness_texture_influence: 1.0);

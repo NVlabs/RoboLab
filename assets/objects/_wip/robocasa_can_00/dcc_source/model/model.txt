@@ -1,0 +1,1 @@
+All geometry source files. Directories are created for commonly used file formats     but it is ok to create new subdirectories as needed (i.e. obj) for exports out of ZBrush.

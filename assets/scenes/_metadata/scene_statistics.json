@@ -1,0 +1,896 @@
+{
+  "total_scenes": 61,
+  "total_unique_objects": 79,
+  "average_objects_per_scene": 4.25,
+  "object_count_distribution": {
+    "0": 4,
+    "1": 11,
+    "2": 12,
+    "3": 4,
+    "4": 6,
+    "5": 4,
+    "6": 2,
+    "7": 11,
+    "8": 1,
+    "11": 3,
+    "12": 1,
+    "13": 2
+  },
+  "per_object_stats": {
+    "../objects/basic/blue_block.usd": {
+      "dataset": "basic",
+      "object_name": "blue_block",
+      "count": 1,
+      "scenes": [
+        "colored_blocks.usda"
+      ]
+    },
+    "../objects/basic/green_block.usd": {
+      "dataset": "basic",
+      "object_name": "green_block",
+      "count": 1,
+      "scenes": [
+        "colored_blocks.usda"
+      ]
+    },
+    "../objects/basic/red_block.usd": {
+      "dataset": "basic",
+      "object_name": "red_block",
+      "count": 1,
+      "scenes": [
+        "colored_blocks.usda"
+      ]
+    },
+    "../objects/basic/yellow_block.usd": {
+      "dataset": "basic",
+      "object_name": "yellow_block",
+      "count": 1,
+      "scenes": [
+        "colored_blocks.usda"
+      ]
+    },
+    "../objects/fruits_veggies/avocado.usd": {
+      "dataset": "fruits_veggies",
+      "object_name": "avocado",
+      "count": 2,
+      "scenes": [
+        "clutter_fruit_bottle_bluebin.usda",
+        "clutter_shelf.usda"
+      ]
+    },
+    "../objects/fruits_veggies/lemon1.usd": {
+      "dataset": "fruits_veggies",
+      "object_name": "lemon1",
+      "count": 5,
+      "scenes": [
+        "clutter_fruit_bottle_bluebin.usda",
+        "clutter_shelf.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/fruits_veggies/lemon2.usd": {
+      "dataset": "fruits_veggies",
+      "object_name": "lemon2",
+      "count": 5,
+      "scenes": [
+        "clutter_fruit_bottle_bluebin.usda",
+        "clutter_shelf.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/fruits_veggies/lime.usd": {
+      "dataset": "fruits_veggies",
+      "object_name": "lime",
+      "count": 5,
+      "scenes": [
+        "clutter_fruit_bottle_bluebin.usda",
+        "clutter_shelf.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/fruits_veggies/orange1.usd": {
+      "dataset": "fruits_veggies",
+      "object_name": "orange1",
+      "count": 5,
+      "scenes": [
+        "clutter_fruit_bottle_bluebin.usda",
+        "clutter_shelf.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/fruits_veggies/orange2.usd": {
+      "dataset": "fruits_veggies",
+      "object_name": "orange2",
+      "count": 5,
+      "scenes": [
+        "clutter_fruit_bottle_bluebin.usda",
+        "clutter_shelf.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/fruits_veggies/pomegranate.usd": {
+      "dataset": "fruits_veggies",
+      "object_name": "pomegranate",
+      "count": 5,
+      "scenes": [
+        "clutter_fruit_bottle_bluebin.usda",
+        "clutter_shelf.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/fruits_veggies/red_onion.usd": {
+      "dataset": "fruits_veggies",
+      "object_name": "red_onion",
+      "count": 4,
+      "scenes": [
+        "cooking_table.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/handal/green_serving_spoon.usd": {
+      "dataset": "handal",
+      "object_name": "green_serving_spoon",
+      "count": 2,
+      "scenes": [
+        "cooking_table.usda",
+        "ladle_pot.usda"
+      ]
+    },
+    "../objects/handal/hammer_1.usd": {
+      "dataset": "handal",
+      "object_name": "hammer_1",
+      "count": 2,
+      "scenes": [
+        "tools_picking.usda",
+        "tools_sorting.usda"
+      ]
+    },
+    "../objects/handal/hammer_2.usd": {
+      "dataset": "handal",
+      "object_name": "hammer_2",
+      "count": 2,
+      "scenes": [
+        "tools_picking.usda",
+        "tools_sorting.usda"
+      ]
+    },
+    "../objects/handal/hammer_3.usd": {
+      "dataset": "handal",
+      "object_name": "hammer_3",
+      "count": 2,
+      "scenes": [
+        "tools_picking.usda",
+        "tools_sorting.usda"
+      ]
+    },
+    "../objects/handal/hammer_6.usd": {
+      "dataset": "handal",
+      "object_name": "hammer_6",
+      "count": 2,
+      "scenes": [
+        "tools_picking.usda",
+        "tools_sorting.usda"
+      ]
+    },
+    "../objects/handal/hammer_7.usd": {
+      "dataset": "handal",
+      "object_name": "hammer_7",
+      "count": 1,
+      "scenes": [
+        "tools_container.usda"
+      ]
+    },
+    "../objects/handal/hammer_8.usd": {
+      "dataset": "handal",
+      "object_name": "hammer_8",
+      "count": 1,
+      "scenes": [
+        "tools_container.usda"
+      ]
+    },
+    "../objects/handal/ladle.usd": {
+      "dataset": "handal",
+      "object_name": "ladle",
+      "count": 2,
+      "scenes": [
+        "cooking_table.usda",
+        "ladle_pot.usda"
+      ]
+    },
+    "../objects/handal/measuring_cups.usd": {
+      "dataset": "handal",
+      "object_name": "measuring_cups",
+      "count": 2,
+      "scenes": [
+        "mugs4_measuringcup_drill_bowl.usda",
+        "mugs4_measuringcup_drill_bowl_v2.usda"
+      ]
+    },
+    "../objects/handal/measuring_cups_1.usd": {
+      "dataset": "handal",
+      "object_name": "measuring_cups_1",
+      "count": 1,
+      "scenes": [
+        "cooking_table.usda"
+      ]
+    },
+    "../objects/handal/pink_spaghetti_spoon.usd": {
+      "dataset": "handal",
+      "object_name": "pink_spaghetti_spoon",
+      "count": 2,
+      "scenes": [
+        "cooking_table.usda",
+        "ladle_pot.usda"
+      ]
+    },
+    "../objects/handal/red_serving_spoon.usd": {
+      "dataset": "handal",
+      "object_name": "red_serving_spoon",
+      "count": 1,
+      "scenes": [
+        "ladle_pot.usda"
+      ]
+    },
+    "../objects/handal/spoon.usd": {
+      "dataset": "handal",
+      "object_name": "spoon",
+      "count": 1,
+      "scenes": [
+        "bin_mug_mustard_marker_bowl_spoon_mayo_soup.usda"
+      ]
+    },
+    "../objects/handal/spoon_1.usd": {
+      "dataset": "handal",
+      "object_name": "spoon_1",
+      "count": 1,
+      "scenes": [
+        "cooking_table.usda"
+      ]
+    },
+    "../objects/hope/bbq_sauce_bottle.usd": {
+      "dataset": "hope",
+      "object_name": "bbq_sauce_bottle",
+      "count": 1,
+      "scenes": [
+        "bin_condiments.usda"
+      ]
+    },
+    "../objects/hope/butter.usd": {
+      "dataset": "hope",
+      "object_name": "butter",
+      "count": 3,
+      "scenes": [
+        "butter_on_top_of_raisin_box.usda",
+        "butter_raisin_box.usda",
+        "butter_raisin_box_grey_bin.usda"
+      ]
+    },
+    "../objects/hope/canned_tuna.usd": {
+      "dataset": "hope",
+      "object_name": "canned_tuna",
+      "count": 1,
+      "scenes": [
+        "bin_condiments.usda"
+      ]
+    },
+    "../objects/hope/granola_bars.usd": {
+      "dataset": "hope",
+      "object_name": "granola_bars",
+      "count": 1,
+      "scenes": [
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hope/ketchup_bottle.usd": {
+      "dataset": "hope",
+      "object_name": "ketchup_bottle",
+      "count": 8,
+      "scenes": [
+        "cartons_in_crate.usda",
+        "cartons_in_vertical_crate.usda",
+        "cartons_on_box.usda",
+        "conditionals_test_scene.usda",
+        "mug_banana_ketchup_bowl_rubiks3_bin.usda",
+        "mugs2_bananas2_ketchup_rubiks3_bin.usda",
+        "shelf2_with_condiments.usda",
+        "shelf2_without_condiments.usda"
+      ]
+    },
+    "../objects/hope/mayonnaise_bottle.usd": {
+      "dataset": "hope",
+      "object_name": "mayonnaise_bottle",
+      "count": 4,
+      "scenes": [
+        "bin_mug_mustard_marker_bowl_spoon_mayo_soup.usda",
+        "cartons_in_crate.usda",
+        "cartons_in_vertical_crate.usda",
+        "cartons_on_box.usda"
+      ]
+    },
+    "../objects/hope/milk_carton.usd": {
+      "dataset": "hope",
+      "object_name": "milk_carton",
+      "count": 4,
+      "scenes": [
+        "cartons_in_crate.usda",
+        "cartons_in_vertical_crate.usda",
+        "cartons_on_box.usda",
+        "objects_around_table.usda"
+      ]
+    },
+    "../objects/hope/mustard_bottle.usd": {
+      "dataset": "hope",
+      "object_name": "mustard_bottle",
+      "count": 1,
+      "scenes": [
+        "mustard_raisin_box.usda"
+      ]
+    },
+    "../objects/hope/oatmeal_raisin_cookies.usd": {
+      "dataset": "hope",
+      "object_name": "oatmeal_raisin_cookies",
+      "count": 2,
+      "scenes": [
+        "bin_condiments.usda",
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hope/orange_juice_carton.usd": {
+      "dataset": "hope",
+      "object_name": "orange_juice_carton",
+      "count": 4,
+      "scenes": [
+        "cartons_in_crate.usda",
+        "cartons_in_vertical_crate.usda",
+        "cartons_on_box.usda",
+        "objects_around_table.usda"
+      ]
+    },
+    "../objects/hope/raisin_box.usd": {
+      "dataset": "hope",
+      "object_name": "raisin_box",
+      "count": 4,
+      "scenes": [
+        "butter_on_top_of_raisin_box.usda",
+        "butter_raisin_box.usda",
+        "butter_raisin_box_grey_bin.usda",
+        "mustard_raisin_box.usda"
+      ]
+    },
+    "../objects/hope/ranch_dressing.usd": {
+      "dataset": "hope",
+      "object_name": "ranch_dressing",
+      "count": 2,
+      "scenes": [
+        "bin_condiments.usda",
+        "bottles_crate.usda"
+      ]
+    },
+    "../objects/hope/tomato_sauce_can.usd": {
+      "dataset": "hope",
+      "object_name": "tomato_sauce_can",
+      "count": 1,
+      "scenes": [
+        "cooking_table.usda"
+      ]
+    },
+    "../objects/hope/yogurt_cup.usd": {
+      "dataset": "hope",
+      "object_name": "yogurt_cup",
+      "count": 1,
+      "scenes": [
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hot3d/bbq_sauce_bottle.usd": {
+      "dataset": "hot3d",
+      "object_name": "bbq_sauce_bottle",
+      "count": 2,
+      "scenes": [
+        "bin_condiments.usda",
+        "bottles_crate.usda"
+      ]
+    },
+    "../objects/hot3d/ceramic_mug.usd": {
+      "dataset": "hot3d",
+      "object_name": "ceramic_mug",
+      "count": 7,
+      "scenes": [
+        "bottles_crate.usda",
+        "mugs4_measuringcup_drill_bowl.usda",
+        "mugs4_measuringcup_drill_bowl_v2.usda",
+        "mugs_on_shelf.usda",
+        "shelf_mugs_jug_bowl.usda",
+        "wire_shelf_mugs_plate_spatula.usda",
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hot3d/clay_plates.usd": {
+      "dataset": "hot3d",
+      "object_name": "clay_plates",
+      "count": 4,
+      "scenes": [
+        "cooking_table.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/hot3d/coffee_pot.usd": {
+      "dataset": "hot3d",
+      "object_name": "coffee_pot",
+      "count": 1,
+      "scenes": [
+        "bin_condiments.usda"
+      ]
+    },
+    "../objects/hot3d/computer_mouse.usd": {
+      "dataset": "hot3d",
+      "object_name": "computer_mouse",
+      "count": 1,
+      "scenes": [
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hot3d/frozen_vegetable_block.usd": {
+      "dataset": "hot3d",
+      "object_name": "frozen_vegetable_block",
+      "count": 1,
+      "scenes": [
+        "green.usda"
+      ]
+    },
+    "../objects/hot3d/glasses.usd": {
+      "dataset": "hot3d",
+      "object_name": "glasses",
+      "count": 1,
+      "scenes": [
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hot3d/keyboard.usd": {
+      "dataset": "hot3d",
+      "object_name": "keyboard",
+      "count": 1,
+      "scenes": [
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hot3d/lizard_figurine.usd": {
+      "dataset": "hot3d",
+      "object_name": "lizard_figurine",
+      "count": 1,
+      "scenes": [
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hot3d/mug.usd": {
+      "dataset": "hot3d",
+      "object_name": "mug",
+      "count": 12,
+      "scenes": [
+        "cartons_in_crate.usda",
+        "cartons_in_vertical_crate.usda",
+        "cartons_on_box.usda",
+        "conditionals_test_scene.usda",
+        "mug_banana_ketchup_bowl_rubiks3_bin.usda",
+        "mugs2_bananas2_ketchup_rubiks3_bin.usda",
+        "mugs4_measuringcup_drill_bowl.usda",
+        "mugs4_measuringcup_drill_bowl_v2.usda",
+        "mugs_on_shelf.usda",
+        "objects_around_table.usda",
+        "shelf_mugs_jug_bowl.usda",
+        "wire_shelf_mugs_plate_spatula.usda"
+      ]
+    },
+    "../objects/hot3d/potato_masher.usd": {
+      "dataset": "hot3d",
+      "object_name": "potato_masher",
+      "count": 1,
+      "scenes": [
+        "cooking_table.usda"
+      ]
+    },
+    "../objects/hot3d/remote_control.usd": {
+      "dataset": "hot3d",
+      "object_name": "remote_control",
+      "count": 1,
+      "scenes": [
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hot3d/rubiks_cube.usd": {
+      "dataset": "hot3d",
+      "object_name": "rubiks_cube",
+      "count": 10,
+      "scenes": [
+        "conditionals_test_scene.usda",
+        "mug_banana_ketchup_bowl_rubiks3_bin.usda",
+        "mugs2_bananas2_ketchup_rubiks3_bin.usda",
+        "objects_around_table.usda",
+        "rubiks_cube_2_bowl.usda",
+        "rubiks_cube_3.usda",
+        "rubiks_cube_banana_bowl.usda",
+        "rubiks_cube_banana_bowl_mug_bin.usda",
+        "rubiks_cube_bowl.usda",
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hot3d/smartphone.usd": {
+      "dataset": "hot3d",
+      "object_name": "smartphone",
+      "count": 5,
+      "scenes": [
+        "cartons_in_crate.usda",
+        "cartons_in_vertical_crate.usda",
+        "cartons_on_box.usda",
+        "objects_around_table.usda",
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hot3d/soup_can.usd": {
+      "dataset": "hot3d",
+      "object_name": "soup_can",
+      "count": 5,
+      "scenes": [
+        "bin_mug_mustard_marker_bowl_spoon_mayo_soup.usda",
+        "cartons_in_crate.usda",
+        "cartons_in_vertical_crate.usda",
+        "cartons_on_box.usda",
+        "objects_around_table.usda"
+      ]
+    },
+    "../objects/hot3d/spatula.usd": {
+      "dataset": "hot3d",
+      "object_name": "spatula",
+      "count": 4,
+      "scenes": [
+        "cooking_table.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/hot3d/storage_box.usd": {
+      "dataset": "hot3d",
+      "object_name": "storage_box",
+      "count": 4,
+      "scenes": [
+        "cooking_table.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/hot3d/wooden_bowl.usd": {
+      "dataset": "hot3d",
+      "object_name": "wooden_bowl",
+      "count": 3,
+      "scenes": [
+        "cooking_table.usda",
+        "fruits_in_basket.usda",
+        "workdesk.usda"
+      ]
+    },
+    "../objects/hot3d/wooden_spoons.usd": {
+      "dataset": "hot3d",
+      "object_name": "wooden_spoons",
+      "count": 4,
+      "scenes": [
+        "cooking_table.usda",
+        "fruits_in_basket.usda",
+        "fruits_out_of_basket.usda",
+        "fruits_out_of_basket_2oranges.usda"
+      ]
+    },
+    "../objects/objaverse/bagel_00.usd": {
+      "dataset": "objaverse",
+      "object_name": "bagel_00",
+      "count": 1,
+      "scenes": [
+        "bagel_plate_banana_bowl.usda"
+      ]
+    },
+    "../objects/objaverse/bagel_06.usd": {
+      "dataset": "objaverse",
+      "object_name": "bagel_06",
+      "count": 1,
+      "scenes": [
+        "bagel_plate_banana_bowl.usda"
+      ]
+    },
+    "../objects/ycb/banana.usd": {
+      "dataset": "ycb",
+      "object_name": "banana",
+      "count": 11,
+      "scenes": [
+        "bagel_plate_banana_bowl.usda",
+        "banana_bowl.usda",
+        "banana_crate.usda",
+        "bananas_5_grey_bin.usda",
+        "bananas_5_in_crate.usda",
+        "conditionals_test_scene.usda",
+        "mug_banana_ketchup_bowl_rubiks3_bin.usda",
+        "mugs2_bananas2_ketchup_rubiks3_bin.usda",
+        "objects_around_table.usda",
+        "rubiks_cube_banana_bowl.usda",
+        "rubiks_cube_banana_bowl_mug_bin.usda"
+      ]
+    },
+    "../objects/ycb/bowl.usd": {
+      "dataset": "ycb",
+      "object_name": "bowl",
+      "count": 19,
+      "scenes": [
+        "bagel_plate_banana_bowl.usda",
+        "banana_bowl.usda",
+        "bin_condiments.usda",
+        "bin_mug_mustard_marker_bowl.usda",
+        "bin_mug_mustard_marker_bowl_spoon_mayo_soup.usda",
+        "bowl_5_table.usda",
+        "bowls_2.usda",
+        "bowls_2_table.usda",
+        "bowls_5.usda",
+        "conditionals_test_scene.usda",
+        "mug_banana_ketchup_bowl_rubiks3_bin.usda",
+        "mugs2_bananas2_ketchup_rubiks3_bin.usda",
+        "mugs4_measuringcup_drill_bowl.usda",
+        "mugs4_measuringcup_drill_bowl_v2.usda",
+        "objects_around_table.usda",
+        "rubiks_cube_2_bowl.usda",
+        "rubiks_cube_banana_bowl.usda",
+        "rubiks_cube_banana_bowl_mug_bin.usda",
+        "rubiks_cube_bowl.usda"
+      ]
+    },
+    "../objects/ycb/cheez_it.usd": {
+      "dataset": "ycb",
+      "object_name": "cheez_it",
+      "count": 5,
+      "scenes": [
+        "food_packing.usda",
+        "food_packing_dense.usda",
+        "foodpacking_1bin_1box_1can.usda",
+        "foodpacking_1bin_2box_2can.usda",
+        "foodpacking_1bin_3box_3can.usda"
+      ]
+    },
+    "../objects/ycb/chocolate_pudding.usd": {
+      "dataset": "ycb",
+      "object_name": "chocolate_pudding",
+      "count": 3,
+      "scenes": [
+        "food_packing.usda",
+        "food_packing_dense.usda",
+        "foodpacking_1bin_3box_3can.usda"
+      ]
+    },
+    "../objects/ycb/clamp.usd": {
+      "dataset": "ycb",
+      "object_name": "clamp",
+      "count": 2,
+      "scenes": [
+        "tools_picking.usda",
+        "tools_sorting.usda"
+      ]
+    },
+    "../objects/ycb/coffee_can.usd": {
+      "dataset": "ycb",
+      "object_name": "coffee_can",
+      "count": 1,
+      "scenes": [
+        "food_packing.usda"
+      ]
+    },
+    "../objects/ycb/cordless_drill.usd": {
+      "dataset": "ycb",
+      "object_name": "cordless_drill",
+      "count": 5,
+      "scenes": [
+        "mugs4_measuringcup_drill_bowl.usda",
+        "mugs4_measuringcup_drill_bowl_v2.usda",
+        "tools_container.usda",
+        "tools_picking.usda",
+        "tools_sorting.usda"
+      ]
+    },
+    "../objects/ycb/dry_erase_marker.usd": {
+      "dataset": "ycb",
+      "object_name": "dry_erase_marker",
+      "count": 3,
+      "scenes": [
+        "bin_mug_mustard_marker_bowl.usda",
+        "bin_mug_mustard_marker_bowl_spoon_mayo_soup.usda",
+        "workdesk.usda"
+      ]
+    },
+    "../objects/ycb/mug.usd": {
+      "dataset": "ycb",
+      "object_name": "mug",
+      "count": 8,
+      "scenes": [
+        "bin_condiments.usda",
+        "bin_mug_mustard_marker_bowl.usda",
+        "bin_mug_mustard_marker_bowl_spoon_mayo_soup.usda",
+        "mugs4_measuringcup_drill_bowl.usda",
+        "mugs4_measuringcup_drill_bowl_v2.usda",
+        "rubiks_cube_banana_bowl_mug_bin.usda",
+        "spam_mug.usda",
+        "wire_shelf_mugs_plate_spatula.usda"
+      ]
+    },
+    "../objects/ycb/mustard.usd": {
+      "dataset": "ycb",
+      "object_name": "mustard",
+      "count": 11,
+      "scenes": [
+        "bin_condiments.usda",
+        "bin_mug_mustard_marker_bowl.usda",
+        "bin_mug_mustard_marker_bowl_spoon_mayo_soup.usda",
+        "food_packing.usda",
+        "food_packing_dense.usda",
+        "foodpacking_1bin_1box_1can.usda",
+        "foodpacking_1bin_2box_2can.usda",
+        "foodpacking_1bin_3box_3can.usda",
+        "shelf2_with_condiments.usda",
+        "shelf2_without_condiments.usda",
+        "two_bin.usda"
+      ]
+    },
+    "../objects/ycb/pitcher.usd": {
+      "dataset": "ycb",
+      "object_name": "pitcher",
+      "count": 1,
+      "scenes": [
+        "blue.usda"
+      ]
+    },
+    "../objects/ycb/soft_scrub.usd": {
+      "dataset": "ycb",
+      "object_name": "soft_scrub",
+      "count": 1,
+      "scenes": [
+        "bin_condiments.usda"
+      ]
+    },
+    "../objects/ycb/spam_can.usd": {
+      "dataset": "ycb",
+      "object_name": "spam_can",
+      "count": 4,
+      "scenes": [
+        "food_packing.usda",
+        "food_packing_dense.usda",
+        "foodpacking_1bin_3box_3can.usda",
+        "spam_mug.usda"
+      ]
+    },
+    "../objects/ycb/spring_clamp.usd": {
+      "dataset": "ycb",
+      "object_name": "spring_clamp",
+      "count": 3,
+      "scenes": [
+        "tools_container.usda",
+        "tools_picking.usda",
+        "tools_sorting.usda"
+      ]
+    },
+    "../objects/ycb/sugar_box.usd": {
+      "dataset": "ycb",
+      "object_name": "sugar_box",
+      "count": 4,
+      "scenes": [
+        "food_packing.usda",
+        "food_packing_dense.usda",
+        "foodpacking_1bin_2box_2can.usda",
+        "foodpacking_1bin_3box_3can.usda"
+      ]
+    },
+    "../objects/ycb/tomato_soup_can.usd": {
+      "dataset": "ycb",
+      "object_name": "tomato_soup_can",
+      "count": 5,
+      "scenes": [
+        "food_packing.usda",
+        "food_packing_dense.usda",
+        "foodpacking_1bin_1box_1can.usda",
+        "foodpacking_1bin_2box_2can.usda",
+        "foodpacking_1bin_3box_3can.usda"
+      ]
+    },
+    "../objects/ycb/tuna_can.usd": {
+      "dataset": "ycb",
+      "object_name": "tuna_can",
+      "count": 3,
+      "scenes": [
+        "food_packing_dense.usda",
+        "foodpacking_1bin_2box_2can.usda",
+        "foodpacking_1bin_3box_3can.usda"
+      ]
+    },
+    "../objects/ycb/wood_block.usd": {
+      "dataset": "ycb",
+      "object_name": "wood_block",
+      "count": 1,
+      "scenes": [
+        "bin_condiments.usda"
+      ]
+    }
+  },
+  "per_scene_object_counts": {
+    "bagel_plate_banana_bowl.usda": 4,
+    "banana_bowl.usda": 2,
+    "banana_crate.usda": 1,
+    "bananas_5_grey_bin.usda": 1,
+    "bananas_5_in_crate.usda": 1,
+    "base_empty.usda": 0,
+    "bin_condiments.usda": 11,
+    "bin_mug_mustard_marker_bowl.usda": 4,
+    "bin_mug_mustard_marker_bowl_spoon_mayo_soup.usda": 7,
+    "blue.usda": 1,
+    "bottles_crate.usda": 3,
+    "bowl_5_table.usda": 1,
+    "bowls_2.usda": 1,
+    "bowls_2_table.usda": 1,
+    "bowls_5.usda": 1,
+    "butter_on_top_of_raisin_box.usda": 2,
+    "butter_raisin_box.usda": 2,
+    "butter_raisin_box_grey_bin.usda": 2,
+    "cartons_in_crate.usda": 7,
+    "cartons_in_vertical_crate.usda": 7,
+    "cartons_on_box.usda": 7,
+    "clutter_fruit_bottle_bluebin.usda": 7,
+    "clutter_shelf.usda": 7,
+    "colored_blocks.usda": 4,
+    "conditionals_test_scene.usda": 5,
+    "cooking_table.usda": 13,
+    "cutlery_shelf.usda": 0,
+    "food_packing.usda": 7,
+    "food_packing_dense.usda": 7,
+    "foodpacking_1bin_1box_1can.usda": 3,
+    "foodpacking_1bin_2box_2can.usda": 5,
+    "foodpacking_1bin_3box_3can.usda": 7,
+    "front_of_shelf.usda": 0,
+    "fruits_in_basket.usda": 12,
+    "fruits_out_of_basket.usda": 11,
+    "fruits_out_of_basket_2oranges.usda": 11,
+    "green.usda": 1,
+    "ladle_pot.usda": 4,
+    "mug_banana_ketchup_bowl_rubiks3_bin.usda": 5,
+    "mugs2_bananas2_ketchup_rubiks3_bin.usda": 5,
+    "mugs4_measuringcup_drill_bowl.usda": 6,
+    "mugs4_measuringcup_drill_bowl_v2.usda": 6,
+    "mugs_on_shelf.usda": 2,
+    "mustard_raisin_box.usda": 2,
+    "objects_around_table.usda": 8,
+    "rubiks_cube_2_bowl.usda": 2,
+    "rubiks_cube_3.usda": 1,
+    "rubiks_cube_banana_bowl.usda": 3,
+    "rubiks_cube_banana_bowl_mug_bin.usda": 4,
+    "rubiks_cube_bowl.usda": 2,
+    "shelf2_with_condiments.usda": 2,
+    "shelf2_without_condiments.usda": 2,
+    "shelf_mugs_jug_bowl.usda": 2,
+    "shelf_with_cleaning_products.usda": 0,
+    "spam_mug.usda": 2,
+    "tools_container.usda": 4,
+    "tools_picking.usda": 7,
+    "tools_sorting.usda": 7,
+    "two_bin.usda": 1,
+    "wire_shelf_mugs_plate_spatula.usda": 3,
+    "workdesk.usda": 13
+  }
+}

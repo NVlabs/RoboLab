@@ -1,0 +1,1 @@
+tree,bench,wall,river,table,sun,outdoor,nature,midday,clear,high contrast,natural light

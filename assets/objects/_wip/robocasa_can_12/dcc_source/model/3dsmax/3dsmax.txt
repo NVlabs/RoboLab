@@ -1,0 +1,1 @@
+3ds max files used in creation of geometry. Best practice is to save 3ds max files     in the earliest format available in your version of 3ds max (i.e. 3ds max 2021 format is preferred     over 3ds max 2023 format). This ensures maximum compatability since 3ds max files are problematic                     to open for people with earlier versions.

@@ -1,0 +1,1 @@
+road,building,architecture,europe,rome,church,car,street,city,outdoor,urban,sunrise-sunset,clear,medium contrast,natural light

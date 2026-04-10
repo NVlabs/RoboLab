@@ -1,0 +1,17 @@
+mdl 1.4;
+
+using ::OmniPBR import OmniPBR;
+import ::tex::gamma_mode;
+import ::state::normal;
+import ::base::mono_mode;
+
+export material Wood_Pressed_A(*)
+ = OmniPBR(
+	diffuse_texture: texture_2d("../textures/Wood_Pressed_A/T_Wood_Pressed_A1_Albedo.png", ::tex::gamma_srgb),
+	enable_ORM_texture: true,
+	metallic_texture_influence: 1.0,
+	normalmap_texture: texture_2d("../textures/Wood_Pressed_A/T_Wood_Pressed_A1_Normal.png", ::tex::gamma_linear),
+	ORM_texture: texture_2d("../textures/Wood_Pressed_A/T_Wood_Pressed_A1_ORM.png", ::tex::gamma_linear),
+	project_uvw: true,
+	reflection_roughness_texture_influence: 1.0,
+	texture_scale: float2(0.045, 0.045));

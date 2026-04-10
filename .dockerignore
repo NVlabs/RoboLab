@@ -1,0 +1,31 @@
+# Exclude assets/ from the blanket COPY, then re-include each subdirectory
+# so they can be added as separate layers in the Dockerfile.
+assets/
+!assets/robots/
+!assets/materials/
+!assets/fixtures/
+!assets/backgrounds/
+!assets/scenes/
+!assets/objects/
+output/
+.git/
+.github/
+
+# Build/IDE artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Docker files themselves
+docker/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

@@ -1,0 +1,1 @@
+road,sun,cliff,outdoor,nature,morning-afternoon,clear,high contrast,natural light

@@ -1,0 +1,1 @@
+sun,road,street,asphalt,city,outdoor,urban,midday,clear,high contrast,natural light

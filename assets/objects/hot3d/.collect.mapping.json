@@ -1,0 +1,203 @@
+{
+    "version": "1.0",
+    "file_records": [
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000008.png",
+            "source_hash": "6059463a6c72bae7a268eeedb092937854a8413b",
+            "target_url": "./textures/obj_000008.png",
+            "target_hash": "a726f49f10ef0a2495ef29225129add93edbcca6"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000020.png",
+            "source_hash": "fc42ee058c67ad9c73e090fc2466ac607934b562",
+            "target_url": "./textures/obj_000020.png",
+            "target_hash": "34f485ddff13a37b358deefabf908ba92417b315"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000009.png",
+            "source_hash": "c852db7a9508e8d735d363c8292a39faa19b30dd",
+            "target_url": "./textures/obj_000009.png",
+            "target_hash": "01f3a8eef0f27d12f52d274d41f2dfd0375b5fff"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000017.png",
+            "source_hash": "48bea0e921be274873151d25de2fecf555eb6fb5",
+            "target_url": "./textures/obj_000017.png",
+            "target_hash": "606004cd66438e078f6c1b3663042ec460879f34"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000011.png",
+            "source_hash": "771b8211bd5860a7abb2f644390e5b23425e57f0",
+            "target_url": "./textures/obj_000011.png",
+            "target_hash": "a87fea86372dcf5efbf5261a98fe386402e9ee1f"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000001.png",
+            "source_hash": "37e485613026fbc78a9e0f71e547969a985924b8",
+            "target_url": "./textures/obj_000001.png",
+            "target_hash": "7323942b2f2f61e5c115dd15882f870a701607ca"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000021.png",
+            "source_hash": "ecb38f7f5381ce5c2b452916aa2ef5b5c8db9ef2",
+            "target_url": "./textures/obj_000021.png",
+            "target_hash": "12772b003b00b7207075be6cff3e6da38f5b8c67"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000029.png",
+            "source_hash": "5e6b4039f66683d56301c66762c392cf1badb785",
+            "target_url": "./textures/obj_000029.png",
+            "target_hash": "43faac79ee71862169c74940b7df2785d2fca305"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000026.png",
+            "source_hash": "0854d9f7b7623fbdac7e6bb98d25afae1bc4ca4b",
+            "target_url": "./textures/obj_000026.png",
+            "target_hash": "082c25472a349d20c2c5063cab175ac5a7ae17e5"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000015.png",
+            "source_hash": "2db9c2d18815bc3b9709fbb899152248de733907",
+            "target_url": "./textures/obj_000015.png",
+            "target_hash": "54e5a6d83c0022c6491ec7129f108abc8a1c5d6e"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000032.png",
+            "source_hash": "d8508897a0e73adcbf898fb323f0760e117122c3",
+            "target_url": "./textures/obj_000032.png",
+            "target_hash": "3fa7b169d6dfd11eb2922ebd47f58c492c3b6e70"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000006.png",
+            "source_hash": "e612948e2d5735c5da11227913c720cc91ab7f6b",
+            "target_url": "./textures/obj_000006.png",
+            "target_hash": "25742cf68953d27da013dfdcb546a85274b0b29f"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000024.png",
+            "source_hash": "694b695614ba847b18c2e59a183022c0cc48e2dc",
+            "target_url": "./textures/obj_000024.png",
+            "target_hash": "e422dfb2cdc7b75cdf461f4a5f24f162f7dd6dbe"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000016.png",
+            "source_hash": "9b8d9006e4d066b61a59075f05ddf07b92e3ff99",
+            "target_url": "./textures/obj_000016.png",
+            "target_hash": "c132ebfc7c00f0f0239e880870f230e3afe0ad46"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000028.png",
+            "source_hash": "114c8964f289b82c8cf3bf308660156575e3531a",
+            "target_url": "./textures/obj_000028.png",
+            "target_hash": "9013f131f60b175447b43a52d2748d62fc4f9083"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000027.png",
+            "source_hash": "9f6c1f0b3c5c66efeb91c7f573b6c60981685968",
+            "target_url": "./textures/obj_000027.png",
+            "target_hash": "b9402604fd60bf75114b19193923d77b92ab5281"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000030.png",
+            "source_hash": "fbd777f5ac6d52d21e136e76c16a2556993db960",
+            "target_url": "./textures/obj_000030.png",
+            "target_hash": "557e58c1cdf905b12014b2cfcf1e383f19272023"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000002.png",
+            "source_hash": "c818744e205955a59aebe0deae0a1e5962839c4a",
+            "target_url": "./textures/obj_000002.png",
+            "target_hash": "fe816d58b7110ece0b4db29036918222d65d5e06"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000018.png",
+            "source_hash": "03761e1c096a55c9e009bd14a918df617dd1880d",
+            "target_url": "./textures/obj_000018.png",
+            "target_hash": "535f9c2227de88ad1f527c1cb3696d6de7e79c46"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000022.png",
+            "source_hash": "fd3aedb55590efd0ef263a00fe9db0b37858b237",
+            "target_url": "./textures/obj_000022.png",
+            "target_hash": "a4f9eb65b2542cad3249ce96fb07ed3e06f2cd3d"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000025.png",
+            "source_hash": "53e07a17316517cd93e5ecec3978d23f2c0d6c35",
+            "target_url": "./textures/obj_000025.png",
+            "target_hash": "f1ab091e275706985981daa48d63cbb448d33fd2"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000014.png",
+            "source_hash": "2c2054863adf3563e526c22d6fc9e2721e8d4ecb",
+            "target_url": "./textures/obj_000014.png",
+            "target_hash": "8a7302902ce91ce95d1239a2764f8cc1e592a364"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000003.png",
+            "source_hash": "585c4e9902210d30cca3b6a1a090065594946db4",
+            "target_url": "./textures/obj_000003.png",
+            "target_hash": "974a29271bf1c891bac4626f6616a16729365ee3"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000010.png",
+            "source_hash": "4648012aaf8c87c0f48e500f806a85ddd2a8d65c",
+            "target_url": "./textures/obj_000010.png",
+            "target_hash": "c2f84ab9c3ae52f9222b5517b910998620b9a9fc"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000023.png",
+            "source_hash": "5cb5f5b36871fcb7a9f59874e98636e8f4eb550c",
+            "target_url": "./textures/obj_000023.png",
+            "target_hash": "dbb75a1960b2e800e8a9734615c9da1a827993af"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000019.png",
+            "source_hash": "ac1ab1bed27fd1ba776002b46ba5c5c81142ac91",
+            "target_url": "./textures/obj_000019.png",
+            "target_hash": "14aba0a9b6c012681ad151c622f3af6d49b1a028"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000013.png",
+            "source_hash": "1a82f38a708b8e4a0931c13f382b2fd13c478993",
+            "target_url": "./textures/obj_000013.png",
+            "target_hash": "d9be2cea3ab11c48b77f8995190a24a474bbec95"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000007.png",
+            "source_hash": "26865bc1d992f2c9ef78f6ec941ff2221caa02a1",
+            "target_url": "./textures/obj_000007.png",
+            "target_hash": "f688951d3840f614cf19b651b2f8eef19bcc3ebe"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000005.png",
+            "source_hash": "cbef2b80880d46964f99d65d3922b3342f8afdc3",
+            "target_url": "./textures/obj_000005.png",
+            "target_hash": "f28693b648dfa3bdca8828e1263db3b16f035fa1"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000031.png",
+            "source_hash": "2a1566ed58b0e1107ea5caeefdc8e9fb1dfaa6b1",
+            "target_url": "./textures/obj_000031.png",
+            "target_hash": "26e1369282f1dd65f1093a2082abc92a6310310e"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000012.png",
+            "source_hash": "33fca7f01168ff1aec7adaef1baafaf448d1bffd",
+            "target_url": "./textures/obj_000012.png",
+            "target_hash": "6da09063972909d87e2fff4844af32bd8f7dd68d"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000004.png",
+            "source_hash": "c5f25b4458661d81b6ee2e30cd37dcdd95e23ae8",
+            "target_url": "./textures/obj_000004.png",
+            "target_hash": "2609d72359a4e038b857861077d3a54142e00538"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hot3d/usd/textures/obj_000033.png",
+            "source_hash": "46d9e9febad1d61dd72e966ea1c233e3e8866324",
+            "target_url": "./textures/obj_000033.png",
+            "target_hash": "120a8451acea77cc2fef062c2a6de32fbaa9d032"
+        }
+    ]
+}

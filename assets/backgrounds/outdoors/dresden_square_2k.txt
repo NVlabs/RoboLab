@@ -1,0 +1,1 @@
+architecture,building,statue,cobblestone,europe,outdoor,urban,morning-afternoon,partly cloudy,low contrast,natural light

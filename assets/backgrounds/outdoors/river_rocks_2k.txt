@@ -1,0 +1,1 @@
+tree,sun,rock,river,outdoor,nature,morning-afternoon,partly cloudy,high contrast,natural light

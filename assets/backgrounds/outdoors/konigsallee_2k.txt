@@ -1,0 +1,1 @@
+bridge,river,building,road,street,symmetrical,europe,outdoor,urban,sunrise-sunset,partly cloudy,low contrast,natural light

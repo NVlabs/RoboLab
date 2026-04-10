@@ -1,0 +1,1 @@
+tree,path,park,forest,outdoor,nature,midday,overcast,medium contrast,natural light

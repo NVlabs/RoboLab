@@ -1,0 +1,32 @@
+# Core dependencies
+isaaclab==2.2.0
+torch
+numpy
+gymnasium
+
+# remote inference
+requests
+json_numpy
+pyzmq
+msgpack
+
+# Computer vision and image processing
+opencv-python
+Pillow
+
+# Scientific computing
+scipy
+matplotlib
+
+# Data handling
+h5py
+PyYAML
+pandas
+pyarrow
+
+# Misc
+tqdm
+tyro
+
+# Environment variable management
+python-dotenv

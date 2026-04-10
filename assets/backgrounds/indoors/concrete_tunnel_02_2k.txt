@@ -1,0 +1,1 @@
+asphalt,concrete,tunnel,road,underpass,indoor,urban,midday,medium contrast,natural light

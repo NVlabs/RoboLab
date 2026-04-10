@@ -1,0 +1,1 @@
+brick,pump,dirt,pipe,shed,window,indoor,urban,morning-afternoon,high contrast,natural light

@@ -1,0 +1,1 @@
+tree,grass,path,view,park,outdoor,nature,sunrise-sunset,partly cloudy,low contrast,natural light

@@ -1,0 +1,32 @@
+__pycache__
+*.pyc
+.vscode/*
+*.egg-info/
+*.log
+*.hdf5
+**/build/
+*.thumbs/
+*log/*
+**/install/**
+**/not_used/**
+**/old/**
+**NOT_USED.py
+**OLD.py
+.venv
+debug/
+
+# Documentation
+docs/superpowers/
+**/_source/
+**/_api/
+**/_build/
+public/*
+docs/doxygen/html/*
+docs/doxygen/xml/*
+
+# Data
+**/data/
+**/output/
+videos/
+*.code-workspace
+pyrightconfig.json

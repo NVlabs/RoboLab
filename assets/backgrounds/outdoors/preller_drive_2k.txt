@@ -1,0 +1,1 @@
+tree,long grass,house,street light,power line,stars,outdoor,urban,nature,partly cloudy,night,high contrast,artificial light

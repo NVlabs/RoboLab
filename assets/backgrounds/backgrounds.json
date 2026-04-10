@@ -1,0 +1,520 @@
+{
+  "metadata": {
+    "generated_at": "2025-09-19T12:10:21.000971",
+    "total_backgrounds": 100,
+    "total_folders": 2,
+    "image_width": 600
+  },
+  "folders": {
+    "default": {
+      "folder_path": "default",
+      "backgrounds": [
+        {
+          "path": "default/aerodynamics_workshop.hdr",
+          "image": "default/aerodynamics_workshop.png",
+          "description": "machine,industrial,workshop,wind tunnel,window,indoor,urban,morning-afternoon,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "default/billiard_hall.hdr",
+          "image": "default/billiard_hall.png",
+          "description": ""
+        },
+        {
+          "path": "default/brown_photostudio.hdr",
+          "image": "default/brown_photostudio.png",
+          "description": ""
+        },
+        {
+          "path": "default/empty_warehouse.hdr",
+          "image": "default/empty_warehouse.png",
+          "description": "warehouse,derelict,fluorescent,concrete,industrial,indoor,urban,morning-afternoon,medium contrast,artificial light"
+        },
+        {
+          "path": "default/home_office.exr",
+          "image": "default/home_office.png",
+          "description": ""
+        }
+      ]
+    },
+    "indoors": {
+      "folder_path": "indoors",
+      "backgrounds": [
+        {
+          "path": "indoors/aft_lounge_2k.hdr",
+          "image": "indoors/aft_lounge_2k.png",
+          "description": "lounge,chair,ship,stage,carpet,window,ocean,sun,lamp,table,indoor,urban,sunrise-sunset,clear,high contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/aircraft_workshop_01_2k.hdr",
+          "image": "indoors/aircraft_workshop_01_2k.png",
+          "description": "workshop,industrial,warehouse,scaffold,indoor,urban,morning-afternoon,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/anniversary_lounge_2k.hdr",
+          "image": "indoors/anniversary_lounge_2k.png",
+          "description": "window,room,couch,lamp,carpet,table,indoor,urban,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/art_studio_2k.hdr",
+          "image": "indoors/art_studio_2k.png",
+          "description": "painting,art,workshop,window,indoor,urban,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/artist_workshop_2k.hdr",
+          "image": "indoors/artist_workshop_2k.png",
+          "description": "painting,canvas,window,art,indoor,urban,midday,low contrast,natural light"
+        },
+        {
+          "path": "indoors/auto_service_2k.hdr",
+          "image": "indoors/auto_service_2k.png",
+          "description": "workshop,warehouse,industrial,concrete,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/autoshop_01_2k.hdr",
+          "image": "indoors/autoshop_01_2k.png",
+          "description": "garage,warehouse,industrial,car,workshop,indoor,urban,low contrast,artificial light"
+        },
+        {
+          "path": "indoors/ballroom_2k.hdr",
+          "image": "indoors/ballroom_2k.png",
+          "description": "tile,victorian,window,piano,chandelier,indoor,urban,medium contrast,artificial light,natural light"
+        },
+        {
+          "path": "indoors/bathroom_2k.hdr",
+          "image": "indoors/bathroom_2k.png",
+          "description": "bath,basin,tiles,sink,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/blender_institute_2k.hdr",
+          "image": "indoors/blender_institute_2k.png",
+          "description": "blender,timber,computer,chair,lamp,people,indoor,urban,low contrast,artificial light"
+        },
+        {
+          "path": "indoors/blinds_2k.hdr",
+          "image": "indoors/blinds_2k.png",
+          "description": "kitchen,window,counter,table,indoor,urban,morning-afternoon,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/boiler_room_2k.hdr",
+          "image": "indoors/boiler_room_2k.png",
+          "description": "machine,industrial,pipes,factory,indoor,urban,low contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/bush_restaurant_2k.hdr",
+          "image": "indoors/bush_restaurant_2k.png",
+          "description": "table,chair,restaurant,window,door,indoor,urban,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/cabin_2k.hdr",
+          "image": "indoors/cabin_2k.png",
+          "description": "bed,tv,hotel,cabin,boat,ship,cruise,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/cape_hill_2k.hdr",
+          "image": "indoors/cape_hill_2k.png",
+          "description": "rock,shrub,view,ocean,hill,hilltop,sun,outdoor,skies,nature,sunrise-sunset,partly cloudy,high contrast,natural light"
+        },
+        {
+          "path": "indoors/carpentry_shop_01_2k.hdr",
+          "image": "indoors/carpentry_shop_01_2k.png",
+          "description": "workshop,lamp,tablesaw,wood,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/carpentry_shop_02_2k.hdr",
+          "image": "indoors/carpentry_shop_02_2k.png",
+          "description": "lamp,fluorescent,workshop,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/cayley_interior_2k.hdr",
+          "image": "indoors/cayley_interior_2k.png",
+          "description": "lamp,table,window,glass,balcony,view,log,indoor,urban,sunrise-sunset,artificial light,natural light,high contrast"
+        },
+        {
+          "path": "indoors/childrens_hospital_2k.hdr",
+          "image": "indoors/childrens_hospital_2k.png",
+          "description": "bed,ward,medical,hospital,room,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/cinema_hall_2k.hdr",
+          "image": "indoors/cinema_hall_2k.png",
+          "description": "movie,cinema,chair,seat,projector,theater,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/cinema_lobby_2k.hdr",
+          "image": "indoors/cinema_lobby_2k.png",
+          "description": "couch,seat,bench,fluorescent,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/circus_arena_2k.hdr",
+          "image": "indoors/circus_arena_2k.png",
+          "description": "seat,theater,arena,show,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/colorful_studio_2k.hdr",
+          "image": "indoors/colorful_studio_2k.png",
+          "description": "couch,bar,bottle,incandescent,set,lounge,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/combination_room_2k.hdr",
+          "image": "indoors/combination_room_2k.png",
+          "description": "couch,victorian,curtain,lamp,painting,window,indoor,urban,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/concrete_tunnel_02_2k.hdr",
+          "image": "indoors/concrete_tunnel_02_2k.png",
+          "description": "asphalt,concrete,tunnel,road,underpass,indoor,urban,midday,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/concrete_tunnel_2k.hdr",
+          "image": "indoors/concrete_tunnel_2k.png",
+          "description": "tunnel,brick,concrete,lamp,bench,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/de_balie_2k.hdr",
+          "image": "indoors/de_balie_2k.png",
+          "description": "stair,banister,people,bcon,door,meeting,pink,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/dresden_station_night_2k.hdr",
+          "image": "indoors/dresden_station_night_2k.png",
+          "description": "train,station,bench,hall,tracks,fluorescent,indoor,urban,night,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/en_suite_2k.hdr",
+          "image": "indoors/en_suite_2k.png",
+          "description": "bathroom,sink,basin,shower,toilet,indoor,urban,artificial light,high contrast"
+        },
+        {
+          "path": "indoors/entrance_hall_2k.hdr",
+          "image": "indoors/entrance_hall_2k.png",
+          "description": "victorian,window,tile,indoor,urban,midday,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/fireplace_2k.hdr",
+          "image": "indoors/fireplace_2k.png",
+          "description": "fire,couch,room,lounge,indoor,urban,night,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/floral_tent_2k.hdr",
+          "image": "indoors/floral_tent_2k.png",
+          "description": "bush,plant,sun,tiles,tent,canopy,indoor,nature,urban,midday,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/garage_2k.hdr",
+          "image": "indoors/garage_2k.png",
+          "description": "garage,fluorescent,indoor,urban,high contrast,natural light"
+        },
+        {
+          "path": "indoors/georgentor_2k.hdr",
+          "image": "indoors/georgentor_2k.png",
+          "description": "brick,architecture,tunnel,passage,indoor,urban,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/glass_passage_2k.hdr",
+          "image": "indoors/glass_passage_2k.png",
+          "description": "tunnel,plant,tree,lamp,enclosure,indoor,nature,urban,low contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/gym_01_2k.hdr",
+          "image": "indoors/gym_01_2k.png",
+          "description": "fluorescent,gym,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/gym_entrance_2k.hdr",
+          "image": "indoors/gym_entrance_2k.png",
+          "description": "shop,couch,gym,red,fluorescent,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/hall_of_finfish_2k.hdr",
+          "image": "indoors/hall_of_finfish_2k.png",
+          "description": "fish,shark,museum,indoor,urban,low contrast,artificial light"
+        },
+        {
+          "path": "indoors/hall_of_mammals_2k.hdr",
+          "image": "indoors/hall_of_mammals_2k.png",
+          "description": "museum,bone,lion,tiger,whale,skeleton,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/hospital_room_2k.hdr",
+          "image": "indoors/hospital_room_2k.png",
+          "description": "bed,table,hospital,lamp,medical,operation,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/hotel_room_2k.hdr",
+          "image": "indoors/hotel_room_2k.png",
+          "description": "bed,tv,table,chair,mirror,window,curtain,lamp,hotel,indoor,urban,high contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/immenstadter_horn_2k.hdr",
+          "image": null,
+          "description": "sun,tree,grass,hilltop,hill,fence,outdoor,nature,midday,partly cloudy,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/indoor_pool_2k.hdr",
+          "image": "indoors/indoor_pool_2k.png",
+          "description": "pool,water,lamp,chair,indoor,urban,low contrast,artificial light"
+        },
+        {
+          "path": "indoors/industrial_pipe_and_valve_01_2k.hdr",
+          "image": "indoors/industrial_pipe_and_valve_01_2k.png",
+          "description": "workshop,lamp,industrial,warehouse,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/industrial_pipe_and_valve_02_2k.hdr",
+          "image": "indoors/industrial_pipe_and_valve_02_2k.png",
+          "description": "industrial,lamp,warehouse,workshop,artificial light,high contrast,indoor,urban"
+        },
+        {
+          "path": "indoors/kiara_interior_2k.hdr",
+          "image": "indoors/kiara_interior_2k.png",
+          "description": "tile,table,fridge,window,door,glass,kitchen,lounge,indoor,urban,sunrise-sunset,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/lapa_2k.hdr",
+          "image": "indoors/lapa_2k.png",
+          "description": "thatch,couch,garden,plant,gazebo,indoor,urban,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/leadenhall_market_2k.hdr",
+          "image": "indoors/leadenhall_market_2k.png",
+          "description": "hall,mall,europe,architecture,london,cobblestone,street,road,indoor,urban,morning-afternoon,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/lebombo_2k.hdr",
+          "image": "indoors/lebombo_2k.png",
+          "description": "house,lamp,window,wood floor,empty,indoor,urban,morning-afternoon,low contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/lookout_2k.hdr",
+          "image": "indoors/lookout_2k.png",
+          "description": "thatch,hide,pilanesberg,window,indoor,urban,nature,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/lythwood_lounge_2k.hdr",
+          "image": "indoors/lythwood_lounge_2k.png",
+          "description": "couch,warm,lounge,lamp,room,indoor,urban,midday,overcast,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/lythwood_room_2k.hdr",
+          "image": "indoors/lythwood_room_2k.png",
+          "description": "couch,bed,lamp,window,mantel,carpet,indoor,urban,midday,overcast,low contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/machine_shop_01_2k.hdr",
+          "image": "indoors/machine_shop_01_2k.png",
+          "description": "workshop,hall,warehouse,industrial,machine,metal,indoor,urban,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/machine_shop_02_2k.hdr",
+          "image": "indoors/machine_shop_02_2k.png",
+          "description": "workshop,hall,warehouse,industrial,machine,metal,indoor,urban,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/machine_shop_03_2k.hdr",
+          "image": "indoors/machine_shop_03_2k.png",
+          "description": "hall,industrial,machine,warehouse,workshop,indoor,urban,morning-afternoon,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/museum_of_ethnography_2k.hdr",
+          "image": "indoors/museum_of_ethnography_2k.png",
+          "description": "museum,antique,display,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/music_hall_01_2k.hdr",
+          "image": "indoors/music_hall_01_2k.png",
+          "description": "theater,organ,chair,victorian,hall,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/music_hall_02_2k.hdr",
+          "image": "indoors/music_hall_02_2k.png",
+          "description": "hall,empty,victorian,window,couch,indoor,urban,medium contrast,artificial light,natural light"
+        },
+        {
+          "path": "indoors/mutianyu_2k.hdr",
+          "image": "indoors/mutianyu_2k.png",
+          "description": "arch,brick,window,mountain,great wall,indoor,urban,morning-afternoon,clear,low contrast,natural light"
+        },
+        {
+          "path": "indoors/old_apartments_walkway_2k.hdr",
+          "image": "indoors/old_apartments_walkway_2k.png",
+          "description": "tree,railing,abandoned,balcony,indoor,urban,midday,clear,low contrast,natural light"
+        },
+        {
+          "path": "indoors/old_bus_depot_2k.hdr",
+          "image": "indoors/old_bus_depot_2k.png",
+          "description": "warehouse,industrial,concrete,abandoned,indoor,urban,midday,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/old_depot_2k.hdr",
+          "image": "indoors/old_depot_2k.png",
+          "description": "warehouse,abandoned,industrial,indoor,urban,morning-afternoon,clear,low contrast,natural light"
+        },
+        {
+          "path": "indoors/old_outdoor_theater_2k.hdr",
+          "image": "indoors/old_outdoor_theater_2k.png",
+          "description": "sun,arena,europe,outdoor,skies,urban,midday,partly cloudy,high contrast,natural light"
+        },
+        {
+          "path": "indoors/parking_garage_2k.hdr",
+          "image": "indoors/parking_garage_2k.png",
+          "description": "lamp,car,parking,road,garage,underground,indoor,urban,natural light,high contrast"
+        },
+        {
+          "path": "indoors/peppermint_powerplant_2k.hdr",
+          "image": "indoors/peppermint_powerplant_2k.png",
+          "description": "abandoned,industrial,factory,workshop,indoor,urban,morning-afternoon,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/phone_shop_2k.hdr",
+          "image": "indoors/phone_shop_2k.png",
+          "description": "lamp,shop,store,display,counter,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/photo_studio_01_2k.hdr",
+          "image": "indoors/photo_studio_01_2k.png",
+          "description": "lamp,photo,fluorescent,bed,white,infinity,chair,indoor,studio,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/pillars_2k.hdr",
+          "image": "indoors/pillars_2k.png",
+          "description": "column,architecture,monument,indoor,urban,morning-afternoon,low contrast,natural light"
+        },
+        {
+          "path": "indoors/pump_house_2k.hdr",
+          "image": "indoors/pump_house_2k.png",
+          "description": "brick,pump,dirt,pipe,shed,window,indoor,urban,morning-afternoon,high contrast,natural light"
+        },
+        {
+          "path": "indoors/reading_room_2k.hdr",
+          "image": "indoors/reading_room_2k.png",
+          "description": "chair,couch,window,door,tile,indoor,urban,morning-afternoon,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/royal_esplanade_2k.hdr",
+          "image": "indoors/royal_esplanade_2k.png",
+          "description": "mall,cruise,screen,balcony,stair,tile,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/sculpture_exhibition_2k.hdr",
+          "image": "indoors/sculpture_exhibition_2k.png",
+          "description": "horse,art,exhibition,museum,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/small_cathedral_2k.hdr",
+          "image": "indoors/small_cathedral_2k.png",
+          "description": "church,chapel,carpet,painting,religion,indoor,urban,low contrast,natural light"
+        },
+        {
+          "path": "indoors/small_empty_house_2k.hdr",
+          "image": "indoors/small_empty_house_2k.png",
+          "description": "house,tile,lamp,door,indoor,urban,morning-afternoon,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/small_hangar_01_2k.hdr",
+          "image": "indoors/small_hangar_01_2k.png",
+          "description": "hangar,plane,industrial,warehouse,indoor,urban,morning-afternoon,low contrast,natural light"
+        },
+        {
+          "path": "indoors/small_hangar_02_2k.hdr",
+          "image": "indoors/small_hangar_02_2k.png",
+          "description": "hangar,plane,industrial,europe,indoor,urban,morning-afternoon,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/st_fagans_interior_2k.hdr",
+          "image": "indoors/st_fagans_interior_2k.png",
+          "description": "bench,couch,lobby,modern,museum,stairs,wooden floor,indoor,urban,low contrast,artificial light"
+        },
+        {
+          "path": "indoors/storeroom_2k.hdr",
+          "image": "indoors/storeroom_2k.png",
+          "description": "mess,junk,fluorescent,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/studio_small_01_2k.hdr",
+          "image": "indoors/studio_small_01_2k.png",
+          "description": "lamp,studio,photo,indoor,urban,studio,high contrast,artificial_light"
+        },
+        {
+          "path": "indoors/studio_small_02_2k.hdr",
+          "image": "indoors/studio_small_02_2k.png",
+          "description": "lamp,studio,photo,indoor,urban,studio,high contrast,artificial_light"
+        },
+        {
+          "path": "indoors/studio_small_03_2k.hdr",
+          "image": "indoors/studio_small_03_2k.png",
+          "description": "lamp,studio,photo,umbrella,indoor,urban,studio,high contrast,artificial_light"
+        },
+        {
+          "path": "indoors/studio_small_04_2k.hdr",
+          "image": "indoors/studio_small_04_2k.png",
+          "description": "lamp,studio,photo,indoor,studio,urban,high contrast,artificial_light"
+        },
+        {
+          "path": "indoors/studio_small_05_2k.hdr",
+          "image": "indoors/studio_small_05_2k.png",
+          "description": "lamp,studio,photo,reflector,dish,indoor,urban,studio,high contrast,artificial_light"
+        },
+        {
+          "path": "indoors/studio_small_06_2k.hdr",
+          "image": "indoors/studio_small_06_2k.png",
+          "description": "lamp,studio,photo,indoor,urban,studio,high contrast,artificial_light"
+        },
+        {
+          "path": "indoors/studio_small_07_2k.hdr",
+          "image": "indoors/studio_small_07_2k.png",
+          "description": "lamp,photo,studio,single,indoor,studio,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/subway_entrance_2k.hdr",
+          "image": "indoors/subway_entrance_2k.png",
+          "description": "tile,fluorescent,stair,map,tunnel,station,escalator,indoor,urban,midday,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/surgery_2k.hdr",
+          "image": "indoors/surgery_2k.png",
+          "description": "bed,table,hospital,lamp,medical,operation,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/theater_01_2k.hdr",
+          "image": "indoors/theater_01_2k.png",
+          "description": "theater,theatre,seat,orchestra,stage,curtain,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/theater_02_2k.hdr",
+          "image": "indoors/theater_02_2k.png",
+          "description": "theater,theatre,seat,orchestra,stage,curtain,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/tv_studio_2k.hdr",
+          "image": "indoors/tv_studio_2k.png",
+          "description": "camera,studio,set,news,show,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/vintage_measuring_lab_2k.hdr",
+          "image": "indoors/vintage_measuring_lab_2k.png",
+          "description": "machine,industrial,workshop,laboratory,indoor,urban,medium contrast,natural light,artificial light"
+        },
+        {
+          "path": "indoors/vulture_hide_2k.hdr",
+          "image": "indoors/vulture_hide_2k.png",
+          "description": "hide,bench,brick,window,indoor,urban,medium contrast,natural light"
+        },
+        {
+          "path": "indoors/whale_skeleton_2k.hdr",
+          "image": "indoors/whale_skeleton_2k.png",
+          "description": "museum,bone,whale,skeleton,indoor,urban,medium contrast,artificial light"
+        },
+        {
+          "path": "indoors/wooden_lounge_2k.hdr",
+          "image": "indoors/wooden_lounge_2k.png",
+          "description": "couch,wood,lamp,table,indoor,urban,high contrast,artificial light"
+        },
+        {
+          "path": "indoors/yaris_interior_garage_2k.hdr",
+          "image": "indoors/yaris_interior_garage_2k.png",
+          "description": "car,driver,seat,garage,indoor,urban,midday,medium contrast,natural light,artificial light"
+        }
+      ]
+    }
+  }
+}

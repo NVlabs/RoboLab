@@ -1,0 +1,1 @@
+tree,grass,path,park,bench,outdoor,urban,night,partly cloudy,high contrast,artificial light

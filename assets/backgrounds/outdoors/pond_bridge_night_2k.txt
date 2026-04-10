@@ -1,0 +1,1 @@
+tree,forest,pond,statue,bridge,street light,path,outdoor,nature,urban,partly cloudy,night,low contrast,natural light,artificial light

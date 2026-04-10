@@ -1,0 +1,1 @@
+architecture,europe,london,university,grass,path,cobblestone,outdoor,urban,midday,overcast,low contrast,natural light

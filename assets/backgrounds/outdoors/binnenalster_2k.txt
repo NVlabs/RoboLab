@@ -1,0 +1,1 @@
+lake,park,tree,bench,outdoor,urban,morning-afternoon,overcast,low contrast,natural light

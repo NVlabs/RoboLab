@@ -1,0 +1,1 @@
+hall,empty,victorian,window,couch,indoor,urban,medium contrast,artificial light,natural light

@@ -1,0 +1,1 @@
+seat,theater,arena,show,indoor,urban,medium contrast,artificial light

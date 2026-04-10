@@ -1,0 +1,1 @@
+tunnel,brick,concrete,lamp,bench,indoor,urban,high contrast,artificial light

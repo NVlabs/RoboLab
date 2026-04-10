@@ -1,0 +1,1 @@
+bathroom,sink,basin,shower,toilet,indoor,urban,artificial light,high contrast

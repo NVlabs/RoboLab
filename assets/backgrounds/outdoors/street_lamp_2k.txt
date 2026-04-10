@@ -1,0 +1,1 @@
+lamp,suburb,road,tree,outdoor,urban,night,partly cloudy,high contrast,artificial light

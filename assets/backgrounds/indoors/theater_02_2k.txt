@@ -1,0 +1,1 @@
+theater,theatre,seat,orchestra,stage,curtain,indoor,urban,medium contrast,artificial light

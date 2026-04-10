@@ -1,0 +1,1 @@
+bench,couch,lobby,modern,museum,stairs,wooden floor,indoor,urban,low contrast,artificial light

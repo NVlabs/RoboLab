@@ -1,0 +1,173 @@
+{
+    "version": "1.0",
+    "file_records": [
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000008.png",
+            "source_hash": "9137aed7f2e6a4ff17074433492637540a496ada",
+            "target_url": "./textures/obj_000008.png",
+            "target_hash": "b1d65b866b3cbde52dcc0a6389ec9dc60078d804"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000020.png",
+            "source_hash": "9fab00ee98198e6bc1ea9f2da7deb85d52b5cf45",
+            "target_url": "./textures/obj_000020.png",
+            "target_hash": "e184f3476b8c3f4ee1ac143b22caf353ac367434"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000009.png",
+            "source_hash": "c6c452804d02fadabbb00336a83d80c3622f0031",
+            "target_url": "./textures/obj_000009.png",
+            "target_hash": "52e979bc364a74c202c0efdbbcffe7c73b2eaf35"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000017.png",
+            "source_hash": "796d93671bb4cb31dc111dd10a1a920c9fc1b9a3",
+            "target_url": "./textures/obj_000017.png",
+            "target_hash": "da7d210afe66bd0530149275506ba94eea3ae6a0"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000011.png",
+            "source_hash": "1c4d1268841aa7ef2adb310b287f4484439d58de",
+            "target_url": "./textures/obj_000011.png",
+            "target_hash": "e127859bbe04055e30ce8b13ecbf0ae69d346eeb"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000001.png",
+            "source_hash": "8ffd30ff09ac3cb04465cc4c1d18d82008cc8dc5",
+            "target_url": "./textures/obj_000001.png",
+            "target_hash": "671f5a810731c6eb16ecd39030470b4f17955f41"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000021.png",
+            "source_hash": "17ef1d2811f76a7393bd3a1173b8006199a07f74",
+            "target_url": "./textures/obj_000021.png",
+            "target_hash": "79fd356d39d9f22a0b62f7d93acdf86ab578493f"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000026.png",
+            "source_hash": "fe5f960f6ef3c2b1e5862bdbf770d7ca2f5b7666",
+            "target_url": "./textures/obj_000026.png",
+            "target_hash": "92ee382995a37aa9bb3d61d601a2c69fcb41d2a8"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000015.png",
+            "source_hash": "6c802b95567721a196459e75b2f451d006bec0cc",
+            "target_url": "./textures/obj_000015.png",
+            "target_hash": "27f4b6ea5d930956b9e595324da0e642c249f610"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000006.png",
+            "source_hash": "e387a5e72a1158fc5d5194647d993a76098ca76f",
+            "target_url": "./textures/obj_000006.png",
+            "target_hash": "34bd5a63373e8ae297399cf2cd282f6861828218"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000024.png",
+            "source_hash": "0fc36a2791586a0b1726beea855c0708413e3f4d",
+            "target_url": "./textures/obj_000024.png",
+            "target_hash": "d4c301bd7589a0f2e6a93ff2f8513cd6d9e397c3"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000016.png",
+            "source_hash": "6d2beb2af1209e192917274062a115679d043534",
+            "target_url": "./textures/obj_000016.png",
+            "target_hash": "3b6052edc4f4f662d04c836674d3c698d5f353bf"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000028.png",
+            "source_hash": "a42499f5f4247e32b19c18ec11168760b9d35e88",
+            "target_url": "./textures/obj_000028.png",
+            "target_hash": "c8cadf918fffcbcfff0c2530298d6553e8387fba"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000027.png",
+            "source_hash": "9da14826f2e77729f266405ac882ba7a206b3d1f",
+            "target_url": "./textures/obj_000027.png",
+            "target_hash": "0788cbd68130bbee521b42209c377126ec1609ff"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000002.png",
+            "source_hash": "b55f6fc952be36871c3286c4beba0f383d8a248b",
+            "target_url": "./textures/obj_000002.png",
+            "target_hash": "c9e285c4f07d0a260388e90a93cca5cb6294f48a"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000018.png",
+            "source_hash": "7437e4a1b2e09e77af9697cb042427281372595d",
+            "target_url": "./textures/obj_000018.png",
+            "target_hash": "3b5640920de12a9e3e7963be5f4547eb978d82f3"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000022.png",
+            "source_hash": "ba54f94afd74f35d0223c3de201616316bba0fe4",
+            "target_url": "./textures/obj_000022.png",
+            "target_hash": "fc1490b99ec280f420ea80d3b45c596f410a641e"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000025.png",
+            "source_hash": "7dedde63d24af68b6c328559d4c34531b1518262",
+            "target_url": "./textures/obj_000025.png",
+            "target_hash": "d676cb48c02fd831da7d1954d5fe8d9ad85a65df"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000014.png",
+            "source_hash": "717fea87966b7ca73287ee63675a23b5ef9cd54e",
+            "target_url": "./textures/obj_000014.png",
+            "target_hash": "9b7e7393b81a32ecdad52f7fe5a914387c438aae"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000003.png",
+            "source_hash": "fe1f3fd962f8b4af246911201d08cf0fd35a4143",
+            "target_url": "./textures/obj_000003.png",
+            "target_hash": "478ce0c231a77fde06cc27ab37aa6453432a2bc9"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000010.png",
+            "source_hash": "73eb8f07bcf4f56f623fea742a8acec3a185264e",
+            "target_url": "./textures/obj_000010.png",
+            "target_hash": "af8f5ddae960e92788c237d529179b64a89f735e"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000023.png",
+            "source_hash": "16034689fbece41b490725d13c7b58ce4bd2fe77",
+            "target_url": "./textures/obj_000023.png",
+            "target_hash": "ef1e4a18a5507188b3ea73e6d13fc14bd77ffbe1"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000019.png",
+            "source_hash": "a1efb24558a2dfeb4cea3515a6fd206e533533eb",
+            "target_url": "./textures/obj_000019.png",
+            "target_hash": "ba5ea254e3f1def116b52b815f68dbf2c32a8b80"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000013.png",
+            "source_hash": "3b80454c16241e3b707605b685d46fe070cedf7b",
+            "target_url": "./textures/obj_000013.png",
+            "target_hash": "810a0473dc500d88c420e9abee8bc3d078e692e6"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000007.png",
+            "source_hash": "6146e61ac891e6db202d4438803f72b73edc4cd5",
+            "target_url": "./textures/obj_000007.png",
+            "target_hash": "5a044a10f8d3d09ed94be05e9b4ce50acd3d245e"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000005.png",
+            "source_hash": "8eafb073246738201c496f98049ecc4b276e36b0",
+            "target_url": "./textures/obj_000005.png",
+            "target_hash": "40878826f13f5304d60be430bde209f0ab3cf194"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000012.png",
+            "source_hash": "879347c4876575dcde9165c4282e8bed7d7c4b3a",
+            "target_url": "./textures/obj_000012.png",
+            "target_hash": "e19fcfe6ff98f4ea5bf0b3940d35d714634bda63"
+        },
+        {
+            "source_url": "/home/xuningy/projects/exe/assets/bop/hope/usd/textures/obj_000004.png",
+            "source_hash": "630ee3b502f61e443c72e15ff0ab7412eb1e6a7a",
+            "target_url": "./textures/obj_000004.png",
+            "target_hash": "0c4aa0fdd5430aea5f34127735a16ebce2f14235"
+        }
+    ]
+}

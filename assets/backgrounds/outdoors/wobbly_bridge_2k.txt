@@ -1,0 +1,1 @@
+tree,bridge,river,rope,long grass,path,outdoor,nature,clear,morning-afternoon,medium contrast,natural light

@@ -1,0 +1,1 @@
+table,tile,brick,patio,veranda,porch,indoor,outdoor,urban,morning-afternoon,medium contrast,natural light

@@ -1,0 +1,1 @@
+warehouse,industrial,concrete,abandoned,indoor,urban,midday,medium contrast,natural light

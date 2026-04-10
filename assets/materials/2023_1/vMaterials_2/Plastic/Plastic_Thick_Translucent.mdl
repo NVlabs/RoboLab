@@ -1,0 +1,673 @@
+/*****************************************************************************
+*     Copyright 2023 NVIDIA Corporation. All rights reserved.
+******************************************************************************
+
+ MDL MATERIALS ARE PROVIDED PURSUANT TO AN END USER LICENSE  AGREEMENT,
+ WHICH WAS ACCEPTED IN ORDER TO GAIN ACCESS TO THIS FILE.  IN PARTICULAR, 
+ THE MDL MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF 
+ COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL NVIDIA
+ CORPORATION BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING
+ ANY GENERAL, SPECIAL,  INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, 
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF 
+ THE USE OR INABILITY TO USE THE MDL MATERIALS OR FROM OTHER DEALINGS IN 
+ THE MDL MATERIALS.
+*/
+
+
+// This file contains samples of very fast rendering SSS plastics for iray
+// 
+
+mdl 1.4;
+import ::df::*;
+import ::math::*;
+import ::anno::*;
+
+
+const string COPYRIGHT = 
+" Copyright 2023 NVIDIA Corporation. All rights reserved.\n"
+" MDL MATERIALS ARE PROVIDED PURSUANT TO AN END USER LICENSE  AGREEMENT,\n"
+" WHICH WAS ACCEPTED IN ORDER TO GAIN ACCESS TO THIS FILE.  IN PARTICULAR,\n" 
+" THE MDL MATERIALS ARE PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\n"
+" EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF\n"
+" MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF\n" 
+" COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL NVIDIA\n"
+" CORPORATION BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING ANY\n"
+" GENERAL, SPECIAL,  INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, WHETHER IN\n"
+" AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF THE USE OR\n"
+" INABILITY TO USE THE MDL MATERIALS OR FROM OTHER DEALINGS IN THE MDL MATERIALS.\n";
+
+
+
+// Template for absorption and scattering, do not use directly
+material volume_absorption(
+	color absorption 		= color(0.8665f, 0.7769f, 0.1559f),
+	color scattering 		= color(.5f),
+	float distance_scale 	= .03f, 
+	float directional_bias 	= 0.0f,
+	uniform float ior 		= 1.2f
+	
+) 
+[[
+	::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Volume Absorption"),
+    ::anno::description("Pure volume absorption material"),
+	::anno::author("NVIDIA"),
+	::anno::copyright_notice(COPYRIGHT),
+	::anno::hidden()
+	
+]]  = material (
+	ior: color(ior),
+    surface: material_surface (
+        scattering: ::df::specular_bsdf (
+            tint: color (1.0f, 1.0f, 1.0f),
+			mode: ::df::scatter_reflect_transmit
+        )
+    ),
+	volume:  material_volume (
+		scattering: ::df::anisotropic_vdf(
+			directional_bias: directional_bias 
+		),
+		absorption_coefficient: (distance_scale <= 0)? color(0): ::math::log(absorption) / -distance_scale,
+		scattering_coefficient: (distance_scale <= 0)? color(0): ::math::log(scattering) / -distance_scale
+	)
+);
+
+// plastic_full_weighted_mix
+// Plastic material using diffuse reflection, diffuse transmission
+// and SSS. Due to the diffuse transmission the volume absorption will
+// render faster and converge smoother than when using specular transmission.
+export material Plastic_Thick_Translucent(	
+	color diffuse_color			= color(0.6940f, 0.5831f, 0.0493f)
+	[[
+		::anno::display_name("Diffuse Color"),
+		::anno::description("The diffuse color of the plastic material"),
+		::anno::in_group("Appearance")
+	]],
+	float diffuse_weight		= 0.3f
+	[[
+		::anno::display_name("Diffuse Weight"),
+		::anno::description("The weight of the diffuse color of the plastic material. It is recommended to keep "
+		"the value around 0.5, lower values make the material appear more transparent while higher values make "
+		"it more opaque."),
+		::anno::in_group("Appearance"),
+		::anno::hard_range(0.f, 1.f)
+	]],
+	color absorption 			= color(0.8665f, 0.7769f, 0.1559f)
+	[[
+		::anno::display_name("Absorption Color"),
+		::anno::description("Sets the absorption color (this is color when light goes extinct)of the plastic material"),
+		::anno::in_group("Appearance")
+	]],
+	color scattering 			= color(.5f)
+	[[
+		::anno::display_name("Scattering Color"),
+		::anno::description("Sets the absorption color (this is color when light goes extinct)of the plastic material"),
+		::anno::in_group("Appearance")
+	]],
+	float distance_scale 		= 1.5f
+	[[
+		::anno::display_name("Distance Scale"),
+		::anno::description("Scales how quickly light is absorbed. Set this value low enough to see "
+		"some light extinction taking place. Tip: Set 'diffuse_weight' to 0.0 while adjusting this "
+		"material parameter for your scene"),
+		::anno::in_group("Appearance")
+	]],
+	
+	color diffuse_transmission_tint = color(1.0000f, 0.7249f, 0.1972f)
+	[[
+		::anno::display_name("Diffuse Transmission Color"),
+		::anno::description("The tinting of light scattering through the plastic material"),
+		::anno::in_group("Appearance")
+	]],	
+
+	float reflection_roughness 	= 0.0f
+	[[
+		::anno::display_name("Roughness"),
+		::anno::description("The roughness of the reflection on the plastic"),
+		::anno::in_group("Appearance"),
+		::anno::hard_range(0.f, 1.f)
+	]]
+) 
+[[
+	::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Full Control"),
+    ::anno::description("Plastic Material finegrained controls of its appearance"),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.Plastic_Thick_Translucent.png"),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny")),
+	::anno::copyright_notice(COPYRIGHT),
+	::anno::hidden()
+]] = let {
+	float reflection_weight 	= 1.0f;
+	float normal_reflectivity 	= 0.04f;
+	float grazing_reflectivity 	= 1.0f;
+	float reflectivity_exponent = 5.0f;
+	uniform float ior 			= 1.4f;
+
+	material plastic = volume_absorption(
+		absorption: absorption,
+		scattering: scattering,
+		distance_scale: distance_scale,
+		ior: ior
+	);
+	
+	bsdf transdiff = ::df::diffuse_transmission_bsdf(
+		tint: diffuse_transmission_tint
+	);
+	
+	bsdf diffuse = ::df::diffuse_reflection_bsdf(
+		tint: diffuse_color
+	);
+	
+	bsdf diffuse_mix_layer = ::df::weighted_layer(
+		base: transdiff,
+		layer: diffuse,
+		weight: diffuse_weight
+	
+	);
+
+	bsdf glossy_reflection = ::df::simple_glossy_bsdf(
+		tint: 				color(1.0f),
+		roughness_u: 		reflection_roughness,
+		mode: 				::df::scatter_reflect
+	);
+	
+	bsdf final_layer = ::df::custom_curve_layer(
+		normal_reflectivity: 	normal_reflectivity,
+		grazing_reflectivity: 	grazing_reflectivity,
+		layer: 					glossy_reflection,
+		base:					diffuse_mix_layer,
+		weight: 				reflection_weight,
+		exponent: 				reflectivity_exponent
+	);
+	
+} in material (
+	surface: material_surface(
+		scattering: final_layer
+	),
+	
+	volume: plastic.volume
+);
+
+
+export material plastic_simple_controls(	
+	color diffuse_color			= color(0.6940f, 0.5831f, 0.0493f)
+	[[
+		::anno::display_name("Diffuse Color"),
+		::anno::description("The diffuse color of the plastic material"),
+		::anno::in_group("Appearance")
+	]],
+	float diffuse_weight		= 0.5f
+	[[
+		::anno::display_name("Diffuse Weight"),
+		::anno::description("The weight of the diffuse color of the plastic material. It is recommended to keep "
+		"the value around 0.5, lower values make the material appear more transparent while higher values make "
+		"it more opaque."),
+		::anno::in_group("Appearance"),
+		::anno::hard_range(0.f, 1.f)
+	]],
+	color transmissive_color	= color(0.8665f, 0.7769f, 0.1559f)
+	[[
+		::anno::display_name("Transmissive Color"),
+		::anno::description("The tinting of light scattering through the plastic material"),
+		::anno::in_group("Appearance")
+	]],
+	float reflection_roughness 	= 0.0f
+	[[
+		::anno::display_name("Roughness"),
+		::anno::description("The roughness of the reflection on the plastic"),
+		::anno::in_group("Appearance"),
+		::anno::hard_range(0.f, 1.f)
+	]],
+	float distance_scale 		= 0.005f
+	[[
+		::anno::display_name("Distance Scale"),
+		::anno::description("Scales how quickly light is absorbed. Set this value low enough to see "
+		"some light extinction taking place. Tip: Set 'diffuse_weight' to 0.0 while adjusting this "
+		"material parameter for your scene"),
+		::anno::in_group("Appearance")
+	]]
+	
+)
+[[
+	::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Weight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_simple_controls.png"),
+    ::anno::copyright_notice(COPYRIGHT),
+	::anno::hidden()
+]] = Plastic_Thick_Translucent(
+		absorption: 				::math::pow(transmissive_color, 0.2f),
+		scattering:					color(0.5f),
+		distance_scale: 			distance_scale,
+		diffuse_transmission_tint: 	::math::pow(transmissive_color, 0.2f),
+		diffuse_color: 				diffuse_color,
+		diffuse_weight:				diffuse_weight,
+		reflection_roughness:		reflection_roughness
+
+);
+
+
+
+// 01 - Black
+export material plastic_black(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Black"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "dark", "black", "neutral")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_black.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.034230f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.034230f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 02 - Dark Gray
+export material plastic_dark_gray(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Dark Gray"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "dark", "gray", "neutral")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_dark_gray.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.127530f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.089194f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 03 - Light Gray
+export material plastic_light_gray(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Light Gray"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "light", "gray", "neutral")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_light_gray.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.464741f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.358654f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 04 - White
+export material plastic_white(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic White"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "light", "white", "neutral")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_white.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.915750f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.812241f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 05 - Ivory White
+export material plastic_ivory_white(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Ivory White"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "white", "bright", "ivory", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_ivory_white.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.899385f, 0.843370f, 0.694081f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.722672f, 0.708298f, 0.547994f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 06 - Lemon
+export material plastic_lemon(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Lemon"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "lemon", "yellow", "light", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_lemon.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.859174f, 0.875138f, 0.039947f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.98211f, 0.843370f, 0.031551f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 07 - Yellow Orange
+export material plastic_yellow_orange(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Yellow"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "light", "orange", "yellow", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_yellow_orange.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.875138f, 0.612066f, 0.039947f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.899385f, 0.373615f, 0.030257f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 08 - Orange
+export material plastic_orange(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Orange"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "orange", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_orange.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.875138f, 0.353741f, 0.030257f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.891262f, 0.420508f, 0.022013f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 09 - Dark Orange
+export material plastic_dark_orange(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Dark Orange"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "dark", "orange", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_dark_orange.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.535642f, 0.127530f, 0.022013f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.827726f, 0.267358f, 0.022013f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 10 - Red
+export material plastic_red(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Red"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "red", "cherry", "warm")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_red.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.547994f, 0.027755f, 0.027755f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.875138f, 0.022013f, 0.022013f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 11 - Magenta
+export material plastic_magenta(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Magenta"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "magenta")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_magenta.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.547994f, 0.047776f, 0.554227f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.722672f, 0.030257f, 0.566810f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 12 - Purple
+export material plastic_purple(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Purple"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "purple")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_purple.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.193972f, 0.017936f, 0.464741f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.701170f, 0.018913f, 0.645555f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 13 - Dark Blue
+export material plastic_dark_blue(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Dark Blue"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "dark", "blue", "cool")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_dark_blue.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.027755f, 0.058187f, 0.311180f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.027755f, 0.058187f, 0.311180f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 14 - Blue
+export material plastic_blue(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Blue"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "blue", "cool")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_blue.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.034230f, 0.173439f, 0.843370f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.034230f, 0.124741f, 0.659224f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 15 - Sky Blue
+export material plastic_sky_blue(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Sky Blue"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "blue", "sky", "cool")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_sky_blue.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.061907f, 0.535642f, 0.875138f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.028991f, 0.358654f, 0.673049f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 16 - Light Blue
+export material plastic_light_blue(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Light Blue"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "light", "blue", "cool")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_light_blue.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.263175f, 0.774227f, 0.827726f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.163641f, 0.592438f, 0.759300f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 17 - Teal
+export material plastic_teal(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Teal"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "teal", "cool")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_teal.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.037029f, 0.579547f, 0.329729f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.022013f, 0.476177f, 0.353741f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 18 - Dark Green
+export material plastic_dark_green(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Dark Green"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "dark", "green")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_dark_green.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.034230f, 0.141980f, 0.034230f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.016988f, 0.141980f, 0.016988f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 19 - Green
+export material plastic_green(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Green"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "green")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_green.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.016988f, 0.311180f, 0.016988f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.012664f, 0.358654f, 0.012664f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 20 - Light Green
+export material plastic_light_green(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Light Green"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "light", "green")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_light_green.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.030257f, 0.687031f, 0.027755f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.030257f, 0.701170f, 0.027755f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);
+
+
+// 21 - Lime Green
+export material plastic_lime_green(*)
+[[
+    ::anno::author("NVIDIA ARC"),
+    ::anno::display_name("Plastic Lime Green"),
+    ::anno::description("Plastic material with a simple but fast light scattering for dense scattering plastic materials. "
+	"The material was built to scatter light within the range of a few centimeters. If light scattering cannot be seen "
+	"(which can be verified by setting 'Diffuse Wight' to 0.0), check the scene units scale or increase 'Distance Scale'."),
+	::anno::key_words(string[]("plastic", "artificial", "scattering", "SSS", "diffuse", "translucent", "new", "shiny", "lime", "green", "light")),
+	::anno::thumbnail("./.thumbs/Plastic_Thick_Translucent.plastic_lime_green.png"),
+    ::anno::copyright_notice(COPYRIGHT)
+]] = plastic_simple_controls(
+	diffuse_color:			color(0.186989f, 0.605484f, 0.027755f),
+	diffuse_weight:			.5f,
+	transmissive_color:		color(0.204710f, 0.701170f, 0.022013f),
+	distance_scale:			0.002f,
+	reflection_roughness:	0.05f
+);

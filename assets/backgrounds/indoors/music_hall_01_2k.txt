@@ -1,0 +1,1 @@
+theater,organ,chair,victorian,hall,indoor,urban,medium contrast,artificial light

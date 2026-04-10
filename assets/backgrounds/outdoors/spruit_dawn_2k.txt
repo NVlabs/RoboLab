@@ -1,0 +1,1 @@
+tree,river,grass,path,field,park,mist,power line,outdoor,skies,nature,sunrise-sunset,clear,low contrast,natural light

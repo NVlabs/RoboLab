@@ -1,0 +1,1 @@
+tree,bush,safari,veld,grass,road,outdoor,nature,sunrise-sunset,partly cloudy,low contrast,natural light

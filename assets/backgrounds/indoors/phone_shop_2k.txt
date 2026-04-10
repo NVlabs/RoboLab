@@ -1,0 +1,1 @@
+lamp,shop,store,display,counter,indoor,urban,medium contrast,artificial light

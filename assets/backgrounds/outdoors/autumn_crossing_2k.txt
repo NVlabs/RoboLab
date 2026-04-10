@@ -1,0 +1,1 @@
+tree,bench,road,bush,leaves,autumn,path,outdoor,nature,overcast,low contrast,natural light

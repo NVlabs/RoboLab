@@ -1,0 +1,1 @@
+car,driver,seat,garage,indoor,urban,midday,medium contrast,natural light,artificial light

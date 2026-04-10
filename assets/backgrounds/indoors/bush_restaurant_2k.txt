@@ -1,0 +1,1 @@
+table,chair,restaurant,window,door,indoor,urban,medium contrast,natural light

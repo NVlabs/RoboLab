@@ -1,0 +1,1 @@
+tree,road,asphalt,highway,autumn,outdoor,nature,morning-afternoon,overcast,low contrast,natural light

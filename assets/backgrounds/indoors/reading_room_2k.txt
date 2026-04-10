@@ -1,0 +1,1 @@
+chair,couch,window,door,tile,indoor,urban,morning-afternoon,medium contrast,natural light

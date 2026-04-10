@@ -1,0 +1,1 @@
+city,street,building,asphalt,fence,apartments,outdoor,urban,morning-afternoon,overcast,low contrast,natural light

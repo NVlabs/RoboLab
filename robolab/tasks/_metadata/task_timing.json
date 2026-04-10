@@ -1,0 +1,1202 @@
+[
+  {
+    "task_name": "AnimalsInBinTask",
+    "wall_total_s": 1272.852,
+    "it_per_sec": 1.06,
+    "policy_inference_s": 460.472,
+    "policy_inference_avg_ms": 341.1,
+    "env_step_s": 691.446,
+    "env_step_avg_ms": 512.2,
+    "episode_s": 90
+  },
+  {
+    "task_name": "AppleAndYogurtInBowlTask",
+    "wall_total_s": 1394.617,
+    "it_per_sec": 1.29,
+    "policy_inference_s": 198.629,
+    "policy_inference_avg_ms": 110.3,
+    "env_step_s": 1107.829,
+    "env_step_avg_ms": 615.5,
+    "episode_s": 120
+  },
+  {
+    "task_name": "BBQSauceInBinTask",
+    "wall_total_s": 1185.095,
+    "it_per_sec": 1.14,
+    "policy_inference_s": 280.659,
+    "policy_inference_avg_ms": 207.9,
+    "env_step_s": 789.719,
+    "env_step_avg_ms": 585.0,
+    "episode_s": 90
+  },
+  {
+    "task_name": "BagelsOnPlateTask",
+    "wall_total_s": 578.451,
+    "it_per_sec": 1.56,
+    "policy_inference_s": 189.858,
+    "policy_inference_avg_ms": 211.0,
+    "env_step_s": 307.077,
+    "env_step_avg_ms": 341.2,
+    "episode_s": 60
+  },
+  {
+    "task_name": "BananaInBowlTask",
+    "wall_total_s": 227.285,
+    "it_per_sec": 2.22,
+    "policy_inference_s": 47.385,
+    "policy_inference_avg_ms": 93.8,
+    "env_step_s": 159.158,
+    "env_step_avg_ms": 315.2,
+    "episode_s": 10
+  },
+  {
+    "task_name": "BananaOnPlateTask",
+    "wall_total_s": 116.439,
+    "it_per_sec": 1.7,
+    "policy_inference_s": 32.866,
+    "policy_inference_avg_ms": 166.0,
+    "env_step_s": 69.07,
+    "env_step_avg_ms": 348.8,
+    "episode_s": 6
+  },
+  {
+    "task_name": "BananaThenRubiksCubeTask",
+    "wall_total_s": 486.283,
+    "it_per_sec": 1.85,
+    "policy_inference_s": 118.961,
+    "policy_inference_avg_ms": 132.2,
+    "env_step_s": 317.004,
+    "env_step_avg_ms": 352.2,
+    "episode_s": 60
+  },
+  {
+    "task_name": "BananasInBinOneMoreTask",
+    "wall_total_s": 143.573,
+    "it_per_sec": 1.64,
+    "policy_inference_s": 33.738,
+    "policy_inference_avg_ms": 143.0,
+    "env_step_s": 96.578,
+    "env_step_avg_ms": 409.2,
+    "episode_s": 12
+  },
+  {
+    "task_name": "BananasInBinThreeTotalTask",
+    "wall_total_s": 190.883,
+    "it_per_sec": 1.72,
+    "policy_inference_s": 39.702,
+    "policy_inference_avg_ms": 121.0,
+    "env_step_s": 135.54,
+    "env_step_avg_ms": 413.2,
+    "episode_s": 7
+  },
+  {
+    "task_name": "BananasInCrateTask",
+    "wall_total_s": 466.543,
+    "it_per_sec": 1.93,
+    "policy_inference_s": 50.774,
+    "policy_inference_avg_ms": 56.4,
+    "env_step_s": 395.371,
+    "env_step_avg_ms": 439.3,
+    "episode_s": 19
+  },
+  {
+    "task_name": "BananasOutOfBinTask",
+    "wall_total_s": 748.86,
+    "it_per_sec": 1.8,
+    "policy_inference_s": 145.799,
+    "policy_inference_avg_ms": 108.0,
+    "env_step_s": 544.959,
+    "env_step_avg_ms": 403.7,
+    "episode_s": 41
+  },
+  {
+    "task_name": "BigPumpkinInBinTask",
+    "wall_total_s": 1021.404,
+    "it_per_sec": 0.88,
+    "policy_inference_s": 187.715,
+    "policy_inference_avg_ms": 208.6,
+    "env_step_s": 752.968,
+    "env_step_avg_ms": 836.6,
+    "episode_s": 60
+  },
+  {
+    "task_name": "BlackItemsInBinTask",
+    "wall_total_s": 1681.202,
+    "it_per_sec": 1.07,
+    "policy_inference_s": 377.096,
+    "policy_inference_avg_ms": 209.5,
+    "env_step_s": 1140.574,
+    "env_step_avg_ms": 633.7,
+    "episode_s": 120
+  },
+  {
+    "task_name": "BlockStackingOrderAgnosticTask",
+    "wall_total_s": 1112.598,
+    "it_per_sec": 1.21,
+    "policy_inference_s": 256.468,
+    "policy_inference_avg_ms": 190.0,
+    "env_step_s": 745.786,
+    "env_step_avg_ms": 552.4,
+    "episode_s": 90
+  },
+  {
+    "task_name": "BlockStackingSpecifiedOrderTask",
+    "wall_total_s": 866.606,
+    "it_per_sec": 1.56,
+    "policy_inference_s": 279.318,
+    "policy_inference_avg_ms": 206.9,
+    "env_step_s": 466.653,
+    "env_step_avg_ms": 345.7,
+    "episode_s": 90
+  },
+  {
+    "task_name": "BlocksInBinTask",
+    "wall_total_s": 2036.257,
+    "it_per_sec": 1.1,
+    "policy_inference_s": 652.671,
+    "policy_inference_avg_ms": 290.1,
+    "env_step_s": 1177.138,
+    "env_step_avg_ms": 523.2,
+    "episode_s": 150
+  },
+  {
+    "task_name": "BowlInBinTask",
+    "wall_total_s": 551.092,
+    "it_per_sec": 1.63,
+    "policy_inference_s": 129.704,
+    "policy_inference_avg_ms": 144.1,
+    "env_step_s": 366.213,
+    "env_step_avg_ms": 406.9,
+    "episode_s": 16
+  },
+  {
+    "task_name": "BowlStackingLeftOnRightTask",
+    "wall_total_s": 176.091,
+    "it_per_sec": 1.7,
+    "policy_inference_s": 61.153,
+    "policy_inference_avg_ms": 203.8,
+    "env_step_s": 88.95,
+    "env_step_avg_ms": 296.5,
+    "episode_s": 20
+  },
+  {
+    "task_name": "BowlStackingRightOnLeftTask",
+    "wall_total_s": 174.047,
+    "it_per_sec": 1.72,
+    "policy_inference_s": 56.652,
+    "policy_inference_avg_ms": 188.8,
+    "env_step_s": 92.93,
+    "env_step_avg_ms": 309.8,
+    "episode_s": 20
+  },
+  {
+    "task_name": "ButterAboveRaisinTask",
+    "wall_total_s": 347.688,
+    "it_per_sec": 1.73,
+    "policy_inference_s": 124.71,
+    "policy_inference_avg_ms": 207.9,
+    "env_step_s": 166.518,
+    "env_step_avg_ms": 277.5,
+    "episode_s": 40
+  },
+  {
+    "task_name": "CannedFoodInBinTask",
+    "wall_total_s": 948.071,
+    "it_per_sec": 0.95,
+    "policy_inference_s": 329.207,
+    "policy_inference_avg_ms": 365.8,
+    "env_step_s": 555.904,
+    "env_step_avg_ms": 617.7,
+    "episode_s": 60
+  },
+  {
+    "task_name": "ClampInRightBinTask",
+    "wall_total_s": 600.384,
+    "it_per_sec": 1.5,
+    "policy_inference_s": 189.564,
+    "policy_inference_avg_ms": 210.6,
+    "env_step_s": 328.962,
+    "env_step_avg_ms": 365.5,
+    "episode_s": 60
+  },
+  {
+    "task_name": "CleanUpToysTask",
+    "wall_total_s": 3911.862,
+    "it_per_sec": 1.15,
+    "policy_inference_s": 1121.651,
+    "policy_inference_avg_ms": 249.3,
+    "env_step_s": 2385.462,
+    "env_step_avg_ms": 530.1,
+    "episode_s": 300
+  },
+  {
+    "task_name": "ClearOrganicObjectsTask",
+    "wall_total_s": 3972.84,
+    "it_per_sec": 0.91,
+    "policy_inference_s": 739.633,
+    "policy_inference_avg_ms": 205.5,
+    "env_step_s": 2911.356,
+    "env_step_avg_ms": 808.7,
+    "episode_s": 240
+  },
+  {
+    "task_name": "ClutterPlasticTask",
+    "wall_total_s": 3091.615,
+    "it_per_sec": 0.87,
+    "policy_inference_s": 560.953,
+    "policy_inference_avg_ms": 207.8,
+    "env_step_s": 2290.814,
+    "env_step_avg_ms": 848.4,
+    "episode_s": 180
+  },
+  {
+    "task_name": "ClutterPumpkinTask",
+    "wall_total_s": 1517.413,
+    "it_per_sec": 0.89,
+    "policy_inference_s": 279.87,
+    "policy_inference_avg_ms": 207.3,
+    "env_step_s": 1117.513,
+    "env_step_avg_ms": 827.8,
+    "episode_s": 90
+  },
+  {
+    "task_name": "CoffeePotInBinTask",
+    "wall_total_s": 775.991,
+    "it_per_sec": 1.16,
+    "policy_inference_s": 187.172,
+    "policy_inference_avg_ms": 208.0,
+    "env_step_s": 512.547,
+    "env_step_avg_ms": 569.5,
+    "episode_s": 60
+  },
+  {
+    "task_name": "CondimentsInBinTask",
+    "wall_total_s": 2406.107,
+    "it_per_sec": 1.12,
+    "policy_inference_s": 565.041,
+    "policy_inference_avg_ms": 209.3,
+    "env_step_s": 1609.332,
+    "env_step_avg_ms": 596.0,
+    "episode_s": 180
+  },
+  {
+    "task_name": "CookingClearPlateTask",
+    "wall_total_s": 2902.582,
+    "it_per_sec": 0.93,
+    "policy_inference_s": 739.707,
+    "policy_inference_avg_ms": 274.0,
+    "env_step_s": 1929.544,
+    "env_step_avg_ms": 714.6,
+    "episode_s": 180
+  },
+  {
+    "task_name": "CookingPickPastaToolTask",
+    "wall_total_s": 841.997,
+    "it_per_sec": 1.07,
+    "policy_inference_s": 186.05,
+    "policy_inference_avg_ms": 206.7,
+    "env_step_s": 574.651,
+    "env_step_avg_ms": 638.5,
+    "episode_s": 60
+  },
+  {
+    "task_name": "CubesAndBlocksInBinTask",
+    "wall_total_s": 3146.455,
+    "it_per_sec": 1.14,
+    "policy_inference_s": 896.869,
+    "policy_inference_avg_ms": 249.1,
+    "env_step_s": 1941.702,
+    "env_step_avg_ms": 539.4,
+    "episode_s": 240
+  },
+  {
+    "task_name": "DishesInBinTask",
+    "wall_total_s": 1687.253,
+    "it_per_sec": 1.6,
+    "policy_inference_s": 531.509,
+    "policy_inference_avg_ms": 196.9,
+    "env_step_s": 935.796,
+    "env_step_avg_ms": 346.6,
+    "episode_s": 180
+  },
+  {
+    "task_name": "ElectronicsInBinTask",
+    "wall_total_s": 2506.454,
+    "it_per_sec": 1.08,
+    "policy_inference_s": 524.354,
+    "policy_inference_avg_ms": 194.2,
+    "env_step_s": 1759.615,
+    "env_step_avg_ms": 651.7,
+    "episode_s": 64
+  },
+  {
+    "task_name": "FoodPacking1BoxesTask",
+    "wall_total_s": 554.037,
+    "it_per_sec": 1.62,
+    "policy_inference_s": 175.897,
+    "policy_inference_avg_ms": 195.4,
+    "env_step_s": 301.985,
+    "env_step_avg_ms": 335.5,
+    "episode_s": 60
+  },
+  {
+    "task_name": "FoodPacking1CansTask",
+    "wall_total_s": 522.969,
+    "it_per_sec": 1.72,
+    "policy_inference_s": 126.703,
+    "policy_inference_avg_ms": 140.8,
+    "env_step_s": 341.024,
+    "env_step_avg_ms": 378.9,
+    "episode_s": 60
+  },
+  {
+    "task_name": "FoodPacking2BoxesTask",
+    "wall_total_s": 1862.343,
+    "it_per_sec": 1.45,
+    "policy_inference_s": 557.198,
+    "policy_inference_avg_ms": 206.4,
+    "env_step_s": 1064.613,
+    "env_step_avg_ms": 394.3,
+    "episode_s": 180
+  },
+  {
+    "task_name": "FoodPacking2CansTask",
+    "wall_total_s": 1948.097,
+    "it_per_sec": 1.39,
+    "policy_inference_s": 525.222,
+    "policy_inference_avg_ms": 194.5,
+    "env_step_s": 1197.709,
+    "env_step_avg_ms": 443.6,
+    "episode_s": 180
+  },
+  {
+    "task_name": "FoodPacking3BoxesTask",
+    "wall_total_s": 2691.769,
+    "it_per_sec": 1.34,
+    "policy_inference_s": 757.961,
+    "policy_inference_avg_ms": 210.5,
+    "env_step_s": 1609.088,
+    "env_step_avg_ms": 447.0,
+    "episode_s": 240
+  },
+  {
+    "task_name": "FoodPacking3CansTask",
+    "wall_total_s": 2677.952,
+    "it_per_sec": 1.34,
+    "policy_inference_s": 714.262,
+    "policy_inference_avg_ms": 198.4,
+    "env_step_s": 1657.579,
+    "env_step_avg_ms": 460.4,
+    "episode_s": 240
+  },
+  {
+    "task_name": "FoodPackingByColorTask",
+    "wall_total_s": 1434.368,
+    "it_per_sec": 1.25,
+    "policy_inference_s": 377.583,
+    "policy_inference_avg_ms": 209.8,
+    "env_step_s": 889.069,
+    "env_step_avg_ms": 493.9,
+    "episode_s": 120
+  },
+  {
+    "task_name": "FruitsGreenLimesOnPlateTask",
+    "wall_total_s": 1345.145,
+    "it_per_sec": 1.0,
+    "policy_inference_s": 265.289,
+    "policy_inference_avg_ms": 196.5,
+    "env_step_s": 965.752,
+    "env_step_avg_ms": 715.4,
+    "episode_s": 79
+  },
+  {
+    "task_name": "FruitsMovingOrangeOrLimeTask",
+    "wall_total_s": 872.612,
+    "it_per_sec": 1.03,
+    "policy_inference_s": 97.606,
+    "policy_inference_avg_ms": 108.5,
+    "env_step_s": 733.272,
+    "env_step_avg_ms": 814.7,
+    "episode_s": 11
+  },
+  {
+    "task_name": "FruitsMovingTask",
+    "wall_total_s": 974.821,
+    "it_per_sec": 0.92,
+    "policy_inference_s": 182.487,
+    "policy_inference_avg_ms": 202.8,
+    "env_step_s": 714.736,
+    "env_step_avg_ms": 794.2,
+    "episode_s": 60
+  },
+  {
+    "task_name": "FruitsOnPlate3Task",
+    "wall_total_s": 3094.46,
+    "it_per_sec": 0.97,
+    "policy_inference_s": 515.678,
+    "policy_inference_avg_ms": 171.9,
+    "env_step_s": 2356.308,
+    "env_step_avg_ms": 785.4,
+    "episode_s": 15
+  },
+  {
+    "task_name": "FruitsOnPlateTask",
+    "wall_total_s": 4643.348,
+    "it_per_sec": 0.97,
+    "policy_inference_s": 942.759,
+    "policy_inference_avg_ms": 209.5,
+    "env_step_s": 3298.036,
+    "env_step_avg_ms": 732.9,
+    "episode_s": 300
+  },
+  {
+    "task_name": "FruitsOnionTask",
+    "wall_total_s": 853.616,
+    "it_per_sec": 1.05,
+    "policy_inference_s": 105.915,
+    "policy_inference_avg_ms": 117.7,
+    "env_step_s": 701.655,
+    "env_step_avg_ms": 779.6,
+    "episode_s": 16
+  },
+  {
+    "task_name": "FruitsOnionToPlateTask",
+    "wall_total_s": 898.425,
+    "it_per_sec": 1.0,
+    "policy_inference_s": 127.959,
+    "policy_inference_avg_ms": 142.2,
+    "env_step_s": 715.016,
+    "env_step_avg_ms": 794.5,
+    "episode_s": 24
+  },
+  {
+    "task_name": "FruitsOrangesOnPlateTask",
+    "wall_total_s": 1134.83,
+    "it_per_sec": 1.19,
+    "policy_inference_s": 83.806,
+    "policy_inference_avg_ms": 62.1,
+    "env_step_s": 1014.826,
+    "env_step_avg_ms": 751.7,
+    "episode_s": 31
+  },
+  {
+    "task_name": "GrabABagelTask",
+    "wall_total_s": 511.195,
+    "it_per_sec": 0.88,
+    "policy_inference_s": 93.765,
+    "policy_inference_avg_ms": 208.4,
+    "env_step_s": 376.964,
+    "env_step_avg_ms": 837.7,
+    "episode_s": 30
+  },
+  {
+    "task_name": "GrabAFruitTask",
+    "wall_total_s": 498.125,
+    "it_per_sec": 0.9,
+    "policy_inference_s": 93.547,
+    "policy_inference_avg_ms": 207.9,
+    "env_step_s": 364.631,
+    "env_step_avg_ms": 810.3,
+    "episode_s": 30
+  },
+  {
+    "task_name": "GreenSpoonsInPotTask",
+    "wall_total_s": 2610.941,
+    "it_per_sec": 1.03,
+    "policy_inference_s": 736.062,
+    "policy_inference_avg_ms": 272.6,
+    "env_step_s": 1637.507,
+    "env_step_avg_ms": 606.5,
+    "episode_s": 180
+  },
+  {
+    "task_name": "HammersInLeftBinTask",
+    "wall_total_s": 1829.722,
+    "it_per_sec": 1.48,
+    "policy_inference_s": 558.653,
+    "policy_inference_avg_ms": 206.9,
+    "env_step_s": 1030.393,
+    "env_step_avg_ms": 381.6,
+    "episode_s": 180
+  },
+  {
+    "task_name": "JugsOnShelfTask",
+    "wall_total_s": 1303.046,
+    "it_per_sec": 1.38,
+    "policy_inference_s": 380.277,
+    "policy_inference_avg_ms": 211.3,
+    "env_step_s": 760.104,
+    "env_step_avg_ms": 422.3,
+    "episode_s": 120
+  },
+  {
+    "task_name": "KeyboardOutOfBinTask",
+    "wall_total_s": 796.929,
+    "it_per_sec": 1.13,
+    "policy_inference_s": 184.988,
+    "policy_inference_avg_ms": 205.5,
+    "env_step_s": 533.546,
+    "env_step_avg_ms": 592.8,
+    "episode_s": 60
+  },
+  {
+    "task_name": "LargerObjectRaisinBoxInBinTask",
+    "wall_total_s": 262.42,
+    "it_per_sec": 1.71,
+    "policy_inference_s": 93.254,
+    "policy_inference_avg_ms": 207.2,
+    "env_step_s": 129.716,
+    "env_step_avg_ms": 288.3,
+    "episode_s": 30
+  },
+  {
+    "task_name": "MarkerInMugTask",
+    "wall_total_s": 580.186,
+    "it_per_sec": 1.03,
+    "policy_inference_s": 124.096,
+    "policy_inference_avg_ms": 206.8,
+    "env_step_s": 400.12,
+    "env_step_avg_ms": 666.9,
+    "episode_s": 40
+  },
+  {
+    "task_name": "MouseOnKeyboardTask",
+    "wall_total_s": 860.452,
+    "it_per_sec": 1.05,
+    "policy_inference_s": 142.466,
+    "policy_inference_avg_ms": 158.3,
+    "env_step_s": 656.327,
+    "env_step_avg_ms": 729.3,
+    "episode_s": 60
+  },
+  {
+    "task_name": "MoveBananaToBagelPlateTask",
+    "wall_total_s": 1524.015,
+    "it_per_sec": 0.89,
+    "policy_inference_s": 277.443,
+    "policy_inference_avg_ms": 205.5,
+    "env_step_s": 1126.491,
+    "env_step_avg_ms": 834.4,
+    "episode_s": 90
+  },
+  {
+    "task_name": "MustardAboveRaisinTask",
+    "wall_total_s": 92.733,
+    "it_per_sec": 1.91,
+    "policy_inference_s": 29.5,
+    "policy_inference_avg_ms": 166.7,
+    "env_step_s": 50.235,
+    "env_step_avg_ms": 283.8,
+    "episode_s": 11
+  },
+  {
+    "task_name": "MustardInLeftBinTask",
+    "wall_total_s": 235.347,
+    "it_per_sec": 1.91,
+    "policy_inference_s": 71.43,
+    "policy_inference_avg_ms": 158.7,
+    "env_step_s": 133.051,
+    "env_step_avg_ms": 295.7,
+    "episode_s": 25
+  },
+  {
+    "task_name": "MustardInRightBinTask",
+    "wall_total_s": 82.25,
+    "it_per_sec": 1.93,
+    "policy_inference_s": 24.667,
+    "policy_inference_avg_ms": 155.1,
+    "env_step_s": 47.374,
+    "env_step_avg_ms": 298.0,
+    "episode_s": 5
+  },
+  {
+    "task_name": "NonHammerToolsInRightBinTask",
+    "wall_total_s": 1787.864,
+    "it_per_sec": 1.51,
+    "policy_inference_s": 556.385,
+    "policy_inference_avg_ms": 206.1,
+    "env_step_s": 993.922,
+    "env_step_avg_ms": 368.1,
+    "episode_s": 180
+  },
+  {
+    "task_name": "OneBottleInSquarePailTask",
+    "wall_total_s": 188.312,
+    "it_per_sec": 1.66,
+    "policy_inference_s": 36.252,
+    "policy_inference_avg_ms": 115.8,
+    "env_step_s": 136.599,
+    "env_step_avg_ms": 436.4,
+    "episode_s": 12
+  },
+  {
+    "task_name": "OneBottleOnShelfTask",
+    "wall_total_s": 657.416,
+    "it_per_sec": 1.37,
+    "policy_inference_s": 186.928,
+    "policy_inference_avg_ms": 207.7,
+    "env_step_s": 391.334,
+    "env_step_avg_ms": 434.8,
+    "episode_s": 60
+  },
+  {
+    "task_name": "PhoneOrRemoteInBinTask",
+    "wall_total_s": 813.085,
+    "it_per_sec": 1.11,
+    "policy_inference_s": 150.89,
+    "policy_inference_avg_ms": 167.7,
+    "env_step_s": 598.622,
+    "env_step_avg_ms": 665.1,
+    "episode_s": 60
+  },
+  {
+    "task_name": "PickDrillTask",
+    "wall_total_s": 336.925,
+    "it_per_sec": 1.78,
+    "policy_inference_s": 123.335,
+    "policy_inference_avg_ms": 205.6,
+    "env_step_s": 161.106,
+    "env_step_avg_ms": 268.5,
+    "episode_s": 40
+  },
+  {
+    "task_name": "PickGlassesTask",
+    "wall_total_s": 410.055,
+    "it_per_sec": 1.1,
+    "policy_inference_s": 93.139,
+    "policy_inference_avg_ms": 207.0,
+    "env_step_s": 276.278,
+    "env_step_avg_ms": 614.0,
+    "episode_s": 30
+  },
+  {
+    "task_name": "PickOrangeObjectTask",
+    "wall_total_s": 1054.29,
+    "it_per_sec": 0.85,
+    "policy_inference_s": 352.74,
+    "policy_inference_avg_ms": 391.9,
+    "env_step_s": 627.76,
+    "env_step_avg_ms": 697.5,
+    "episode_s": 60
+  },
+  {
+    "task_name": "PickUpBluePitcherTask",
+    "wall_total_s": 252.874,
+    "it_per_sec": 1.78,
+    "policy_inference_s": 93.021,
+    "policy_inference_avg_ms": 206.7,
+    "env_step_s": 120.475,
+    "env_step_avg_ms": 267.7,
+    "episode_s": 30
+  },
+  {
+    "task_name": "PickUpGreenObjectTask",
+    "wall_total_s": 268.701,
+    "it_per_sec": 1.67,
+    "policy_inference_s": 93.38,
+    "policy_inference_avg_ms": 207.5,
+    "env_step_s": 135.63,
+    "env_step_avg_ms": 301.4,
+    "episode_s": 30
+  },
+  {
+    "task_name": "PinkSpoonInPotTask",
+    "wall_total_s": 742.635,
+    "it_per_sec": 1.21,
+    "policy_inference_s": 143.291,
+    "policy_inference_avg_ms": 159.2,
+    "env_step_s": 539.097,
+    "env_step_avg_ms": 599.0,
+    "episode_s": 43
+  },
+  {
+    "task_name": "PlasticBottlesInSquarePailTask",
+    "wall_total_s": 1917.142,
+    "it_per_sec": 1.41,
+    "policy_inference_s": 443.85,
+    "policy_inference_avg_ms": 164.4,
+    "env_step_s": 1286.838,
+    "env_step_avg_ms": 476.6,
+    "episode_s": 180
+  },
+  {
+    "task_name": "PutBowlOnShelfTopTask",
+    "wall_total_s": 548.104,
+    "it_per_sec": 1.64,
+    "policy_inference_s": 186.027,
+    "policy_inference_avg_ms": 206.7,
+    "env_step_s": 281.368,
+    "env_step_avg_ms": 312.6,
+    "episode_s": 60
+  },
+  {
+    "task_name": "PutMugsOnShelfTask",
+    "wall_total_s": 1796.292,
+    "it_per_sec": 1.5,
+    "policy_inference_s": 563.203,
+    "policy_inference_avg_ms": 208.6,
+    "env_step_s": 990.75,
+    "env_step_avg_ms": 366.9,
+    "episode_s": 180
+  },
+  {
+    "task_name": "PutTwoMugsOnShelfTask",
+    "wall_total_s": 2303.902,
+    "it_per_sec": 1.17,
+    "policy_inference_s": 736.289,
+    "policy_inference_avg_ms": 272.7,
+    "env_step_s": 1325.539,
+    "env_step_avg_ms": 490.9,
+    "episode_s": 180
+  },
+  {
+    "task_name": "RecycleCartonTask",
+    "wall_total_s": 974.423,
+    "it_per_sec": 1.39,
+    "policy_inference_s": 236.024,
+    "policy_inference_avg_ms": 174.8,
+    "env_step_s": 633.499,
+    "env_step_avg_ms": 469.3,
+    "episode_s": 36
+  },
+  {
+    "task_name": "RecycleCartonsOnBoxTask",
+    "wall_total_s": 1168.645,
+    "it_per_sec": 1.16,
+    "policy_inference_s": 466.347,
+    "policy_inference_avg_ms": 345.4,
+    "env_step_s": 579.6,
+    "env_step_avg_ms": 429.3,
+    "episode_s": 90
+  },
+  {
+    "task_name": "RecycleCartonsVerticalCrateTask",
+    "wall_total_s": 993.478,
+    "it_per_sec": 1.36,
+    "policy_inference_s": 282.648,
+    "policy_inference_avg_ms": 209.4,
+    "env_step_s": 588.87,
+    "env_step_avg_ms": 436.2,
+    "episode_s": 90
+  },
+  {
+    "task_name": "RedDishesInBinTask",
+    "wall_total_s": 532.326,
+    "it_per_sec": 1.69,
+    "policy_inference_s": 168.565,
+    "policy_inference_avg_ms": 187.3,
+    "env_step_s": 291.656,
+    "env_step_avg_ms": 324.1,
+    "episode_s": 60
+  },
+  {
+    "task_name": "RedItemsInBinTask",
+    "wall_total_s": 553.941,
+    "it_per_sec": 1.62,
+    "policy_inference_s": 175.355,
+    "policy_inference_avg_ms": 194.8,
+    "env_step_s": 302.879,
+    "env_step_avg_ms": 336.5,
+    "episode_s": 52
+  },
+  {
+    "task_name": "ReorientAllMugsTask",
+    "wall_total_s": 939.457,
+    "it_per_sec": 1.44,
+    "policy_inference_s": 283.101,
+    "policy_inference_avg_ms": 209.7,
+    "env_step_s": 536.301,
+    "env_step_avg_ms": 397.3,
+    "episode_s": 90
+  },
+  {
+    "task_name": "ReorientJugTask",
+    "wall_total_s": 619.113,
+    "it_per_sec": 1.45,
+    "policy_inference_s": 187.506,
+    "policy_inference_avg_ms": 208.3,
+    "env_step_s": 351.924,
+    "env_step_avg_ms": 391.0,
+    "episode_s": 60
+  },
+  {
+    "task_name": "ReorientRedMugTask",
+    "wall_total_s": 640.827,
+    "it_per_sec": 1.4,
+    "policy_inference_s": 155.98,
+    "policy_inference_avg_ms": 173.3,
+    "env_step_s": 418.314,
+    "env_step_avg_ms": 464.8,
+    "episode_s": 53
+  },
+  {
+    "task_name": "ReorientWhiteMugsTask",
+    "wall_total_s": 522.77,
+    "it_per_sec": 1.72,
+    "policy_inference_s": 95.484,
+    "policy_inference_avg_ms": 106.1,
+    "env_step_s": 387.033,
+    "env_step_avg_ms": 430.0,
+    "episode_s": 60
+  },
+  {
+    "task_name": "RubiksCubeAndBananaTask",
+    "wall_total_s": 395.49,
+    "it_per_sec": 1.96,
+    "policy_inference_s": 84.169,
+    "policy_inference_avg_ms": 108.6,
+    "env_step_s": 275.138,
+    "env_step_avg_ms": 355.0,
+    "episode_s": 17
+  },
+  {
+    "task_name": "RubiksCubeBehindBowlTask",
+    "wall_total_s": 147.768,
+    "it_per_sec": 2.08,
+    "policy_inference_s": 33.288,
+    "policy_inference_avg_ms": 108.4,
+    "env_step_s": 100.701,
+    "env_step_avg_ms": 328.0,
+    "episode_s": 7
+  },
+  {
+    "task_name": "RubiksCubeInFrontOfBowlTask",
+    "wall_total_s": 253.44,
+    "it_per_sec": 1.78,
+    "policy_inference_s": 95.3,
+    "policy_inference_avg_ms": 211.8,
+    "env_step_s": 117.374,
+    "env_step_avg_ms": 260.8,
+    "episode_s": 30
+  },
+  {
+    "task_name": "RubiksCubeLeftOfBowlTask",
+    "wall_total_s": 275.589,
+    "it_per_sec": 1.63,
+    "policy_inference_s": 86.338,
+    "policy_inference_avg_ms": 191.9,
+    "env_step_s": 152.152,
+    "env_step_avg_ms": 338.1,
+    "episode_s": 30
+  },
+  {
+    "task_name": "RubiksCubeOrBananaTask",
+    "wall_total_s": 174.112,
+    "it_per_sec": 1.98,
+    "policy_inference_s": 39.631,
+    "policy_inference_avg_ms": 114.9,
+    "env_step_s": 117.867,
+    "env_step_avg_ms": 341.6,
+    "episode_s": 6
+  },
+  {
+    "task_name": "RubiksCubeRightOfBowlTask",
+    "wall_total_s": 286.617,
+    "it_per_sec": 1.57,
+    "policy_inference_s": 93.97,
+    "policy_inference_avg_ms": 208.8,
+    "env_step_s": 150.207,
+    "env_step_avg_ms": 333.8,
+    "episode_s": 30
+  },
+  {
+    "task_name": "RubiksCubeTask",
+    "wall_total_s": 126.984,
+    "it_per_sec": 2.1,
+    "policy_inference_s": 31.701,
+    "policy_inference_avg_ms": 118.7,
+    "env_step_s": 81.685,
+    "env_step_avg_ms": 305.9,
+    "episode_s": 10
+  },
+  {
+    "task_name": "RubiksCubeThenBananaTask",
+    "wall_total_s": 527.394,
+    "it_per_sec": 1.71,
+    "policy_inference_s": 175.35,
+    "policy_inference_avg_ms": 194.8,
+    "env_step_s": 277.083,
+    "env_step_avg_ms": 307.9,
+    "episode_s": 60
+  },
+  {
+    "task_name": "RubiksCubesInBinTask",
+    "wall_total_s": 1283.871,
+    "it_per_sec": 1.35,
+    "policy_inference_s": 233.299,
+    "policy_inference_avg_ms": 134.5,
+    "env_step_s": 948.321,
+    "env_step_avg_ms": 546.6,
+    "episode_s": 95
+  },
+  {
+    "task_name": "SauceBottlesCrateTask",
+    "wall_total_s": 338.945,
+    "it_per_sec": 1.77,
+    "policy_inference_s": 110.066,
+    "policy_inference_avg_ms": 183.4,
+    "env_step_s": 180.584,
+    "env_step_avg_ms": 301.0,
+    "episode_s": 40
+  },
+  {
+    "task_name": "SmallPumpkinInBinTask",
+    "wall_total_s": 1017.393,
+    "it_per_sec": 0.88,
+    "policy_inference_s": 186.567,
+    "policy_inference_avg_ms": 207.3,
+    "env_step_s": 750.708,
+    "env_step_avg_ms": 834.1,
+    "episode_s": 60
+  },
+  {
+    "task_name": "SmallerObjectButterInBinTask",
+    "wall_total_s": 261.834,
+    "it_per_sec": 1.72,
+    "policy_inference_s": 76.156,
+    "policy_inference_avg_ms": 169.2,
+    "env_step_s": 152.719,
+    "env_step_avg_ms": 339.4,
+    "episode_s": 7
+  },
+  {
+    "task_name": "SmartphoneInBinTask",
+    "wall_total_s": 803.798,
+    "it_per_sec": 1.12,
+    "policy_inference_s": 176.797,
+    "policy_inference_avg_ms": 196.4,
+    "env_step_s": 550.063,
+    "env_step_avg_ms": 611.2,
+    "episode_s": 60
+  },
+  {
+    "task_name": "SpoonInMugTask",
+    "wall_total_s": 789.26,
+    "it_per_sec": 1.14,
+    "policy_inference_s": 133.563,
+    "policy_inference_avg_ms": 148.4,
+    "env_step_s": 597.262,
+    "env_step_avg_ms": 663.6,
+    "episode_s": 22
+  },
+  {
+    "task_name": "SpoonsInPotTask",
+    "wall_total_s": 2435.029,
+    "it_per_sec": 1.11,
+    "policy_inference_s": 562.563,
+    "policy_inference_avg_ms": 208.4,
+    "env_step_s": 1634.881,
+    "env_step_avg_ms": 605.5,
+    "episode_s": 180
+  },
+  {
+    "task_name": "Stack3RubiksCubeTask",
+    "wall_total_s": 621.865,
+    "it_per_sec": 1.45,
+    "policy_inference_s": 172.698,
+    "policy_inference_avg_ms": 191.9,
+    "env_step_s": 374.235,
+    "env_step_avg_ms": 415.8,
+    "episode_s": 60
+  },
+  {
+    "task_name": "StackWhiteMugsTask",
+    "wall_total_s": 625.809,
+    "it_per_sec": 1.44,
+    "policy_inference_s": 140.659,
+    "policy_inference_avg_ms": 156.3,
+    "env_step_s": 425.177,
+    "env_step_avg_ms": 472.4,
+    "episode_s": 33
+  },
+  {
+    "task_name": "StackYellowOnRedTask",
+    "wall_total_s": 931.338,
+    "it_per_sec": 0.97,
+    "policy_inference_s": 328.167,
+    "policy_inference_avg_ms": 364.6,
+    "env_step_s": 538.617,
+    "env_step_avg_ms": 598.5,
+    "episode_s": 60
+  },
+  {
+    "task_name": "TakeMeasuringSpoonOutTask",
+    "wall_total_s": 414.1,
+    "it_per_sec": 1.45,
+    "policy_inference_s": 120.381,
+    "policy_inference_avg_ms": 200.6,
+    "env_step_s": 243.365,
+    "env_step_avg_ms": 405.6,
+    "episode_s": 40
+  },
+  {
+    "task_name": "TakeMugsOffOfShelfTask",
+    "wall_total_s": 1604.995,
+    "it_per_sec": 1.68,
+    "policy_inference_s": 564.221,
+    "policy_inference_avg_ms": 209.0,
+    "env_step_s": 799.966,
+    "env_step_avg_ms": 296.3,
+    "episode_s": 180
+  },
+  {
+    "task_name": "TakeSpatulaOffShelfTask",
+    "wall_total_s": 655.943,
+    "it_per_sec": 1.37,
+    "policy_inference_s": 187.747,
+    "policy_inference_avg_ms": 208.6,
+    "env_step_s": 386.889,
+    "env_step_avg_ms": 429.9,
+    "episode_s": 60
+  },
+  {
+    "task_name": "ThrowAwayAppleTask",
+    "wall_total_s": 769.105,
+    "it_per_sec": 1.17,
+    "policy_inference_s": 186.072,
+    "policy_inference_avg_ms": 206.7,
+    "env_step_s": 501.758,
+    "env_step_avg_ms": 557.5,
+    "episode_s": 60
+  },
+  {
+    "task_name": "ThrowAwaySnacksTask",
+    "wall_total_s": 1668.333,
+    "it_per_sec": 1.08,
+    "policy_inference_s": 373.506,
+    "policy_inference_avg_ms": 207.5,
+    "env_step_s": 1134.37,
+    "env_step_avg_ms": 630.2,
+    "episode_s": 120
+  },
+  {
+    "task_name": "ToolOrganizationBothTask",
+    "wall_total_s": 1790.329,
+    "it_per_sec": 1.51,
+    "policy_inference_s": 563.23,
+    "policy_inference_avg_ms": 208.6,
+    "env_step_s": 988.092,
+    "env_step_avg_ms": 366.0,
+    "episode_s": 180
+  },
+  {
+    "task_name": "ToolOrganizationTask",
+    "wall_total_s": 1804.226,
+    "it_per_sec": 1.5,
+    "policy_inference_s": 555.668,
+    "policy_inference_avg_ms": 205.8,
+    "env_step_s": 1008.612,
+    "env_step_avg_ms": 373.6,
+    "episode_s": 180
+  },
+  {
+    "task_name": "ToolsPickingAllHammersTask",
+    "wall_total_s": 2886.549,
+    "it_per_sec": 1.25,
+    "policy_inference_s": 930.241,
+    "policy_inference_avg_ms": 258.4,
+    "env_step_s": 1641.165,
+    "env_step_avg_ms": 455.9,
+    "episode_s": 240
+  },
+  {
+    "task_name": "ToolsPickingDrillTask",
+    "wall_total_s": 667.225,
+    "it_per_sec": 1.35,
+    "policy_inference_s": 187.749,
+    "policy_inference_avg_ms": 208.6,
+    "env_step_s": 399.522,
+    "env_step_avg_ms": 443.9,
+    "episode_s": 60
+  },
+  {
+    "task_name": "ToolsPickingHammerTask",
+    "wall_total_s": 668.012,
+    "it_per_sec": 1.35,
+    "policy_inference_s": 187.496,
+    "policy_inference_avg_ms": 208.3,
+    "env_step_s": 399.274,
+    "env_step_avg_ms": 443.6,
+    "episode_s": 60
+  },
+  {
+    "task_name": "ToyInBinTask",
+    "wall_total_s": 751.314,
+    "it_per_sec": 1.2,
+    "policy_inference_s": 109.081,
+    "policy_inference_avg_ms": 121.2,
+    "env_step_s": 594.515,
+    "env_step_avg_ms": 660.6,
+    "episode_s": 60
+  },
+  {
+    "task_name": "UnstackRubiksCubeTask",
+    "wall_total_s": 913.176,
+    "it_per_sec": 1.48,
+    "policy_inference_s": 274.248,
+    "policy_inference_avg_ms": 203.1,
+    "env_step_s": 523.972,
+    "env_step_avg_ms": 388.1,
+    "episode_s": 90
+  },
+  {
+    "task_name": "UtensilsInMugTask",
+    "wall_total_s": 1674.251,
+    "it_per_sec": 0.81,
+    "policy_inference_s": 285.011,
+    "policy_inference_avg_ms": 211.1,
+    "env_step_s": 1266.757,
+    "env_step_avg_ms": 938.3,
+    "episode_s": 90
+  },
+  {
+    "task_name": "WhiteMugInCenterOfTableTask",
+    "wall_total_s": 281.657,
+    "it_per_sec": 1.6,
+    "policy_inference_s": 82.07,
+    "policy_inference_avg_ms": 182.4,
+    "env_step_s": 163.517,
+    "env_step_avg_ms": 363.4,
+    "episode_s": 30
+  },
+  {
+    "task_name": "WhiteMugsInBinTask",
+    "wall_total_s": 681.719,
+    "it_per_sec": 1.32,
+    "policy_inference_s": 187.826,
+    "policy_inference_avg_ms": 208.7,
+    "env_step_s": 412.214,
+    "env_step_avg_ms": 458.0,
+    "episode_s": 60
+  },
+  {
+    "task_name": "WoodSpatulaToBowlTask",
+    "wall_total_s": 989.508,
+    "it_per_sec": 0.91,
+    "policy_inference_s": 177.865,
+    "policy_inference_avg_ms": 197.6,
+    "env_step_s": 732.686,
+    "env_step_avg_ms": 814.1,
+    "episode_s": 60
+  },
+  {
+    "task_name": "YellowAndWhiteObjectsInBinTask",
+    "wall_total_s": 550.203,
+    "it_per_sec": 1.64,
+    "policy_inference_s": 188.03,
+    "policy_inference_avg_ms": 208.9,
+    "env_step_s": 280.726,
+    "env_step_avg_ms": 311.9,
+    "episode_s": 60
+  },
+  {
+    "task_name": "YogurtInBowlTask",
+    "wall_total_s": 881.591,
+    "it_per_sec": 0.68,
+    "policy_inference_s": 298.702,
+    "policy_inference_avg_ms": 497.8,
+    "env_step_s": 532.651,
+    "env_step_avg_ms": 887.8,
+    "episode_s": 15
+  }
+]

@@ -1,0 +1,1 @@
+house,lamp,window,wood floor,empty,indoor,urban,morning-afternoon,low contrast,natural light,artificial light

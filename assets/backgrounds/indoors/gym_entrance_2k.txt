@@ -1,0 +1,1 @@
+shop,couch,gym,red,fluorescent,indoor,urban,medium contrast,artificial light
