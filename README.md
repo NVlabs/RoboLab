@@ -1,11 +1,7 @@
 # RoboLab
 
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-5.0-brightgreen.svg)](https://developer.nvidia.com/isaac-sim)
-[![IsaacLab](https://img.shields.io/badge/IsaacLab-2.2.0-brightgreen.svg)](https://github.com/isaac-sim/IsaacLab)
-[![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
-[![License: CC BY-NC-4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-
-[\[Website\]](https://research.nvidia.com/labs/srl/projects/robolab) | Paper (coming soon)
+[![Website](https://img.shields.io/badge/Website-RoboLab-blue?logo=googlechrome&logoColor=white)](https://research.nvidia.com/labs/srl/projects/robolab)
+[![arXiv](https://img.shields.io/badge/arXiv-2604.09860-b31b1b?logo=arXiv&logoColor=white)](https://arxiv.org/abs/2604.09860)
 
 **RoboLab** is a task-based evaluation benchmark for robot manipulation policies built on [NVIDIA Isaac Lab](https://github.com/isaac-sim/IsaacLab). It provides 100+ manipulation tasks with automated success detection, a server-client policy architecture, and multi-environment parallel evaluation — designed for reproducible, large-scale benchmarking of generalist robot policies in simulation.
 
@@ -100,6 +96,8 @@ Full documentation is at **[docs/README.md](docs/README.md)**, covering:
 
 ## Example Tasks
 
+See the full [Benchmark Task Library](robolab/tasks/README.md) for all 120 tasks.
+
 <div align="center">
   <img src="docs/images/Make_sure_all_the_white_mugs_are_upright_so_that_the_opening_is_facing_upwards_0_hstack_3X_fps24_width800.gif" alt="Make sure all the white mugs are upright so that the opening is facing upwards" width="800"/>
   <br><em>"Make sure all the white mugs are upright so that the opening is facing upwards."</em>
@@ -114,8 +112,6 @@ Full documentation is at **[docs/README.md](docs/README.md)**, covering:
   <img src="docs/images/Put_the_orange_measuring_cup_and_the_blue_measuring_cup_outside_of_the_plate_0_hstack_3X_fps24_width800.gif" alt="Put the orange measuring cup and the blue measuring cup outside of the plate" width="800"/>
   <br><em>"Put the orange measuring cup and the blue measuring cup outside of the plate."</em>
 </div>
-
-See the full [Benchmark Task Library](robolab/tasks/README.md) for all 120 tasks.
 
 ## Requirements
 
@@ -137,9 +133,10 @@ The RoboLab framework is released under [CC-BY-NC-4.0](https://creativecommons.o
 ## Citation
 
 ```bibtex
-% Coming soon
-@article{robolab2026,
-  title={RoboLab: A Task-Based Evaluation Benchmark for Robot Manipulation},
-  year={2026}
+@misc{yang2026robolab,
+      title={RoboLab: A High-Fidelity Simulation Benchmark for Analysis of Task Generalist Policies},
+      author={Xuning Yang and Rishit Dagli and Alex Zook and Hugo Hadfield and Ankit Goyal and Stan Birchfield and Fabio Ramos and Jonathan Tremblay},
+      year={2026},
+      url={https://arxiv.org/abs/2604.09860},
 }
 ```
