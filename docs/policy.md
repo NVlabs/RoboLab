@@ -19,49 +19,63 @@ my_policy_eval/
 
 ## Step 1: Implement an Inference Client
 
-Subclass `robolab.inference.InferenceClient`:
+Subclass `robolab.eval.InferenceClient`. The base provides the control loop
+(`infer`, `reset`, chunking, multi-env bookkeeping); subclasses implement
+four narrow hooks:
 
 ```python
 # my_policy/inference_client.py
 
 import numpy as np
-from robolab.inference.base_client import InferenceClient
+from robolab.eval import InferenceClient
 
 
 class MyPolicyClient(InferenceClient):
+    open_loop_horizon = 8  # how many actions to consume per server query
+
     def __init__(self, remote_host: str = "localhost", remote_port: int = 8000) -> None:
+        super().__init__()
         # Connect to your model server
         ...
 
-    def infer(self, obs: dict, instruction: str) -> dict:
-        # For the default DROID registration, obs contains:
-        #   obs["image_obs"]["external_cam"]    - (N, H, W, 3) torch tensor, uint8
-        #   obs["image_obs"]["wrist_cam"]       - (N, H, W, 3) torch tensor, uint8
-        #   obs["proprio_obs"]["arm_joint_pos"] - (N, 7) torch tensor, float32
-        #   obs["proprio_obs"]["gripper_pos"]   - (N, 1) torch tensor, float32
+    # --- required hooks ---------------------------------------------------
 
-        # Extract observations for this env (N = num_envs; index by env_id)
-        image = obs["image_obs"]["external_cam"][0].cpu().numpy()
-        joint_pos = obs["proprio_obs"]["arm_joint_pos"][0].cpu().numpy()
-
-        # Call your model server and get back an action
-        action = self._query_server(image, joint_pos, instruction)
-
-        # Return dict with "action" (np.ndarray) and "viz" (np.ndarray for display)
+    def _extract_observation(self, raw_obs, *, env_id=0) -> dict:
+        # For the default DROID registration, raw_obs contains:
+        #   raw_obs["image_obs"]["external_cam"]    - (N, H, W, 3) torch tensor, uint8
+        #   raw_obs["image_obs"]["wrist_cam"]       - (N, H, W, 3) torch tensor, uint8
+        #   raw_obs["proprio_obs"]["arm_joint_pos"] - (N, 7) torch tensor, float32
+        #   raw_obs["proprio_obs"]["gripper_pos"]   - (N, 1) torch tensor, float32
         return {
-            "action": action,  # shape (8,): 7 joint positions + 1 gripper {0, 1}
-            "viz": image,      # any RGB image for the live visualization window
+            "image":    raw_obs["image_obs"]["external_cam"][env_id].cpu().numpy(),
+            "joint_pos": raw_obs["proprio_obs"]["arm_joint_pos"][env_id].cpu().numpy(),
         }
 
-    def reset(self):
-        # Called between episodes. Clear any internal state (action buffers, etc.)
-        ...
+    def _pack_request(self, extracted_obs, instruction):
+        # Whatever wire format your server expects
+        return {"image": extracted_obs["image"], "prompt": instruction}
+
+    def _query_server(self, request):
+        return self.client.infer(request)
+
+    def _unpack_response(self, response) -> np.ndarray:
+        # Must return a (horizon, action_dim) array; base handles the rest.
+        return np.asarray(response["actions"])
+
+    # --- optional hooks (defaults are identity / None) -------------------
+
+    def _postprocess_chunk(self, chunk):
+        # Binarize gripper, pad 7->8, flip sign, etc.
+        return chunk
+
+    def _build_visualization(self, extracted_obs):
+        return extracted_obs["image"]
 ```
 
 **Key contract:**
-- `infer()` receives the raw observation dict from the simulator and a language instruction string.
-- It must return a dict with `"action"` (a numpy array, typically 8-dim: 7 joints + 1 gripper) and `"viz"` (an image array for the live display window).
-- `reset()` is called at the end of each episode.
+- `_extract_observation` + `_pack_request` split repo-specific obs munging from backend-specific wire format. The ABC's default `infer()` wires them together: extract → pack → query → unpack → postprocess → cache chunk → step one action.
+- Action dict returned by `infer()` has `"action"` (numpy array, typically 8-dim: 7 joints + 1 gripper) and `"viz"` (image for the live display window, or `None`).
+- `reset(env_id=...)` clears per-episode state. Override only if your server needs session notification; otherwise the base's default is enough.
 
 See the [existing clients](#existing-clients-as-reference) for complete working examples.
 
@@ -110,7 +124,8 @@ In short:
 
 | Client | Protocol | File |
 |--------|----------|------|
-| Pi0 / Pi0-fast / Pi05 | WebSocket (OpenPI) | `robolab/inference/pi0_family.py` |
-| GR00T | ZMQ | `robolab/inference/gr00t.py` |
+| Pi0 / Pi0-fast / Pi05 | WebSocket (OpenPI) | `robolab_policy_client/pi0_family.py` |
+| GR00T | ZMQ | `robolab_policy_client/gr00t.py` |
+| DreamZero | WebSocket (msgpack) | `robolab_policy_client/dreamzero.py` |
 
 See [Inference Clients](inference.md) for server setup instructions.

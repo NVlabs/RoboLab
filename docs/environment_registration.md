@@ -68,7 +68,7 @@ from robolab.constants import DEFAULT_TASK_SUBFOLDERS, TASK_DIR
 
 
 def register_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, task=None):
-    from robolab.core.environments.factory import auto_discover_and_create_cfgs, create_env_cfg
+    from robolab.core.environments.factory import auto_discover_and_create_cfgs
     from robolab.core.observations.observation_utils import generate_image_obs_from_cameras, generate_obs_cfg
     from robolab.robots.droid import (
         DroidCfg,
@@ -92,7 +92,13 @@ def register_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, task=None):
         "viewport_cam": ViewportCameraCfg(),
     })
 
-    shared_kwargs = dict(
+    auto_discover_and_create_cfgs(
+        task_dir=TASK_DIR,
+        task_subdirs=task_dirs,
+        tasks=task,             # None → discover everything in task_subdirs; str/list → only those
+        pattern="*.py",
+        env_prefix="",
+        env_postfix="",
         observations_cfg=ObservationCfg(),
         actions_cfg=DroidJointPositionActionCfg(),
         robot_cfg=DroidCfg,
@@ -105,17 +111,6 @@ def register_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, task=None):
         decimation=8,           # Action repeat
         seed=1,
     )
-
-    if task is not None:
-        tasks = task if isinstance(task, list) else [task]
-        for t in tasks:
-            create_env_cfg(t, task_dir=TASK_DIR, env_prefix="", env_postfix="", **shared_kwargs)
-    else:
-        for subdir in task_dirs:
-            auto_discover_and_create_cfgs(
-                task_dir=TASK_DIR, task_subdirs=[subdir], pattern="*.py",
-                env_prefix="", env_postfix="", **shared_kwargs,
-            )
 ```
 
 ## Step 3: Verify
@@ -139,23 +134,24 @@ The examples above register RoboLab's built-in benchmark tasks (from `TASK_DIR`)
 
 ### Register individual tasks by file path
 
-Use `create_env_cfg()` with the **full file path** to your task file:
+Pass the **full file path** via `tasks=`:
 
 ```python
 def register_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, task=None):
     ...
 
     # Register a specific task by absolute path
-    create_env_cfg(
-        "/path/to/my_tasks/tasks/my_task.py",
+    auto_discover_and_create_cfgs(
+        task_dir=TASK_DIR,
+        tasks="/path/to/my_tasks/tasks/my_task.py",
         env_prefix="", env_postfix="",
-        **shared_kwargs,
+        # ... same observation/robot/camera/lighting/etc kwargs as above
     )
 ```
 
 ### Auto-discover tasks from your own directory
 
-Use `auto_discover_and_create_cfgs()` with `task_dir` pointing to your tasks folder:
+Point `task_dir` at your tasks folder and omit `tasks`:
 
 ```python
 def register_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, task=None):
@@ -167,11 +163,11 @@ def register_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, task=None):
         task_subdirs=[""],
         pattern="*.py",
         env_prefix="", env_postfix="Custom",
-        **shared_kwargs,
+        # ... same observation/robot/camera/lighting/etc kwargs as above
     )
 ```
 
-You can register both benchmark tasks and your own tasks in the same function — just call `auto_discover_and_create_cfgs()` or `create_env_cfg()` multiple times. Use `env_postfix` or `add_tags` to distinguish them.
+You can register both benchmark tasks and your own tasks in the same function — just call `auto_discover_and_create_cfgs()` multiple times (with different `task_dir` / `task_subdirs` / `tasks`). Use `env_postfix` or `add_tags` to distinguish them.
 
 ## Example Registration Files
 

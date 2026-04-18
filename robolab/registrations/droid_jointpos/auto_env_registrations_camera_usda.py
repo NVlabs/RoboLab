@@ -158,7 +158,7 @@ def auto_register_droid_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, lighting_intensi
               all tasks. Accepts a single task name/filename/path (str) or a list of them.
               Significantly faster when running a subset of tasks.
     """
-    from robolab.core.environments.factory import auto_discover_and_create_cfgs, create_env_cfg
+    from robolab.core.environments.factory import auto_discover_and_create_cfgs
     from robolab.core.observations.observation_utils import generate_obs_cfg
 
     # from robolab.registrations.droid_jointpos.observations import ImageObsCfg
@@ -185,7 +185,13 @@ def auto_register_droid_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, lighting_intensi
         # "viewport_cam": ViewportCameraCfg(),
     })
 
-    shared_kwargs = dict(
+    auto_discover_and_create_cfgs(
+        task_dir=TASK_DIR,
+        task_subdirs=task_dirs,
+        tasks=task,
+        pattern="*.py",
+        env_prefix="",
+        env_postfix="",
         observations_cfg=ObservationCfg(),
         actions_cfg=DroidJointPositionActionCfg(),
         robot_cfg=DroidCfg,
@@ -199,29 +205,6 @@ def auto_register_droid_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, lighting_intensi
         decimation=8,
         seed=1,
     )
-
-    if task is not None:
-        tasks = task if isinstance(task, list) else [task]
-        print(f"\033[96m[RoboLab] Registering {len(tasks)} task(s): {tasks}\033[0m")
-        for t in tasks:
-            create_env_cfg(
-                t,
-                task_dir=TASK_DIR,
-                env_prefix="",
-                env_postfix="",
-                **shared_kwargs,
-            )
-    else:
-        print(f"\033[96m[RoboLab] Registering all tasks in {task_dirs}\033[0m")
-        for subdir in task_dirs:
-            auto_discover_and_create_cfgs(
-                task_dir=TASK_DIR,
-                task_subdirs=[subdir],
-                pattern="*.py",
-                env_prefix="",
-                env_postfix="",
-                **shared_kwargs,
-            )
 
     if robolab.constants.VERBOSE:
         from robolab.core.environments.factory import print_env_table

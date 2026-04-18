@@ -59,7 +59,7 @@ robolab.constants.DEBUG = True
 
 ### `VISUALIZE`
 
-Renders bounding boxes and pose axes for all tracked objects in the viewport at every simulation step. Used inside the episode loop in `examples/policy/episode.py`.
+Renders bounding boxes and pose axes for all tracked objects in the viewport at every simulation step. Used inside the episode loop in `robolab/eval/episode.py`.
 
 **Enable programmatically:**
 

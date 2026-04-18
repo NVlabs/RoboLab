@@ -1,7 +1,10 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: CC-BY-NC-4.0
+
 """DreamZero VLA client for robolab.
 
-DreamZero is a world model that predicts future observations while predicting actions.
-It uses the roboarena WebSocket protocol, similar to OpenPI but with:
+DreamZero is a world model that predicts future observations while predicting
+actions. It uses the roboarena WebSocket protocol, with:
   - Support for multiple external cameras (2 for DROID)
   - Temporal frame input (can send multiple frames for temporal context)
   - Session ID tracking for episode-level history
@@ -15,14 +18,14 @@ Usage:
     python examples/policy/run_eval.py --policy dreamzero --remote-port 5000 --task BananaInBowlTableTask
 """
 
+import logging
 import time
 import uuid
-import logging
+
 import numpy as np
-from PIL import Image
 import websockets.sync.client
 
-from .base_client import InferenceClient
+from robolab.eval.base_client import InferenceClient
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +59,6 @@ class MsgPackNumpy:
         return self._msgpack.unpackb(data, object_hook=self._decode_numpy, strict_map_key=False)
 
     def _encode_numpy(self, obj):
-        """Encode numpy arrays and generics for msgpack serialization."""
-        # Handle numpy arrays
         if isinstance(obj, np.ndarray):
             if obj.dtype.kind in ("V", "O", "c"):
                 raise ValueError(f"Unsupported dtype: {obj.dtype}")
@@ -68,7 +69,6 @@ class MsgPackNumpy:
                 b"shape": obj.shape,
             }
 
-        # Handle numpy scalar types
         if isinstance(obj, np.generic):
             return {
                 b"__npgeneric__": True,
@@ -76,7 +76,6 @@ class MsgPackNumpy:
                 b"dtype": obj.dtype.str,
             }
 
-        # Let msgpack handle other types (including tuples, lists, etc.)
         return obj
 
     def _decode_numpy(self, obj):
@@ -88,7 +87,7 @@ class MsgPackNumpy:
 
 
 class DreamZeroClient(InferenceClient):
-    """Inference client for DreamZero VLA model.
+    """Inference client for DreamZero VAM model.
 
     DreamZero uses the roboarena WebSocket protocol with:
       - 2 external cameras + 1 wrist camera
@@ -96,49 +95,26 @@ class DreamZeroClient(InferenceClient):
       - Joint position action space (7 DoF + gripper)
       - Session ID for episode tracking
       - Action chunks output
-
-    Input observation keys:
-      - observation/exterior_image_0_left: (H, W, 3) uint8 - External camera 1
-      - observation/exterior_image_1_left: (H, W, 3) uint8 - External camera 2
-      - observation/wrist_image_left: (H, W, 3) uint8 - Wrist camera
-      - observation/joint_position: (7,) float32 - Joint positions
-      - observation/cartesian_position: (6,) float32 - Cartesian pose
-      - observation/gripper_position: (1,) float32 - Gripper position
-      - prompt: str - Language instruction
-      - session_id: str - Unique session/episode ID
-
-    Output:
-      - actions: (N, 8) float32 - N actions with 7 joints + 1 gripper
     """
 
-    def __init__(self,
-                 remote_host: str = "localhost",
-                 remote_port: int = 5000,  # Default DreamZero port
-                 open_loop_horizon: int = 24,  # DreamZero uses 24-step action chunks
-                 image_height: int = 180,  # DreamZero DROID default
-                 image_width: int = 320,   # DreamZero DROID default
-                 ) -> None:
-        """Initialize DreamZero client.
-
-        Args:
-            remote_host: Server hostname
-            remote_port: Server port (default 5000 for DreamZero)
-            open_loop_horizon: Number of actions to execute before re-querying
-            image_height: Target image height for resizing
-            image_width: Target image width for resizing
-        """
+    def __init__(
+        self,
+        remote_host: str = "localhost",
+        remote_port: int = 5000,
+        open_loop_horizon: int = 8,
+        image_height: int = 180,
+        image_width: int = 320,
+    ) -> None:
+        super().__init__()
         self.host = remote_host
         self.port = remote_port
-        self.open_loop_horizon = open_loop_horizon
+        self.open_loop_horizon = int(open_loop_horizon)
         self.image_height = image_height
         self.image_width = image_width
 
-        # Action chunking state
-        self.actions_from_chunk_completed = 0
-        self.pred_action_chunk = None
-
-        # Session tracking (unique per episode)
-        self.session_id = str(uuid.uuid4())
+        # Per-env session IDs. The server uses session_id to track temporal
+        # history; parallel envs must not share one or their histories get mixed.
+        self._env_session_id: dict[int, str] = {}
 
         # MsgPack for numpy serialization
         self._packer = MsgPackNumpy()
@@ -147,6 +123,96 @@ class DreamZeroClient(InferenceClient):
         self._uri = f"ws://{remote_host}:{remote_port}"
         self._ws = None
         self._connect_with_retries()
+
+    # ---- required hooks -----------------------------------------------
+
+    def _extract_observation(self, raw_obs: dict, *, env_id: int = 0) -> dict:
+        right_image = raw_obs["image_obs"]["external_cam"][env_id].clone().detach().cpu().numpy()
+        wrist_image = raw_obs["image_obs"]["wrist_cam"][env_id].clone().detach().cpu().numpy()
+
+        robot_state = raw_obs["proprio_obs"]
+        joint_position = robot_state["arm_joint_pos"][env_id].clone().detach().cpu().numpy().astype(np.float32)
+        gripper_position = robot_state["gripper_pos"][env_id].clone().detach().cpu().numpy().astype(np.float32)
+
+        # Lazy-init a stable session_id per env so the server can thread temporal history.
+        if env_id not in self._env_session_id:
+            self._env_session_id[env_id] = str(uuid.uuid4())
+
+        return {
+            "right_image": right_image,
+            "wrist_image": wrist_image,
+            "joint_position": joint_position,
+            "gripper_position": gripper_position,
+            "session_id": self._env_session_id[env_id],
+        }
+
+    def _pack_request(self, extracted_obs: dict, instruction: str) -> dict:
+        right_resized = self._resize_image(extracted_obs["right_image"], self.image_height, self.image_width)
+        wrist_resized = self._resize_image(extracted_obs["wrist_image"], self.image_height, self.image_width)
+        return {
+            "observation/exterior_image_0_left": right_resized,
+            # Using same image for both when only one external camera is available
+            "observation/exterior_image_1_left": right_resized,
+            "observation/wrist_image_left": wrist_resized,
+            "observation/joint_position": extracted_obs["joint_position"],
+            "observation/cartesian_position": np.zeros(6, dtype=np.float32),
+            "observation/gripper_position": extracted_obs["gripper_position"],
+            "prompt": instruction,
+            "session_id": extracted_obs["session_id"],
+            "endpoint": "infer",
+        }
+
+    def _query_server(self, request: dict):
+        raw = self._send_recv(self._packer.pack(request))
+        if isinstance(raw, str):
+            raise RuntimeError(f"DreamZero server error:\n{raw}")
+        return self._packer.unpack(raw)
+
+    def _unpack_response(self, response) -> np.ndarray:
+        if isinstance(response, dict):
+            response = response.get("actions", response)
+        chunk = np.asarray(response)
+        if chunk.ndim == 1:
+            chunk = chunk.reshape(1, -1)
+        return chunk
+
+    # ---- optional hooks -----------------------------------------------
+
+    def _postprocess_chunk(self, chunk: np.ndarray) -> np.ndarray:
+        # DreamZero emits continuous gripper values that the downstream
+        # controller interprets directly. Do not binarize here.
+        chunk = chunk.copy()
+        if chunk.shape[-1] == 7:
+            pad = np.zeros((*chunk.shape[:-1], 1), dtype=chunk.dtype)
+            chunk = np.concatenate([chunk, pad], axis=-1)
+        return chunk
+
+    def _build_visualization(self, extracted_obs: dict) -> np.ndarray:
+        img1 = self._resize_image(extracted_obs["right_image"], self.image_height, self.image_width)
+        img2 = self._resize_image(extracted_obs["wrist_image"], self.image_height, self.image_width)
+        return np.concatenate([img1, img2], axis=1)
+
+    # ---- lifecycle overrides ------------------------------------------
+
+    def reset(self, *, env_id: int | None = None) -> None:
+        """Notify server, clear per-env session ids, then clear chunk state."""
+        self._send_recv(self._packer.pack({"endpoint": "reset"}))
+        if env_id is None:
+            self._env_session_id.clear()
+        else:
+            self._env_session_id.pop(env_id, None)
+        super().reset(env_id=env_id)
+        print(f"[{self.__class__.__name__}] Reset complete (env_id={env_id}).")
+
+    def close(self) -> None:
+        if self._ws is not None:
+            try:
+                self._ws.close()
+            except Exception:
+                pass
+            self._ws = None
+
+    # ---- connection internals -----------------------------------------
 
     @staticmethod
     def _wait_with_progress(tag: str, label: str, duration: float, interval: float = 5.0):
@@ -218,7 +284,7 @@ class DreamZeroClient(InferenceClient):
                     tag, attempt, MAX_CONNECT_RETRIES, e, wait,
                 )
                 print(f"{tag} Connection attempt {attempt}/{MAX_CONNECT_RETRIES} failed ({e}).")
-                self._wait_with_progress(tag, f"Waiting to retry", wait)
+                self._wait_with_progress(tag, "Waiting to retry", wait)
 
     def _ensure_connected(self):
         """Reconnect if the WebSocket has been closed or lost."""
@@ -232,10 +298,7 @@ class DreamZeroClient(InferenceClient):
         self._connect_with_retries()
 
     def _send_recv(self, data: bytes, *, timeout: float = RECV_TIMEOUT_SECS) -> bytes:
-        """Send packed data and receive response with timeout and auto-reconnect.
-
-        Retries up to MAX_INFER_RETRIES times on transient failures.
-        """
+        """Send packed data and receive response with timeout and auto-reconnect."""
         tag = f"[{self.__class__.__name__}]"
         last_exc = None
 
@@ -272,157 +335,22 @@ class DreamZeroClient(InferenceClient):
             f"Last error: {last_exc}"
         ) from last_exc
 
-    def reset(self):
-        """Reset for new episode - generates new session ID and clears action buffer."""
-        reset_data = {"endpoint": "reset"}
-        self._send_recv(self._packer.pack(reset_data))
-
-        # Reset local state
-        self.actions_from_chunk_completed = 0
-        self.pred_action_chunk = None
-        self.session_id = str(uuid.uuid4())
-        print(f"[{self.__class__.__name__}] Reset complete. New session_id: {self.session_id}")
-
-    def infer(self, obs: dict, instruction: str, *, env_id: int = 0) -> dict:
-        """Query DreamZero server and return the next action.
-
-        Args:
-            obs: Observation dict from robolab environment
-            instruction: Natural language instruction
-            env_id: Environment index to extract observations from.
-
-        Returns:
-            dict with:
-                - "action": np.ndarray (8,) - 7 joint positions + 1 gripper
-                - "viz": np.ndarray - Combined camera visualization
-        """
-        curr_obs = self._extract_observation(obs, env_id=env_id)
-
-        # Only query server when action buffer is exhausted
-        if (self.actions_from_chunk_completed == 0 or
-            self.actions_from_chunk_completed >= self.open_loop_horizon):
-
-            self.actions_from_chunk_completed = 0
-
-            # Build request in DreamZero/roboarena format
-            request_data = {
-                # Camera images - resize to DreamZero expected resolution
-                "observation/exterior_image_0_left": self._resize_image(
-                    curr_obs["right_image"], self.image_height, self.image_width
-                ),
-                "observation/exterior_image_1_left": self._resize_image(
-                    curr_obs["right_image"], self.image_height, self.image_width
-                ),  # Using same image for both if only one external camera available
-                "observation/wrist_image_left": self._resize_image(
-                    curr_obs["wrist_image"], self.image_height, self.image_width
-                ),
-                # Proprioception
-                "observation/joint_position": curr_obs["joint_position"],
-                "observation/cartesian_position": np.zeros(6, dtype=np.float32),  # Placeholder if not available
-                "observation/gripper_position": curr_obs["gripper_position"],
-                # Language and session
-                "prompt": instruction,
-                "session_id": self.session_id,
-                # Endpoint marker for server
-                "endpoint": "infer",
-            }
-
-            # Send request and receive action chunk (with timeout + auto-reconnect)
-            response = self._send_recv(self._packer.pack(request_data))
-
-            if isinstance(response, str):
-                raise RuntimeError(f"DreamZero server error:\n{response}")
-
-            self.pred_action_chunk = self._packer.unpack(response)
-
-            # Handle different response formats
-            if isinstance(self.pred_action_chunk, dict):
-                self.pred_action_chunk = self.pred_action_chunk.get("actions", self.pred_action_chunk)
-
-            self.pred_action_chunk = np.asarray(self.pred_action_chunk)
-
-            # Ensure 2D shape
-            if self.pred_action_chunk.ndim == 1:
-                self.pred_action_chunk = self.pred_action_chunk.reshape(1, -1)
-
-        # Get current action from chunk (copy to make writable)
-        assert self.pred_action_chunk is not None
-        action = self.pred_action_chunk[self.actions_from_chunk_completed].copy()
-        self.actions_from_chunk_completed += 1
-
-        # Ensure 8-dim action (7 joints + gripper)
-        if action.size == 7:
-            action = np.concatenate([action, np.zeros((1,))])
-
-        # Binarize gripper to {0, 1}
-        if action.size >= 8:
-            action[-1] = 1.0 if action[-1] > 0.5 else 0.0
-
-        # Build visualization
-        viz = self._build_visualization(curr_obs)
-
-        return {"action": action, "viz": viz}
-
-    def visualize(self, request: dict):
-        """Return camera views visualization."""
-        curr_obs = self._extract_observation(request)
-        return self._build_visualization(curr_obs)
-
-    def _extract_observation(self, obs_dict, *, env_id=0, save_to_disk=False):
-        """Extract observations from robolab environment format.
-
-        Converts robolab obs structure to intermediate format for DreamZero.
-        """
-        # Extract images
-        right_image = obs_dict["image_obs"]["external_cam"][env_id].clone().detach().cpu().numpy()
-        wrist_image = obs_dict["image_obs"]["wrist_cam"][env_id].clone().detach().cpu().numpy()
-
-        # Extract proprioception
-        robot_state = obs_dict["proprio_obs"]
-        joint_position = robot_state["arm_joint_pos"][env_id].clone().detach().cpu().numpy()
-        gripper_position = robot_state["gripper_pos"][env_id].clone().detach().cpu().numpy()
-
-        if save_to_disk:
-            combined_image = np.concatenate([right_image, wrist_image], axis=1)
-            Image.fromarray(combined_image).save("robot_camera_views.png")
-
-        return {
-            "right_image": right_image,
-            "wrist_image": wrist_image,
-            "joint_position": joint_position.astype(np.float32),
-            "gripper_position": gripper_position.astype(np.float32),
-        }
-
     def _resize_image(self, image: np.ndarray, height: int, width: int) -> np.ndarray:
-        """Resize image to target resolution.
+        # Aspect-preserving resize to (height, width), padded with zeros.
+        # Replicates tf.image.resize_with_pad (what the DreamZero training
+        # pipeline uses); see robolab_policy_client/image_tools.py.
+        from .image_tools import resize_with_pad
+        return resize_with_pad(image, height, width)
 
-        Args:
-            image: (H, W, 3) uint8 RGB image
-            height: Target height
-            width: Target width
-
-        Returns:
-            Resized (height, width, 3) uint8 image
-        """
-        import cv2
-        resized = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
-        return resized.astype(np.uint8)
-
-    def _build_visualization(self, curr_obs: dict) -> np.ndarray:
-        """Build combined camera view for visualization.
-
-        Uses the same dimensions as what's sent to the model to avoid distortion.
-        """
-        # Use same dimensions as model input (preserves aspect ratio of what model sees)
-        img1 = self._resize_image(curr_obs["right_image"], self.image_height, self.image_width)
-        img2 = self._resize_image(curr_obs["wrist_image"], self.image_height, self.image_width)
-        return np.concatenate([img1, img2], axis=1)
+        # Previous implementation: cv2.resize with INTER_AREA (no aspect preservation).
+        # import cv2
+        # resized = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+        # return resized.astype(np.uint8)
 
 
 if __name__ == "__main__":
     import torch
 
-    # Test with fake observations
     client = DreamZeroClient(remote_host="localhost", remote_port=5000)
 
     fake_obs = {

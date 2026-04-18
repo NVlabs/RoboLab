@@ -4,7 +4,7 @@
 """Policy episode runner for RoboLab.
 
 This module contains the run_episode function that executes policy-controlled
-episodes using various policy backends (pi0, gr00t, dreamzero, molmo, openvla, etc.).
+episodes using various policy backends (pi0, gr00t, dreamzero).
 
 Supports multi-env: one PolicyClient per env, per-env video writers,
 actions inferred per active env and stacked for env.step().
@@ -50,20 +50,24 @@ from robolab.core.logging.results import get_all_env_subtask_infos
 from robolab.core.observations.observation_utils import unpack_image_obs, unpack_viewport_cams
 from robolab.core.utils.video_utils import VideoWriter
 from robolab.core.world.world_state import get_world
+from robolab.eval.base_client import InferenceClient
 
 
-def run_episode(env, env_cfg, episode, headless=False, save_videos=True, video_mode="all", remote_host="localhost", remote_port="8000"):
+def run_episode(env, env_cfg, episode, client: InferenceClient, *, headless=False, save_videos=True, video_mode="all"):
     """Run a policy-controlled episode across all parallel envs.
+
+    The policy client is constructed by the caller (typically via
+    :func:`robolab.eval.create_client`). This function stays policy-agnostic.
 
     Args:
         env: The environment instance (RobolabEnv with num_envs >= 1)
-        env_cfg: Environment configuration with policy attribute
+        env_cfg: Environment configuration
         episode: Run index (each run produces num_envs episodes)
+        client: Constructed inference client. One connection shared across envs
+            with per-env chunk state keyed by ``env_id``.
         headless: If True, don't display video
         save_videos: If True, save per-env episode videos
         video_mode: Which videos to save: 'all', 'viewport', 'sensor', or 'none'
-        remote_host: Host for policy server
-        remote_port: Port for policy server
 
     Returns:
         tuple: (env_results, subtask_status, timing)
@@ -72,37 +76,22 @@ def run_episode(env, env_cfg, episode, headless=False, save_videos=True, video_m
             timing: dict with wall-clock timing breakdown
     """
     timer = TimingStats()
-    # Dynamically choose policy backend
-    backend = getattr(env_cfg, "policy", "pi0").lower()
-
-    if backend in ("pi0", "pi0_fast", "paligemma", "paligemma_fast", "pi05"):
-        from robolab.inference.pi0_family import Pi0DroidJointposClient as PolicyClient
-    elif "gr00t" in backend:
-        from robolab.inference.gr00t import GR00TDroidJointposClient as PolicyClient
-    elif backend == "dreamzero":
-        from robolab.inference.dreamzero import DreamZeroClient as PolicyClient
-    elif backend == "molmo":
-        from robolab.inference.droid_molmo import MolmoActClient as PolicyClient
-    elif backend == "openvla":
-        from robolab.inference.openvla import OpenVLAClient as PolicyClient
-    elif backend == "openvla_oft":
-        from robolab.inference.openvla_oft import OpenVLAOFTClient as PolicyClient
-    else:
-        raise ValueError(
-            f"Unsupported policy '{backend}'. Choose 'pi0', 'pi0_fast', 'pi05', 'paligemma', 'paligemma_fast', 'gr00t', 'dreamzero', 'molmo', 'openvla', 'openvla_oft'"
-        )
 
     obs, _ = env.reset()
     obs, _ = env.reset()
     max_steps = env.max_episode_length
     video_fps = 1 / (env_cfg.sim.render_interval * env_cfg.sim.dt) # Hz
     instruction = env_cfg.instruction
-    action_dim = 8  # 7 joints + 1 gripper
+    # Pull action dim from the env's action manager (IsaacLab canonical),
+    # falling back to the gym action space if the manager isn't available.
+    action_dim = getattr(
+        getattr(env, "action_manager", None),
+        "total_action_dim",
+        None,
+    ) or env.action_space.shape[-1]
 
     subtask_status = []
 
-    # Single client (one WebSocket connection) with per-env chunk state
-    client = PolicyClient(remote_host=remote_host, remote_port=remote_port)
     clients = [client] * env.num_envs
 
     # Set up per-run HDF5 file and per-env demo indices

@@ -9,15 +9,30 @@ RoboLab uses a **server-client architecture**: your model runs as a standalone s
 | Pi0 / Pi0-fast / Pi05 | `Pi0DroidJointposClient` | WebSocket (OpenPI) | 8000 | `openpi-client` |
 | GR00T | `GR00TDroidJointposClient` | ZMQ | 5555 | `zmq`, `msgpack` |
 
-All clients live in `robolab/inference/` and implement the `InferenceClient` base class:
+Concrete clients live in the top-level `robolab_policy_client/` package (sibling to `robolab/`, installed together). They all inherit from the `InferenceClient` ABC in `robolab/eval/base_client.py`:
 
 ```python
-from robolab.inference import InferenceClient
+from robolab.eval import InferenceClient
 
 class InferenceClient(ABC):
-    def __init__(self, args) -> None: ...
-    def infer(self, obs, instruction) -> dict: ...
-    def reset(self): ...
+    # Hooks subclasses must implement:
+    def _extract_observation(self, raw_obs, *, env_id=0) -> dict: ...
+    def _pack_request(self, extracted_obs, instruction) -> Any: ...
+    def _query_server(self, request) -> Any: ...
+    def _unpack_response(self, response) -> np.ndarray: ...
+    # Provided by the base: infer(), reset(), close(), chunking state.
+```
+
+The `create_client(name, **kwargs)` factory looks a backend up in
+`POLICY_REGISTRY` and constructs it with signature-filtered kwargs:
+
+```python
+from robolab.eval import create_client
+
+client = create_client("pi0", remote_host="localhost", remote_port=8000)
+
+# Or import a client class directly from the top-level package:
+from robolab_policy_client import Pi0DroidJointposClient
 ```
 
 For writing your own inference client, see [Evaluating a New Policy](policy.md).
@@ -86,7 +101,7 @@ uv run python examples/policy/run_eval.py --policy pi05 --remote-host <HOST> --r
 
 ## GR00T N1.6
 
-RoboLab ships a built-in GR00T inference client (`robolab/inference/gr00t.py`) that communicates via ZMQ.
+RoboLab ships a built-in GR00T inference client (`robolab_policy_client/gr00t.py`) that communicates via ZMQ.
 
 ### Install the server
 

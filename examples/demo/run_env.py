@@ -43,7 +43,7 @@ from episodes import run_gripper_toggle_episode, run_prerecorded_episode, run_em
 
 from robolab.core.environments.runtime import create_env # noqa
 from robolab.core.environments.config import generate_env_cfg_from_task # noqa
-from robolab.policies.droid_jointpos.observations import ImageObsCfg, ProprioceptionObservationCfg # noqa
+from robolab.registrations.droid_jointpos.observations import ImageObsCfg, ProprioceptionObservationCfg # noqa
 from robolab.robots.droid import DroidCfg, contact_gripper, DroidJointPositionActionCfg # noqa
 from robolab.variations.camera import OverShoulderLeftCameraCfg # noqa
 from robolab.variations.lighting import SphereLightCfg # noqa

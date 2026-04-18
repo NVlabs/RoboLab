@@ -34,10 +34,8 @@ Output:
 import argparse
 import cv2 # Must import this before isaaclab. Do not remove
 import os
-import re
 import traceback
 import sys
-from collections import Counter
 from isaaclab.app import AppLauncher
 from robolab.constants import get_timestamp, DEFAULT_TASK_SUBFOLDERS # noqa
 
@@ -71,6 +69,13 @@ parser.add_argument("--remote-host", "--remote_host", type=str, default="localho
                        help="Remote host for policy server (default: localhost)")
 parser.add_argument("--remote-port", "--remote_port", type=int, default=8000,
                        help="Remote port for policy server (default: 8000)")
+parser.add_argument("--remote-uri", "--remote_uri", type=str, default=None,
+                       help="Full WebSocket URI for policy server, e.g. wss://host.lepton.run. "
+                            "Overrides --remote-host and --remote-port when set.")
+parser.add_argument("--open-loop-horizon", "--open_loop_horizon", type=int, default=None,
+                       help="Number of actions to execute from each predicted chunk before requesting a new one. "
+                            "If omitted, each inference client uses its own default. "
+                            "Must match the model's action_horizon for best performance.")
 parser.add_argument("--instruction-type", "--instruction_type", type=str, default="default",
                        help="Which instruction variant to use when a task defines multiple (default, vague, specific, etc.)")
 parser.add_argument("--video-mode", "--video_mode", type=str, default="all",
@@ -84,17 +89,13 @@ app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
 from robolab.constants import PACKAGE_DIR, set_output_dir # noqa
-from episode import run_episode # noqa
 from robolab.core.environments.runtime import create_env # noqa
+from robolab.eval import create_client, run_episode, summarize_run # noqa
 from robolab.core.logging.recorder_manager import patch_recorder_manager # noqa
 from robolab.core.environments.factory import get_envs # noqa
 from robolab.core.utils.print_utils import print_experiment_summary # noqa
-from robolab.core.logging.results import check_all_episodes_complete, check_run_complete, dump_results_to_file # noqa
-from robolab.core.logging.results import init_experiment, update_experiment_results, summarize_experiment_results, get_final_subtask_info # noqa
-from robolab.core.metrics import load_demo_data, compute_episode_metrics # noqa
-from robolab.core.logging.results import extract_subtask_status_changes # noqa
-from robolab.core.task.status import StatusCode, get_status_name # noqa
-from robolab.core.utils.file_utils import load_file # noqa
+from robolab.core.logging.results import check_all_episodes_complete, check_run_complete # noqa
+from robolab.core.logging.results import init_experiment, summarize_experiment_results # noqa
 import robolab.constants # noqa
 
 # Update robolab.constants module settings from command line arguments
@@ -109,61 +110,6 @@ patch_recorder_manager()
 # Run automatic factory generation before main
 from robolab.registrations.droid_jointpos.auto_env_registrations import auto_register_droid_envs # noqa
 auto_register_droid_envs(task_dirs=args_cli.task_dirs, task=args_cli.task)
-
-EVENT_STATUS_CODES = {
-    StatusCode.WRONG_OBJECT_GRABBED_FAILURE,
-    StatusCode.GRIPPER_HIT_TABLE,
-    StatusCode.WRONG_OBJECT_DETACHED,
-    StatusCode.OBJECT_BUMPED,
-    StatusCode.OBJECT_MOVED,
-    StatusCode.OBJECT_OUT_OF_SCENE,
-    StatusCode.OBJECT_TIPPED_OVER,
-    StatusCode.TARGET_OBJECT_DROPPED,
-    StatusCode.GRIPPER_HIT_OBJECT,
-    StatusCode.MULTIPLE_OBJECTS_GRABBED,
-    StatusCode.GRIPPER_FULLY_CLOSED,
-}
-
-def _extract_events_from_log(log_file: str) -> dict:
-    """Extract error events from a log file. Returns dict of event counts and details."""
-    if not os.path.exists(log_file):
-        return {}
-
-    log_data = load_file(log_file)
-    if log_data is None:
-        return {}
-
-    status_changes = extract_subtask_status_changes(log_data)
-    if not status_changes:
-        return {}
-
-    event_counts: Counter = Counter()
-    wrong_objects_grabbed: list[str] = []
-
-    for change in status_changes:
-        status_code = change.get("status", 0)
-        if status_code not in EVENT_STATUS_CODES:
-            continue
-
-        event_name = get_status_name(status_code)
-        if event_name.endswith("_FAILURE"):
-            event_name = event_name[:-8]
-
-        event_counts[event_name] += 1
-
-        if status_code == StatusCode.WRONG_OBJECT_GRABBED_FAILURE:
-            info = change.get("info", "")
-            match = re.search(r"Wrong object grabbed: '([^']+)'", info)
-            if match:
-                wrong_objects_grabbed.append(match.group(1))
-
-    events: dict = {}
-    for event_name, count in event_counts.items():
-        events[event_name] = count
-    if wrong_objects_grabbed:
-        events["wrong_objects_grabbed"] = wrong_objects_grabbed
-
-    return events
 
 def main():
     """Main function."""
@@ -217,6 +163,17 @@ def main():
             instruction_type=args_cli.instruction_type,
             policy=args_cli.policy)
 
+        # Construct the inference client once per task; reuse across runs.
+        # CLI values of None are filtered out by create_client so the
+        # client's own defaults apply.
+        client = create_client(
+            args_cli.policy,
+            remote_host=args_cli.remote_host,
+            remote_port=args_cli.remote_port,
+            remote_uri=args_cli.remote_uri,
+            open_loop_horizon=args_cli.open_loop_horizon,
+        )
+
         for run_idx in range(num_runs):
 
             # Check if all episodes in this run are already complete
@@ -235,89 +192,28 @@ def main():
             env_results, msgs, timing = run_episode(env=env,
                         env_cfg=env_cfg,
                         episode=run_idx,
+                        client=client,
                         save_videos=args_cli.save_videos,
                         video_mode=args_cli.video_mode,
-                        headless=args_cli.headless,
-                        remote_host=args_cli.remote_host,
-                        remote_port=args_cli.remote_port)
+                        headless=args_cli.headless)
 
-            # Get per-env final info for incomplete episodes
-            final_infos = get_final_subtask_info(env, env_id=None)  # list[dict | None]
-
-            # Split msgs (list[list[dict] | None]) into per-env log streams
-            per_env_msgs: dict[int, list] = {eid: [] for eid in range(num_envs)}
-            for step_infos in msgs:
-                if step_infos is None:
-                    for eid in range(num_envs):
-                        per_env_msgs[eid].append(None)
-                else:
-                    for eid in range(num_envs):
-                        per_env_msgs[eid].append(step_infos[eid] if eid < len(step_infos) else None)
-
-            # Write per-env log files and extract per-env events
-            per_env_events: dict[int, dict] = {}
-            for eid in range(num_envs):
-                log_file = os.path.join(scene_output_dir, f"log_{run_idx}_env{eid}.json")
-                dump_results_to_file(log_file, per_env_msgs[eid], append=False)
-                per_env_events[eid] = _extract_events_from_log(log_file)
-
-            dt = env_cfg.sim.dt * env_cfg.decimation
-
-            # Emit one run_summary per env
-            for r in env_results:
-                env_id = r['env_id']
-                episode_id = run_idx * num_envs + env_id
-
-                # Compute trajectory metrics from per-run HDF5
-                hdf5_path = os.path.join(scene_output_dir, f"run_{run_idx}.hdf5")
-                demo_key = f"demo_{env_id}"
-                traj_data = load_demo_data(hdf5_path, demo_key)
-                traj_metrics = compute_episode_metrics(traj_data, dt=dt) if traj_data else None
-
-                events = per_env_events.get(env_id, {})
-
-                run_summary = {
-                    "env_name": task_env,
-                    "task_name": env_cfg._task_name,
-                    "run_name": run_name,
-                    "run": run_idx,
-                    "episode": episode_id,
-                    "env_id": env_id,
-                    "policy": args_cli.policy,
-                    "instruction": env_cfg.instruction,
-                    "instruction_type": args_cli.instruction_type,
-                    "attributes": env_cfg._task_attributes,
-                    "success": r['success'],
-                    "episode_step": r['step'],
-                    "duration": r['step'] * dt if r['step'] else 0,
-                    "dt": dt,
-                    "metrics": traj_metrics if traj_metrics else {},
-                    "events": events if events else {},
-                    "timing": timing,
-                }
-
-                if robolab.constants.ENABLE_SUBTASK_PROGRESS_CHECKING:
-                    env_msgs = per_env_msgs.get(env_id, [])
-                    # Find last non-None msg for this env
-                    last_msg = None
-                    for m in reversed(env_msgs):
-                        if m is not None:
-                            last_msg = m
-                            break
-
-                    if last_msg is not None:
-                        run_summary["score"] = last_msg.get("score", None)
-                        run_summary["reason"] = last_msg.get("info", None)
-                    else:
-                        run_summary["score"] = None
-                        run_summary["reason"] = None
-
-                    # For failed episodes, use per-env final_info
-                    final_info = final_infos[env_id] if final_infos else None
-                    if not r['success'] and final_info is not None:
-                        run_summary["reason"] = final_info.get("info", run_summary.get("reason"))
-
-                episode_results = update_experiment_results(run_summary=run_summary, episode_results=episode_results, episode_results_file=episode_results_file)
+            episode_results = summarize_run(
+                env_results=env_results,
+                msgs=msgs,
+                timing=timing,
+                env=env,
+                env_cfg=env_cfg,
+                num_envs=num_envs,
+                run_idx=run_idx,
+                run_name=run_name,
+                task_env=task_env,
+                scene_output_dir=scene_output_dir,
+                policy=args_cli.policy,
+                instruction_type=args_cli.instruction_type,
+                episode_results=episode_results,
+                episode_results_file=episode_results_file,
+                enable_subtask_progress=robolab.constants.ENABLE_SUBTASK_PROGRESS_CHECKING,
+            )
 
             # Reset eval state for next run (unfreeze all envs)
             env.reset_eval_state()

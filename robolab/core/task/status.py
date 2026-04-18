@@ -178,3 +178,21 @@ class StatusCode(IntEnum):
             return cls[f"{subtask_name.upper()}_FAILURE"]
         else:
             return cls.UNKNOWN_FAILURE
+
+
+# Subset of StatusCodes classified as runtime events worth tallying in a
+# run summary (wrong grabs, collisions, displacements, etc.). Consumed by
+# ``robolab.eval.summarize.extract_events_from_log``.
+EVENT_STATUS_CODES: set[StatusCode] = {
+    StatusCode.WRONG_OBJECT_GRABBED_FAILURE,
+    StatusCode.GRIPPER_HIT_TABLE,
+    StatusCode.WRONG_OBJECT_DETACHED,
+    StatusCode.OBJECT_BUMPED,
+    StatusCode.OBJECT_MOVED,
+    StatusCode.OBJECT_OUT_OF_SCENE,
+    StatusCode.OBJECT_TIPPED_OVER,
+    StatusCode.TARGET_OBJECT_DROPPED,
+    StatusCode.GRIPPER_HIT_OBJECT,
+    StatusCode.MULTIPLE_OBJECTS_GRABBED,
+    StatusCode.GRIPPER_FULLY_CLOSED,
+}

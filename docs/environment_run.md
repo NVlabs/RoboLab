@@ -140,7 +140,7 @@ python examples/policy/run_eval.py --headless --num_envs 20
 python examples/policy/run_eval.py --headless --num_envs 10 --num-runs 2
 ```
 
-**Multi-env episode handling:** With `num_envs > 1`, each environment runs an independent episode. The built-in `run_eval.py` handles per-env termination, video recording, and result logging automatically. If you are writing a custom evaluation loop, see `examples/policy/episode.py` for the multi-env episode runner pattern, which manages per-env video writers, independent termination tracking, and batched policy inference.
+**Multi-env episode handling:** With `num_envs > 1`, each environment runs an independent episode. The built-in `run_eval.py` handles per-env termination, video recording, and result logging automatically. If you are writing a custom evaluation loop, see `robolab/eval/episode.py` for the multi-env episode runner pattern (`from robolab.eval import run_episode`), which manages per-env video writers, independent termination tracking, and batched policy inference.
 
 ## Initial Condition Randomization
 
@@ -251,7 +251,7 @@ patch_recorder_manager()
 def run_episode(env, env_cfg, client, episode, headless=False):
     """Run a single policy-controlled episode (single-env example).
 
-    For multi-env, see examples/policy/episode.py which handles per-env
+    For multi-env, see robolab/eval/episode.py which handles per-env
     video writers, per-env policy clients, and independent termination.
     """
     obs, _ = env.reset()
