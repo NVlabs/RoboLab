@@ -26,10 +26,9 @@ Requires [uv](https://docs.astral.sh/uv/getting-started/installation/). Isaac Si
 
 ```bash
 git clone https://github.com/NVlabs/RoboLab.git
-cd robolab
+cd RoboLab
 uv venv --python 3.11
 source .venv/bin/activate
-uv pip install "setuptools<81"
 uv sync
 ```
 

@@ -32,6 +32,7 @@ dependencies = [
     "tqdm",
     "tyro",
     "python-dotenv",
+    "setuptools<81",
 ]
 
 [project.optional-dependencies]
@@ -55,6 +56,9 @@ no-build-isolation-package = ["flatdict"]
 # wheel — no Linux build — so any resolver pass that picked it would break
 # `uv sync` on Linux. Exclude that specific version.
 constraint-dependencies = ["warp-lang != 1.13.0.dev20260418"]
+
+[tool.uv.extra-build-dependencies]
+flatdict = ["setuptools<81"]
 
 [[tool.uv.index]]
 name = "pytorch-cu128"
