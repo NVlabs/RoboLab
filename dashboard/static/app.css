@@ -1,0 +1,723 @@
+/* Dark theme tuned to roughly match lerobot's visualizer palette. */
+
+:root {
+  --bg-0: #07070a;        /* near-black, main background */
+  --bg-1: #101218;        /* tile/card surface */
+  --bg-2: #161922;        /* hover / elevated surface */
+  --border: #20232c;
+  --border-strong: #2a2e3a;
+  --text-0: #e6e7eb;
+  --text-1: #a4a8b4;       /* secondary */
+  --text-2: #6c707c;       /* tertiary, muted */
+  --accent: #4f46e5;       /* indigo-600, kept subtle */
+  --accent-fg: #c7d2fe;
+  --success: #34d399;
+  --fail: #f87171;
+}
+
+html, body { background-color: var(--bg-0); color: var(--text-0); }
+
+/* top nav (Scenes / Tasks / Results) */
+.topnav-brand {
+  color: var(--text-0);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Dancing robot mark.  The body sways side-to-side, the arms wave in
+   opposite phase. Subtle so it doesn't pull focus from the nav. */
+.ribble-icon {
+  color: var(--accent-fg);
+  transform-origin: 50% 80%;
+  animation: ribble-sway 1.6s ease-in-out infinite;
+}
+/* Pivot at the shoulder (where each arm meets the body). We use
+   `transform-box: fill-box` + a bbox-relative origin instead of raw SVG
+   coords because browser interpretation of px values for transform-origin
+   on SVG children varies with transform-box defaults.
+     Left arm:  line from (5, 17) [hand] to (7.5, 17.5) [shoulder] →
+                shoulder = bottom-right of the element's fill-box.
+     Right arm: line from (19, 17) [hand] to (16.5, 17.5) [shoulder] →
+                shoulder = bottom-left of the element's fill-box. */
+.ribble-icon .ribble-arm-l {
+  transform-box: fill-box;
+  transform-origin: right bottom;
+  animation: ribble-arm-l 1.6s ease-in-out infinite;
+}
+.ribble-icon .ribble-arm-r {
+  transform-box: fill-box;
+  transform-origin: left bottom;
+  animation: ribble-arm-r 1.6s ease-in-out infinite;
+}
+@keyframes ribble-sway {
+  0%, 100% { transform: rotate(-6deg) translateY(0); }
+  50%      { transform: rotate( 6deg) translateY(-1px); }
+}
+@keyframes ribble-arm-l {
+  0%, 100% { transform: rotate(-20deg); }
+  50%      { transform: rotate( 20deg); }
+}
+@keyframes ribble-arm-r {
+  0%, 100% { transform: rotate( 20deg); }
+  50%      { transform: rotate(-20deg); }
+}
+/* Ribble — JS toggles .ribble-happy on the SVG (via mouseenter/mouseleave on
+   the surrounding host). We deliberately avoid CSS :hover here because the
+   SVG is stroke-only and direct :hover misses the empty interior; the JS
+   path is dead-simple to verify in DevTools (look at the element's class
+   list while you hover the icon). */
+/* Mouth stays straight at all times — smile path stays hidden. Only the eyes
+   swap to happy arcs on hover. */
+.ribble-icon .ribble-eyes-default,
+.ribble-icon .ribble-eyes-happy { transition: opacity 0.18s ease; }
+.ribble-icon .ribble-smile,
+.ribble-icon .ribble-eyes-happy { opacity: 0; }
+.ribble-icon.ribble-happy .ribble-eyes-default { opacity: 0; }
+.ribble-icon.ribble-happy .ribble-eyes-happy { opacity: 1; }
+.ribble-icon.ribble-happy {
+  /* One-shot bounce when ribble-happy is first applied. After the 0.4s plays
+     it ends back at translateY(0) (no fill-mode) so Ribble sits still for
+     the rest of the hover. */
+  animation: ribble-bounce 0.4s ease-out 1;
+  transform: rotate(0deg);
+}
+@keyframes ribble-bounce {
+  0%   { transform: translateY(0) rotate(0deg); }
+  45%  { transform: translateY(-4px) rotate(0deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+/* Wave Ribble's right arm (.ribble-arm-l in our class naming — the left side
+   of the screen, since the robot faces us). The arm's pivot is right-bottom
+   of its bbox so positive (CW) rotations raise the hand overhead. */
+.ribble-icon.ribble-happy .ribble-arm-r {
+  animation: none;
+  transform: rotate(0deg);
+}
+.ribble-icon.ribble-happy .ribble-arm-l {
+  animation: ribble-wave 0.55s ease-in-out infinite;
+}
+/* scaleX lengthens the arm along its local x-axis (shoulder→hand) before the
+   rotation applies, so the hand reaches further out without moving the
+   shoulder. Adjust the scale factor to taste. */
+@keyframes ribble-wave {
+  0%, 100% { transform: rotate(15deg) scaleX(1.2); }
+  50%      { transform: rotate(40deg) scaleX(1.2); }
+}
+
+/* Ribble host span. Sized to the SVG it wraps; gives JS a reliable
+   rectangular hit-area for mouseenter (the bare SVG's hit-area is only the
+   strokes, so cursoring into the head/body interior wouldn't fire). */
+.ribble-host {
+  display: inline-flex;
+  line-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ribble-icon, .ribble-icon * { animation: none; }
+}
+.topnav-tab {
+  padding: 0.3rem 0.5rem;
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  color: var(--text-2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 80ms, color 80ms;
+}
+.topnav-tab.active { color: white; background: rgba(79, 70, 229, 0.25); }
+
+/* ---- Tasks sidebar: combined folder list (active + greyed) ---- */
+.task-folder-groups { display: flex; flex-direction: column; gap: 0.6rem; }
+.task-folder-group { display: flex; flex-direction: column; gap: 0.15rem; }
+.task-folder-group-header {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-2);
+  font-family: ui-monospace, monospace;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.task-folder-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex; flex-direction: column;
+  gap: 1px;
+}
+.task-folder-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: ui-monospace, monospace;
+}
+.task-folder-row-ok       { background: rgba(79, 70, 229, 0.12); color: var(--text-0); }
+.task-folder-row-warn     { background: rgba(217, 119, 6, 0.10); color: var(--text-0); }
+.task-folder-row-fail     { background: rgba(248, 113, 113, 0.10); color: var(--text-0); }
+.task-folder-row-inactive {
+  /* Greyed-out — listed but not currently contributing to the union. Click
+     anywhere on the row to re-activate. */
+  color: var(--text-2);
+  opacity: 0.65;
+}
+.task-folder-row-inactive:hover {
+  background: var(--bg-2);
+  opacity: 1;
+}
+.task-folder-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+.task-folder-row-right {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  flex-shrink: 0;
+}
+.task-folder-count {
+  font-size: 0.7rem;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.task-folder-warn-icon { color: #d97706; font-size: 0.85rem; }
+.task-folder-fail-icon { color: var(--fail);  font-size: 0.85rem; }
+.task-folder-x {
+  background: transparent;
+  border: none;
+  color: var(--text-2);
+  cursor: pointer;
+  padding: 0 0.15rem;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+.task-folder-x:hover { color: var(--text-0); }
+
+/* mini bucket cards (clickable filters under Tasks summary) */
+.mini-card {
+  border-radius: 6px;
+  padding: 0.4rem 0.65rem;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  min-width: 110px;
+  cursor: pointer;
+  transition: border-color 80ms, background 80ms, transform 80ms;
+}
+.mini-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.mini-card.active {
+  border-color: var(--accent);
+  background: rgba(79, 70, 229, 0.18);
+}
+
+/* sortable column headers — only the active column shows an arrow. */
+.sort-th { cursor: pointer; user-select: none; }
+.sort-th:hover { color: var(--text-0); }
+.sort-th.active { color: var(--text-0); }
+.sort-th .arrow {
+  font-size: 0.7em;
+  color: var(--accent-fg);
+  margin-left: 0.15rem;
+}
+
+/* home tile grid */
+.home-tile {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: border-color 100ms, background 100ms;
+  display: flex; flex-direction: column;
+  gap: 0.5rem;
+  min-height: 180px;
+}
+.home-tile:hover { border-color: var(--accent); background: var(--bg-2); }
+.home-tile h3 { font-size: 1.25rem; font-weight: 600; }
+.home-tile p { font-size: 0.85rem; color: var(--text-2); line-height: 1.45; }
+.home-tile .arrow { color: var(--accent-fg); font-size: 0.85rem; margin-top: auto; }
+
+/* sidebar pane: collapse toggle + drag-to-resize handle */
+#sidebar-pane { transition: width 140ms ease; }
+#sidebar-pane.is-resizing { transition: none; }
+#sidebar-pane.collapsed { width: 32px !important; }
+#sidebar-pane.collapsed #sidebar-content,
+#sidebar-pane.collapsed #sidebar-resize-handle { display: none; }
+
+#sidebar-toggle {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-2);
+  font-family: ui-monospace, monospace;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 80ms, color 80ms;
+}
+#sidebar-toggle:hover { background: var(--bg-2); color: var(--text-0); }
+#sidebar-pane.collapsed #sidebar-toggle {
+  position: static;
+  margin: 4px auto 0;
+}
+
+#sidebar-resize-handle {
+  position: absolute;
+  top: 0; bottom: 0; right: -2px;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 3;
+  background: transparent;
+  transition: background 120ms;
+}
+#sidebar-resize-handle:hover,
+#sidebar-pane.is-resizing #sidebar-resize-handle {
+  background: rgba(79, 70, 229, 0.35);
+}
+
+body.sidebar-resizing { cursor: col-resize; user-select: none; }
+
+/* sidebar tree */
+.tree-row { cursor: pointer; transition: background-color 80ms ease; }
+.tree-row:hover { background-color: var(--bg-2); }
+.tree-row.selected {
+  background-color: rgba(79, 70, 229, 0.18);  /* accent @ ~18% */
+  border-left: 2px solid var(--accent);
+}
+.tree-row.compared {
+  box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.45);
+}
+
+/* sticky compare bar at top of main pane */
+.compare-bar {
+  position: sticky; top: 0; z-index: 10;
+  margin: 0.75rem 1.5rem 0;
+  padding: 0.5rem 0.75rem;
+  background: rgba(79, 70, 229, 0.10);
+  border: 1px solid rgba(79, 70, 229, 0.5);
+  border-radius: 6px;
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.8rem;
+  min-width: 0;
+  /* When the main pane is narrow, let buttons wrap onto a second line
+     instead of bursting past the right edge of the box. */
+  flex-wrap: wrap;
+}
+/* Label text on the left of the compare bar — let it shrink and truncate
+   with ellipsis instead of pushing the Combine/Compare/Clear buttons past
+   the right edge when the main pane is narrow. */
+.compare-bar > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.compare-bar button { flex-shrink: 0; }
+.compare-bar button {
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  background: var(--accent);
+  color: white;
+  font-weight: 500;
+}
+.compare-bar button.ghost {
+  background: transparent;
+  color: var(--text-1);
+  border: 1px solid var(--border);
+}
+
+/* matrix table for compare report */
+.matrix {
+  /* fixed layout = column widths declared in CSS are authoritative.
+     Width is intentionally NOT 100% — the table sizes to the sum of its
+     column widths so per-run columns stay compact instead of soaking up
+     a wide container. */
+  table-layout: fixed;
+}
+.matrix th, .matrix td {
+  padding: 0.4rem 0.65rem;
+  font-size: 0.78rem;
+  text-align: left;  /* default; numeric columns override via .cell-num */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.matrix th { color: var(--text-2); font-weight: 500; border-bottom: 1px solid var(--border); }
+.matrix tbody tr { border-top: 1px solid var(--border); }
+.matrix td.best { color: var(--success); font-weight: 600; }
+.matrix td.cell-num,
+.matrix th.cell-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  /* Numeric columns are sized to fit a stacked value + ±half CI line (e.g.
+     "29.7%" / "±5.4"). 50px is the empirically-tight estimate (paired with
+     a 100px cap on the colspan=2 header below). Bump it if you add wider
+     per-cell content later. */
+  width: 50px;
+}
+
+/* SR/Score value followed by a small CI annotation on the next line */
+.val-with-ci {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.15;
+}
+/* Inside numeric matrix cells, stretch the val-with-ci block to fill the
+   cell so the `title` attribute (which carries the full CI range / n) fires
+   from anywhere in the cell — not just over the few px of value text. */
+.matrix td.cell-num > .val-with-ci {
+  display: flex;
+  width: 100%;
+}
+.val-with-ci .val { font-variant-numeric: tabular-nums; }
+.val-with-ci .ci {
+  font-size: 0.65rem;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* In the policy cards we want the value left-aligned (under the SR/Score label),
+   not right-aligned like in tables. .metric-block is the wrapper that flips it. */
+.metric-block .val-with-ci { align-items: flex-start; }
+.matrix td.label-col,
+.matrix th.label-col {
+  /* Label column — fixed at a sensible reading width; long names truncate
+     with ellipsis (full text in tooltip via the `title` attribute).
+     Targeted via class (not :first-child) because header rows with
+     rowspan/colspan mis-identify the first body column under :first-child. */
+  width: 240px;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Inner wrapper for label cells: pins the actual rendered width to 240px
+   regardless of table-layout:auto column distribution, so every matrix's
+   Experiment/Task column has the same width. */
+.matrix td.label-col > .label-cell,
+.matrix th.label-col > .label-cell {
+  display: inline-block;
+  width: 240px;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+/* Clickable task names in the per-task matrix — visually hint the link. */
+.matrix td.label-col.task-link {
+  cursor: pointer;
+  color: var(--accent-fg);
+}
+.matrix td.label-col.task-link:hover {
+  text-decoration: underline;
+  color: white;
+}
+
+/* Paired SR/Score columns per run.  The SR% cell ("pair-start") is the start
+   of a run's column-group; we put a faint vertical rule on its left edge to
+   separate it from the previous run, and tighten the horizontal padding
+   between SR% and Score so the pair reads as one unit. */
+.matrix td.pair-start, .matrix th.pair-start {
+  border-left: 1px solid var(--border);
+  padding-left: 0.7rem;
+  padding-right: 0.15rem;
+}
+/* Header that labels a paired (SR%, Score) column. Capped at the sum of the
+   two underlying cell widths (2 × 50px = 100px) so a long experiment ID
+   ellipsis-truncates instead of stretching the column pair. Full text via
+   `title`. */
+.matrix th.pair-start {
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.matrix td.pair-end, .matrix th.pair-end {
+  padding-left: 0.15rem;
+  padding-right: 0.6rem;
+}
+
+/* chips */
+.chip {
+  display: inline-flex; align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.7rem; font-weight: 500;
+  background-color: var(--bg-1);
+  color: var(--text-1);
+  border: 1px solid var(--border);
+}
+.chip.success { background-color: rgba(52,211,153,0.10); color: var(--success); border-color: rgba(52,211,153,0.35); }
+.chip.fail    { background-color: rgba(248,113,113,0.10); color: var(--fail);    border-color: rgba(248,113,113,0.35); }
+.chip.accent  { background-color: rgba(79,70,229,0.15);  color: var(--accent-fg); border-color: rgba(79,70,229,0.4); }
+
+/* lerobot-style bar */
+.bar {
+  height: 6px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--success) var(--rate, 0%), var(--border) var(--rate, 0%));
+}
+
+/* Combined SR + Score bar — solid green fill up to SR, then a hatched/striped
+   overlay from SR up to Score (since score >= SR by construction). The grey
+   track from Score → 100% is the bar's own background. Each region has its
+   own title for hover-to-see-value. */
+.sr-score-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border);
+  overflow: hidden;
+}
+.sr-score-bar .stripe {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  /* Lower layer — gets covered by the solid SR fill in the 0→SR region,
+     visible only in the SR→Score region. A flat lighter green reads more
+     cleanly than a hatched pattern at 8px tall. */
+  background: rgba(52, 211, 153, 0.45);
+}
+.sr-score-bar .fill {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: var(--success);
+}
+
+/* camera tile */
+.cam-tile {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.cam-tile-label {
+  font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: var(--text-1);
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-0);
+  display: flex; align-items: center; gap: 6px;
+}
+.cam-tile-label .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text-2);
+}
+/* Camera tile grid. Two layout modes:
+   - Narrow (default): width-bound grid; each video keeps natural aspect, so
+     tile heights vary with the mp4 dimensions.
+   - Wide (>= 1024px, lerobot-style): all tiles share a fixed height; widths
+     follow each video's true aspect, just like the lerobot screenshot.
+   No CSS aspect-ratio on <video>, so native fullscreen renders unclamped. */
+.cam-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.5rem;
+  align-items: start;
+}
+.cam-tile-video-wrap {
+  background: #000;
+  min-height: 60px;
+  position: relative;
+}
+.cam-tile-video-wrap video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Loading state shown while a video element fetches its first frame.
+   .is-loading is set when the element is created and removed on `loadeddata`
+   (or `error`, in which case the failure variant is rendered instead). */
+.video-host {
+  position: relative;
+  background: #000;
+}
+.video-host.is-loading::after {
+  content: "Loading…";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--text-2);
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+.video-host.is-failed::after {
+  content: "video failed";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--fail);
+  font-family: ui-monospace, monospace;
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+  .cam-grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .cam-tile {
+    /* shrink to fit the contained video's natural width */
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+  .cam-tile-video-wrap {
+    height: 200px;
+    min-height: 0;
+  }
+  .cam-tile-video-wrap video {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+  }
+}
+
+/* tabs (lerobot-style underline) */
+.tab {
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 80ms ease, border-color 80ms ease;
+}
+.tab:hover { color: var(--text-1); }
+.tab.active {
+  color: var(--text-0);
+  border-bottom-color: var(--accent);
+}
+
+/* panel surfaces */
+.panel {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+/* "language instruction" header used in episode view */
+.lang-label {
+  font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* events timeline strip + scrollable list */
+.events-strip {
+  position: relative;
+  height: 28px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.events-strip-track {
+  position: absolute; top: 50%; left: 8px; right: 8px;
+  height: 2px;
+  background: rgba(120, 128, 150, 0.25);
+  transform: translateY(-50%);
+}
+.events-strip-marker {
+  position: absolute; top: 4px; bottom: 4px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--text-2);
+  transform: translateX(-50%);
+}
+.events-strip-marker.success { background: var(--success); }
+.events-strip-marker.failure { background: var(--fail); }
+.events-strip-marker.active {
+  outline: 2px solid white;
+  outline-offset: 1px;
+}
+.events-strip-playhead {
+  position: absolute; top: 0; bottom: 0;
+  width: 2px; background: white;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.events-list {
+  max-height: 220px;
+  overflow-y: auto;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.events-row {
+  padding: 4px 8px;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.events-row:first-child { border-top: none; }
+.events-row:hover { background: var(--bg-2); }
+.events-row.active {
+  background: rgba(79, 70, 229, 0.18);
+  border-left: 2px solid var(--accent);
+}
+.events-row .ev-time {
+  font-family: ui-monospace, monospace;
+  color: var(--text-2);
+  font-size: 11px;
+}
+.events-row .ev-name {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+}
+.events-row.success .ev-name { color: var(--success); }
+.events-row.failure .ev-name { color: var(--fail); }
+.events-row .ev-info {
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* table rows */
+.tbl-row { border-top: 1px solid var(--border); }
+.tbl-row-clickable:hover { background-color: var(--bg-2); }
+
+/* episode card on task view */
+.ep-card { transition: border-color 80ms ease; }
+.ep-card:hover { border-color: var(--accent) !important; }
+.ep-thumb { background: #000; }
+.cam-empty { background: #000; color: var(--text-2); }
+
+/* table head — subtle */
+table thead { background: var(--bg-0); color: var(--text-2); }
+table thead th { padding: 0.5rem 0.75rem; font-weight: 500; }
+
+/* Plotly tweaks for dark */
+.plotly .modebar-btn svg path { fill: var(--text-2) !important; }

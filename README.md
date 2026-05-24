@@ -1,4 +1,4 @@
-# RoboLab
+<h1><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/ribble.gif"><img src="docs/images/ribble-dark.gif" alt="" height="42" align="absmiddle" /></picture> RoboLab</h1>
 
 [![Website](https://img.shields.io/badge/Website-RoboLab-blue?logo=googlechrome&logoColor=white)](https://research.nvidia.com/labs/srl/projects/robolab)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.09860-b31b1b?logo=arXiv&logoColor=white)](https://arxiv.org/abs/2604.09860)
@@ -118,6 +118,7 @@ Full documentation is at **[docs/README.md](docs/README.md)**, covering:
 - [Evaluating a New Policy](docs/policy.md) — Implementing your own inference client
 - [Running Environments](docs/environment_run.md) — CLI reference and evaluation workflows
 - [Analysis and Results](docs/analysis.md) — Summarizing, comparing, and auditing results
+- [Dashboard](docs/dashboard.md) — Interactive web viewer for benchmark, tasks, scenes, and eval results
 - [Subtask Checking](docs/subtask.md), [Conditionals](docs/task_conditionals.md), [Event Tracking](docs/event_tracking.md) — Advanced task features
 
 ## Example Tasks
@@ -138,6 +139,22 @@ See the full [Benchmark Task Library](robolab/tasks/README.md) for all 120 tasks
   <img src="docs/images/Put_the_orange_measuring_cup_and_the_blue_measuring_cup_outside_of_the_plate_0_hstack_3X_fps24_width800.gif" alt="Put the orange measuring cup and the blue measuring cup outside of the plate" width="800"/>
   <br><em>"Put the orange measuring cup and the blue measuring cup outside of the plate."</em>
 </div>
+
+## Dashboard
+
+A self-contained web dashboard for browsing the benchmark (scenes and tasks) and analyzing your experiment results.
+
+```bash
+robolab-dashboard
+# open http://localhost:8080
+```
+
+<video src="docs/images/robolab_dashboard.mp4" autoplay controls muted loop playsinline width="800">
+  Your viewer doesn't render inline video — see <a href="docs/images/robolab_dashboard.mp4">robolab_dashboard.mp4</a>.
+</video>
+
+See **[docs/dashboard.md](docs/dashboard.md)** for the full feature tour, CLI
+flags, and the API endpoints under the hood.
 
 ## Requirements
 

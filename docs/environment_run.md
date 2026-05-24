@@ -130,7 +130,7 @@ env_cfg = parse_env_cfg("BananaInBowlTask",
 
 **Choosing `env_spacing`:** The spacing must be large enough that objects in adjacent environments do not overlap or interfere with each other. The default of 5.0m is sufficient for most tabletop manipulation tasks. Reduce it (e.g., 2.0m) for compact scenes to fit more environments in the viewport, or increase it if your scene has large objects or long-reach robot motions.
 
-**Choosing `num_envs`:** The number of parallel environments is limited by GPU VRAM. As a rough guide, a single DROID tabletop environment with one camera uses ~1–2 GB; scale accordingly. If you run out of memory, reduce `num_envs` and increase `--num-runs` to reach the same total episode count:
+**Choosing `num_envs`:** The number of parallel environments is limited by GPU VRAM. As a rough guide, a single DROID tabletop environment with one camera uses ~1–2 GB; scale accordingly. For empirically measured per-task ceilings on L40 (48 GB), see the [num_envs VRAM size guide](env_vram_size_guide.md). If you run out of memory, reduce `num_envs` and increase `--num-runs` to reach the same total episode count:
 
 ```bash
 # 20 episodes total: 20 envs × 1 run (if VRAM allows)

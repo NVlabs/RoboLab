@@ -35,6 +35,7 @@ The core concepts are:
 - **[Environment Registration](environment_registration.md)** — How tasks are combined with robot/observation/action configs into runnable Gymnasium environments
 - **[Environment Generation](environment_generation.md)** — Contact sensor creation, subtask trackers, and runtime environment internals
 - **[Running Environments](environment_run.md)** — Creating environments, evaluation scripts, CLI reference, and robustness testing
+- **[`num_envs` VRAM size guide](env_vram_size_guide.md)** — Per-task `num_envs` ceiling on L40, measured against pi05
 #### Policy
 - **[Inference Clients](inference.md)** — Built-in policy clients and server setup instructions (OpenPI, GR00T)
 #### Output
@@ -72,6 +73,10 @@ Otherwise, pick whichever applies to your use case.
 ### Analysis
 
 1. **[Statistical Significance of Results](statistical_significance.md)** — Discussion on how to run evaluations such that your results are statistically significant.
+
+### Browsing the benchmark and eval results
+
+- **[Dashboard](dashboard.md)** — Self-contained web viewer for scenes, tasks, and eval outputs. Runs locally with `robolab-dashboard --output-dir output/`; binds `0.0.0.0` so anyone on your LAN can hit your IP.
 
 ### AI Workflows
 

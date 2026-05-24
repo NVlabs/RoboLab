@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoboLab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+  <link rel="stylesheet" href="/static/app.css?v={{ asset_version }}" />
+</head>
+<body class="font-sans h-screen overflow-hidden" style="background: var(--bg-0); color: var(--text-0);">
+  <!-- Top nav: switch between Scenes / Tasks / Results -->
+  <header id="topnav" class="flex items-center gap-0 px-3 py-1.5"
+          style="background: var(--bg-1); border-bottom: 1px solid var(--border);">
+    <button class="topnav-brand text-xl font-semibold mr-3 flex items-center gap-1" data-route="home">
+      <svg viewBox="0 0 24 24" class="ribble-icon" width="32" height="32" aria-hidden="true">
+        <!-- antenna -->
+        <line x1="12" y1="2" x2="12" y2="5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+        <circle cx="12" cy="2.2" r="1.05" fill="currentColor" />
+        <!-- head -->
+        <rect x="6" y="5" width="12" height="9" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.4" />
+        <!-- eyes -->
+        <!-- Default round eyes (visible at rest, hidden on .ribble-happy) -->
+        <circle cx="9.3" cy="9.2" r="1.05" fill="currentColor" class="ribble-eyes-default" />
+        <circle cx="14.7" cy="9.2" r="1.05" fill="currentColor" class="ribble-eyes-default" />
+        <!-- Smiley arc eyes (hidden at rest, shown during wave) -->
+        <path d="M 8.4 9.7 Q 9.3 8.4 10.2 9.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none" class="ribble-eyes-happy" />
+        <path d="M 13.8 9.7 Q 14.7 8.4 15.6 9.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none" class="ribble-eyes-happy" />
+        <!-- mouth (flat at rest, swaps to smile via JS-toggled .ribble-happy) -->
+        <line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" class="ribble-mouth" />
+        <path d="M 9 11.6 Q 12 13.6 15 11.6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" fill="none" class="ribble-smile" />
+        <!-- body -->
+        <rect x="7.5" y="15" width="9" height="6.5" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.4" />
+        <!-- arms -->
+        <line x1="5" y1="17" x2="7.5" y2="17.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" class="ribble-arm-l" />
+        <line x1="19" y1="17" x2="16.5" y2="17.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" class="ribble-arm-r" />
+      </svg>
+      <span>RoboLab</span>
+    </button>
+    <button class="topnav-tab" data-route="scenes">Scenes</button>
+    <button class="topnav-tab" data-route="tasks">Tasks</button>
+    <button class="topnav-tab" data-route="results">Results</button>
+  </header>
+
+  <div class="flex" style="height: calc(100vh - 45px);">
+    <!-- Sidebar — only visible on the Results route -->
+    <aside id="sidebar-pane" class="shrink-0 flex flex-col relative"
+           style="background: var(--bg-1); border-right: 1px solid var(--border); width: 288px; display: none;">
+      <button id="sidebar-toggle" type="button" title="Collapse sidebar"
+              aria-label="Collapse sidebar" aria-expanded="true">«</button>
+      <div id="sidebar-content" class="flex-1 flex flex-col min-h-0">
+        <!-- Results route sidebar (shown when state.route === 'results') -->
+        <div id="sidebar-content-results" class="flex-1 flex flex-col min-h-0">
+          <header class="p-3" style="border-bottom: 1px solid var(--border);">
+            <h1 class="text-xs font-semibold uppercase tracking-wider mb-2"
+                style="color: var(--text-2);">Results directories</h1>
+            <div id="sources" class="space-y-1"></div>
+            <div class="mt-2 flex gap-1">
+              <input id="source-input" type="text" placeholder="Enter a results directory…"
+                     class="flex-1 min-w-0 text-xs px-2 py-1 rounded font-mono"
+                     style="background: var(--bg-0); color: var(--text-0); border: 1px solid var(--border); outline: none;"
+                     onfocus="this.style.borderColor='var(--accent)'"
+                     onblur="this.style.borderColor='var(--border)'" />
+              <button id="source-add" class="text-xs px-2 py-1 rounded"
+                      style="background: var(--accent); color: white; border: 1px solid var(--accent);"
+                      title="Add">+</button>
+            </div>
+          </header>
+          <div class="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider"
+               style="color: var(--text-2);">Experiments</div>
+          <nav id="sidebar" class="flex-1 overflow-y-auto text-sm">
+            <div class="p-3" style="color: var(--text-2);">Loading experiments…</div>
+          </nav>
+          <footer class="p-2 text-xs" style="border-top: 1px solid var(--border); color: var(--text-1);">
+            <button id="overview-btn" class="w-full text-left px-2 py-1 rounded" style="transition: background 80ms;"
+                    onmouseover="this.style.background='var(--bg-2)'" onmouseout="this.style.background=''">
+              ← Results overview
+            </button>
+          </footer>
+        </div>
+        <!-- Tasks route sidebar (chip strip + Add-folder panel; JS-populated) -->
+        <div id="sidebar-content-tasks" class="flex-1 flex flex-col min-h-0" style="display: none;"></div>
+      </div>
+      <div id="sidebar-resize-handle" role="separator" aria-orientation="vertical"
+           aria-label="Resize sidebar" tabindex="-1"></div>
+    </aside>
+
+    <!-- Main pane -->
+    <main class="flex-1 overflow-y-auto">
+      <div id="breadcrumb" class="px-6 pt-4 text-xs" style="color: var(--text-2);"></div>
+      <div id="compare-bar"></div>
+      <div id="pane" class="p-6"></div>
+    </main>
+  </div>
+  <script src="/static/app.js?v={{ asset_version }}"></script>
+</body>
+</html>
