@@ -414,6 +414,11 @@ class RobolabRecorderManager(RecorderManager):
             # Get episode index for this environment (if set)
             episode_index = self._current_episode_index.get(env_id)
 
+            # Convert list-of-tensor buffers to stacked tensors before writing;
+            # EpisodeData.add() stores values as lists but HDF5 handlers expect
+            # torch.Tensor -- without pre_export(), value.cpu().numpy() crashes
+            self._episodes[env_id].pre_export()
+
             # Append data to the current episode (creates one if not started)
             # If episode_index is set and episode exists, it will be deleted and recreated
             target_handler.append_data(self._episodes[env_id], episode_index=episode_index)
@@ -524,12 +529,14 @@ class RobolabRecorderManager(RecorderManager):
             if is_streaming:
                 # Streaming mode: append any remaining data and finalize
                 if episode and not episode.is_empty():
+                    episode.pre_export()
                     target_handler.append_data(episode, episode_index=episode_index)
                 target_handler.end_episode(success=episode_succeeded, episode_index=episode_index)
                 self._streaming_active[env_id] = False
             else:
                 # Standard mode: write complete episode (with optional episode_index)
                 if episode and not episode.is_empty():
+                    episode.pre_export()
                     if episode_index is not None:
                         target_handler.begin_episode(episode.seed, episode_index=episode_index)
                         target_handler.append_data(episode, episode_index=episode_index)
