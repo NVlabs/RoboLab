@@ -7,6 +7,7 @@ import isaaclab.envs.mdp as mdp
 import isaaclab.sim as sim_utils
 import numpy as np
 import torch
+import warp as wp
 from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets import ArticulationCfg
 from isaaclab.controllers.differential_ik_cfg import DifferentialIKControllerCfg
@@ -175,6 +176,12 @@ contact_gripper = {"gripper": "{ENV_REGEX_NS}/robot/Gripper/Robotiq_2F_85/left_i
 ########################################################
 
 
+def _to_torch(value):
+    if isinstance(value, torch.Tensor):
+        return value
+    return wp.to_torch(value)
+
+
 def arm_joint_pos(
     env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
 ):
@@ -192,7 +199,7 @@ def arm_joint_pos(
     joint_indices = [
         i for i, name in enumerate(robot.data.joint_names) if name in joint_names
     ]
-    joint_pos = robot.data.joint_pos[:, joint_indices]
+    joint_pos = _to_torch(robot.data.joint_pos)[:, joint_indices]
     return joint_pos
 
 
@@ -206,7 +213,7 @@ def gripper_pos(
     joint_indices = [
         i for i, name in enumerate(robot.data.joint_names) if name in joint_names
     ]
-    joint_pos = robot.data.joint_pos[:, joint_indices]
+    joint_pos = _to_torch(robot.data.joint_pos)[:, joint_indices]
 
     # rescale
     joint_pos = joint_pos / (np.pi / 4)
@@ -223,7 +230,7 @@ def ee_pos(
     ee_body_name = "base_link"  # Robotiq gripper base link
     body_idx = robot.data.body_names.index(ee_body_name)
     # Return position (shape: [num_envs, 3])
-    return robot.data.body_pos_w[:, body_idx, :] - env.scene.env_origins[:, 0:3]
+    return _to_torch(robot.data.body_pos_w)[:, body_idx, :] - env.scene.env_origins[:, 0:3]
 
 
 def ee_quat(
@@ -235,21 +242,21 @@ def ee_quat(
     ee_body_name = "base_link"  # Robotiq gripper base link
     body_idx = robot.data.body_names.index(ee_body_name)
     # Return quaternion (shape: [num_envs, 4])
-    return robot.data.body_quat_w[:, body_idx, :]
+    return _to_torch(robot.data.body_quat_w)[:, body_idx, :]
 
 
 def eef_pos(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("frames")):
     """Returns the eef_frame position (x, y, z) in the env-local frame."""
     frames = env.scene[asset_cfg.name]
     idx = frames.data.target_frame_names.index("eef_frame")
-    return frames.data.target_pos_w[:, idx, :] - env.scene.env_origins[:, 0:3]
+    return _to_torch(frames.data.target_pos_w)[:, idx, :] - env.scene.env_origins[:, 0:3]
 
 
 def eef_quat(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("frames")):
     """Returns the eef_frame orientation as quaternion (w, x, y, z) in the world frame."""
     frames = env.scene[asset_cfg.name]
     idx = frames.data.target_frame_names.index("eef_frame")
-    return frames.data.target_quat_w[:, idx, :]
+    return _to_torch(frames.data.target_quat_w)[:, idx, :]
 
 ########################################################
 # Actions

@@ -8,6 +8,11 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 
+image_observation = getattr(mdp, "image", None)
+if image_observation is None:
+    image_observation = mdp.observations.image
+
+
 @configclass
 class CameraObservationCfg:
     """Static camera observation configuration - example implementation."""
@@ -15,7 +20,7 @@ class CameraObservationCfg:
     class ImageObsCfg(ObsGroup):
         """Observations for policy."""
         egocentric_wide_angle_camera = ObsTerm(
-            func=mdp.observations.image,
+            func=image_observation,
             params={
                 "sensor_cfg": SceneEntityCfg("egocentric_wide_angle_camera"),
                 "data_type": "rgb",
@@ -24,7 +29,7 @@ class CameraObservationCfg:
             )
 
         egocentric_mirrored_wide_angle_camera = ObsTerm(
-            func=mdp.observations.image,
+            func=image_observation,
             params={
                 "sensor_cfg": SceneEntityCfg("egocentric_mirrored_camera"),
                 "data_type": "rgb",

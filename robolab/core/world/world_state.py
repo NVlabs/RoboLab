@@ -21,7 +21,8 @@ from typing import Any, Callable
 import isaaclab.sim.utils as sim_utils
 import numpy as np
 import torch
-from isaaclab.assets import Articulation, AssetBase, DeformableObject, RigidObject
+from isaaclab.assets import Articulation, AssetBase, RigidObject
+from isaaclab_physx.assets import DeformableObject
 from isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.sensors.frame_transformer.frame_transformer import FrameTransformer
 from isaaclab.utils.math import transform_points

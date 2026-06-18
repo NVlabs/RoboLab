@@ -12,6 +12,18 @@ from isaaclab.sensors import CameraCfg
 from isaaclab.utils import configclass
 
 
+def _image_observation_func():
+    image_func = getattr(mdp, "image", None)
+    if image_func is not None:
+        return image_func
+
+    observations = getattr(mdp, "observations", None)
+    image_func = getattr(observations, "image", None) if observations is not None else None
+    if image_func is None:
+        raise AttributeError("IsaacLab image observation function not found")
+    return image_func
+
+
 def generate_image_obs_from_cameras(camera_cfgs: List[Any] | Any):
     """
     Dynamically create an image observation group configuration from one or more camera configs.
@@ -41,6 +53,7 @@ def generate_image_obs_from_cameras(camera_cfgs: List[Any] | Any):
     """
     # Create a dictionary to store observation terms
     obs_terms = {}
+    image_observation = _image_observation_func()
 
     if not isinstance(camera_cfgs, list):
         camera_cfgs = [camera_cfgs]
@@ -59,7 +72,7 @@ def generate_image_obs_from_cameras(camera_cfgs: List[Any] | Any):
                 # if hasattr(attr_value, 'prim_path'):
                     camera_name = attr_name
                     obs_terms[camera_name] = ObsTerm(
-                        func=mdp.observations.image,
+                        func=image_observation,
                         params={
                             "sensor_cfg": SceneEntityCfg(camera_name),
                             "data_type": "rgb",
