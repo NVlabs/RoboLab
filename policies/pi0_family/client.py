@@ -92,7 +92,16 @@ class Pi0DroidJointposClient(InferenceClient):
             "gripper_position": gripper_position,
         }
 
+    def infer(self, obs: dict, instruction: str, *, env_id: int = 0) -> dict:
+        # A policy server may run a stateful, per-env simulated-inference-delay / real-time-chunking rollout
+        # (it returns the previous chunk's committed actions for the first few steps, then the new chunk).
+        # That needs to know which env each request belongs to and when an episode restarts; stash env_id so
+        # _pack_request can stamp it onto the wire request. No-op for stateless servers (they ignore the keys).
+        self._rtc_env_id = env_id
+        return super().infer(obs, instruction, env_id=env_id)
+
     def _pack_request(self, extracted_obs: dict, instruction: str) -> dict:
+        env_id = getattr(self, "_rtc_env_id", 0)
         return {
             "observation/exterior_image_1_left": image_tools.resize_with_pad(
                 extracted_obs["right_image"], 224, 224
@@ -103,6 +112,13 @@ class Pi0DroidJointposClient(InferenceClient):
             "observation/joint_position": extracted_obs["joint_position"],
             "observation/gripper_position": extracted_obs["gripper_position"],
             "prompt": instruction,
+            # Per-env keying + an episode/reconnect reset signal for a stateful policy server. ``reset`` is
+            # True exactly when this env has no cached chunk at request time — a fresh episode after
+            # ``reset()``, a reconnect after ``_infer_with_retry`` clears ``_chunks``, or the first request —
+            # i.e. exactly when the server must drop any stale per-env rollout state. ``_pack_request`` is
+            # only called by the base ``infer`` when a (re)plan is needed, so the flag lands on the right ones.
+            "env_id": int(env_id),
+            "reset": env_id not in self._chunks,
         }
 
     def _query_server(self, request: dict) -> dict:
