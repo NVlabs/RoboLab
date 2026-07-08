@@ -23,6 +23,18 @@ def get_memory_usage_mb() -> float:
     return process.memory_info().rss / (1024 * 1024)
 
 
+# torch has no advanced-indexing ("index"/"index_cuda") kernel for the wider
+# unsigned integer dtypes on either CPU or CUDA, so `tensor[env_ids]` raises
+# e.g. `RuntimeError: "index_cuda" not implemented for 'UInt16'` (seen on the
+# IsaacSim 5.1 stack for the uint16 subtask status codes recorded under
+# --enable-subtask; also fails on CPU with the same torch-cu128 build). Cast
+# such tensors to int64 for the gather, then restore the original dtype.
+_UNINDEXABLE_DTYPES = tuple(
+    dt for dt in (getattr(torch, name, None) for name in ("uint16", "uint32", "uint64"))
+    if dt is not None
+)
+
+
 def _slice_to_envs(value, env_ids):
     """Slice a recorder-term value (tensor or nested dict of tensors) to a subset of envs.
 
@@ -33,6 +45,8 @@ def _slice_to_envs(value, env_ids):
     if isinstance(value, dict):
         return {k: _slice_to_envs(v, env_ids) for k, v in value.items()}
     if isinstance(value, torch.Tensor):
+        if value.dtype in _UNINDEXABLE_DTYPES:
+            return value.to(torch.int64)[env_ids].to(value.dtype)
         return value[env_ids]
     return value
 
@@ -339,6 +353,21 @@ class RobolabRecorderManager(RecorderManager):
             return
 
         super().record_pre_reset(env_ids, force_export_or_skip=force_export_or_skip)
+
+        # Override upstream's HDF5 success flag with the authoritative signal.
+        #
+        # Upstream RecorderManager.record_pre_reset derives demo `success` from a
+        # termination term literally named "success". Tasks using the per-object
+        # `success_<obj>` any-of-N pattern (e.g. GrabABagelTask, GrabAFruitTask)
+        # have no such term, so upstream silently records success=False even when
+        # an episode genuinely succeeded. Re-derive from termination_manager.terminated
+        # (the OR of all non-timeout terms) — the same signal env.py uses for the
+        # canonical jsonl — so the HDF5 attr is correct regardless of term naming.
+        # set_success_to_episodes only updates in-memory EpisodeData.success; export
+        # runs later (env.py _reset_idx), so this re-set is picked up on write.
+        if hasattr(self._env, "termination_manager"):
+            success = self._env.termination_manager.terminated[env_ids]
+            self.set_success_to_episodes(env_ids, success)
 
     def record_post_reset(self, env_ids: Sequence[int] | None) -> None:
         """Filter env_ids to non-frozen, then delegate to upstream.
