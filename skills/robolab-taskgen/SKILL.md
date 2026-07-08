@@ -310,9 +310,9 @@ After writing the task file, display the following **next steps** message to the
 
 Task file created! Here's what to do next:
 
-**1. Validate the task** — checks contact objects, terminations, and scene references:
+**1. Validate the task** — checks contact objects, terminations, and scene references (runs over every task in `robolab/tasks/benchmark/`, so the newly generated task is included; failures name the offending file):
 ```bash
-python scripts/check_tasks_valid.py --tasks-folder <tasks_folder>
+uv run pytest tests/test_tasks_valid.py
 ```
 
 **2. Update the task metadata registry** — regenerates JSON, CSV, and README table:

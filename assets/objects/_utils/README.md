@@ -26,14 +26,6 @@ python generate_readme.py
 python generate_readme.py --datasets hope ycb vomp
 ```
 
-### Generate statistics
-Outputs statistics about the object dataset (counts by class, dataset, dimensions, etc.).
-```bash
-python generate_object_statistics.py
-python generate_object_statistics.py --format markdown
-python generate_object_statistics.py --output stats.json --format json
-```
-
 ### Generate screenshots
 Renders preview images for objects (requires IsaacSim).
 ```bash
