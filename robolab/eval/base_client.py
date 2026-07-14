@@ -64,6 +64,23 @@ class InferenceClient(ABC):
         viz = self._build_visualization(extracted)
         return {"action": action, "viz": viz}
 
+    def infer_batch(
+        self, obs: Any, instruction: str, *, env_ids: list[int]
+    ) -> dict[int, dict]:
+        """Infer actions for several envs in one call.
+
+        Returns ``{env_id: {"action": ..., "viz": ...}}`` with one entry per
+        requested env. Default implementation is a serial loop over
+        :meth:`infer` — behavior-identical to the historical per-env eval
+        loop, so every existing client works unchanged. Clients whose server
+        supports batched payloads can override this to issue one request for
+        all envs needing a replan.
+        """
+        return {
+            env_id: self.infer(obs, instruction, env_id=env_id)
+            for env_id in env_ids
+        }
+
     def reset(self, *, env_id: int | None = None) -> None:
         """Clear per-episode state. ``env_id=None`` resets all envs.
 

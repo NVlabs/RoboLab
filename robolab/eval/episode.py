@@ -98,8 +98,6 @@ def run_episode(env, env_cfg, episode, client: InferenceClient, *, headless=Fals
 
     subtask_status = []
 
-    clients = [client] * env.num_envs
-
     # Set up per-run HDF5 file and per-env demo indices
     if env.recorder_manager is not None and hasattr(env.recorder_manager, 'set_hdf5_file'):
         env.recorder_manager.set_hdf5_file(f"run_{episode}.hdf5")
@@ -136,11 +134,17 @@ def run_episode(env, env_cfg, episode, client: InferenceClient, *, headless=Fals
                 kit_app.update()
 
             timer.start("policy_inference")
-            # Infer actions for all active (non-frozen) envs
+            # Infer actions for all active (non-frozen) envs in ONE call.
+            # Batching-capable clients send a single request for every env
+            # needing a replan; the InferenceClient default is a serial
+            # loop, so other policies behave exactly as before.
             actions = torch.zeros(env.num_envs, action_dim, device=env.device)
             last_viz = None
-            for env_id in env.active_env_ids:
-                ret = clients[env_id].infer(obs, instruction, env_id=env_id)
+            rets = client.infer_batch(
+                obs, instruction, env_ids=list(env.active_env_ids)
+            )
+            for env_id in sorted(rets):
+                ret = rets[env_id]
                 actions[env_id] = torch.tensor(ret["action"], device=env.device)
                 if env_id == 0 or last_viz is None:
                     last_viz = ret.get("viz")
