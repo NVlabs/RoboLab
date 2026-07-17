@@ -40,6 +40,8 @@ parser.add_argument("--task", nargs="+", default=None,
 parser.add_argument("--tag", nargs="+", default=None,
                     help="List of tags of tasks to run on.")
 parser.add_argument("--num-steps", type=int, default=100, help="Number of steps per episode.")
+parser.add_argument("--settle-steps", type=int, default=0,
+                    help="Physics steps to run after reset before recording starts.")
 parser.add_argument("--toggle-every", type=int, default=15, help="Toggle gripper every N steps.")
 parser.add_argument("--video-mode", "--video_mode", type=str, default="all",
                     choices=["all", "viewport", "sensor", "none"],
@@ -91,6 +93,7 @@ def main():
                 video_mode=args_cli.video_mode,
                 headless=args_cli.headless,
                 num_steps=args_cli.num_steps,
+                settle_steps=args_cli.settle_steps,
                 toggle_every=args_cli.toggle_every,
             )
             end_episode(env)

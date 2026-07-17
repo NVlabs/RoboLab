@@ -28,7 +28,7 @@ from robolab.core.utils.video_utils import VideoWriter
 
 
 def run_gripper_toggle_episode(env, env_cfg=None, *, save_videos=True, video_mode="all",
-                               headless=False, num_steps=100, toggle_every=5):
+                               headless=False, num_steps=100, toggle_every=5, settle_steps=0):
     """Toggle the gripper open/closed every `toggle_every` steps while holding the
     arm joints fixed.
 
@@ -39,6 +39,13 @@ def run_gripper_toggle_episode(env, env_cfg=None, *, save_videos=True, video_mod
     """
     robot = env.scene["robot"]
     obs, _ = env.reset()
+
+    if settle_steps > 0:
+        current_joint_pos = robot.data.joint_pos[0, :7]
+        gripper_action = torch.tensor([0.785398163], device=env.device)
+        actions = torch.cat([current_joint_pos, gripper_action]).unsqueeze(0)
+        for _ in tqdm(range(settle_steps), desc="Settling scene"):
+            obs, _, _, _, _ = env.step(actions)
 
     instruction = getattr(env_cfg, "instruction", None) or "gripper_toggle"
     if isinstance(instruction, dict):
