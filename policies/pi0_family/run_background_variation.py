@@ -43,8 +43,10 @@ parser.add_argument("--policy", choices=["pi0", "pi0_fast", "paligemma", "palige
                        help="Pi0-family variant to use (default: pi05)")
 parser.add_argument("--num-runs", "--num_runs", type=int, default=1,
                        help="Number of sequential runs per task (default: 1). Total episodes = num_runs * num_envs. Prefer increasing --num_envs for more episodes. Only increase --num-runs if you run out of GPU memory with the desired num_envs.")
-parser.add_argument("--enable-subtask", "--enable_subtask", action="store_true",
-                       help="Enable subtask progress checking (default: False)")
+parser.add_argument("--enable-subtask", "--enable_subtask", dest="enable_subtask", action="store_true", default=True,
+                       help="Enable subtask progress checking (default: on; kept for backward compatibility)")
+parser.add_argument("--disable-subtask", "--disable_subtask", dest="enable_subtask", action="store_false",
+                       help="Disable subtask progress checking")
 parser.add_argument("--record-image-data", "--record_image_data", action="store_true",
                        help="Enable proprio image data recording (default: False)")
 parser.add_argument("--output-folder-name", "--output_folder_name", type=str, default=None,

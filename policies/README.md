@@ -56,6 +56,6 @@ uv run python policies/<policy>/run.py --headless --num-runs 5 --num-envs 2
 # Resume a previous run
 uv run python policies/<policy>/run.py --headless --output-folder-name my_previous_run
 
-# Enable subtask checking
-uv run python policies/<policy>/run.py --headless --enable-subtask
+# Disable subtask checking (on by default)
+uv run python policies/<policy>/run.py --headless --disable-subtask
 ```

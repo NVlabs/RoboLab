@@ -71,8 +71,14 @@ def add_common_eval_args(parser: argparse.ArgumentParser) -> None:
                               "(0, 1]) for adaptive sampling. Default 0.14 = worst-case CI "
                               "width at n=200 (TRI LBM sim protocol, arXiv:2507.05331). "
                               "Only used when --num-episodes-adaptive is set."))
-    parser.add_argument("--enable-subtask", "--enable_subtask", action="store_true",
-                        help="Enable subtask progress checking (default: False).")
+    parser.add_argument("--enable-subtask", "--enable_subtask", dest="enable_subtask",
+                        action="store_true", default=True,
+                        help="Enable subtask progress checking (default: on; kept for "
+                             "backward compatibility).")
+    parser.add_argument("--disable-subtask", "--disable_subtask", dest="enable_subtask",
+                        action="store_false",
+                        help="Disable subtask progress checking (episode results will "
+                             "have no score/reason and an empty events log).")
     parser.add_argument("--output-folder-name", "--output_folder_name", type=str, default=None,
                         help=("Output folder name under <repo>/output. Default is "
                               "<timestamp>_<policy>. If you provide the output folder name "
@@ -202,6 +208,13 @@ def run_evaluation(
             renderer=args.renderer,
             rendering_mode=args.rendering_type,
         )
+
+        if robolab.constants.ENABLE_SUBTASK_PROGRESS_CHECKING and getattr(env_cfg, "subtasks", None) is None:
+            print(
+                f"\033[93m[RoboLab] WARNING: Subtask tracking is enabled but task `{task_env}` "
+                f"has no subtask specification — subtask tracking is skipped for this task, so "
+                f"its episode results will have no score/reason and an empty events log.\033[0m"
+            )
 
         client = client_factory(args)
 

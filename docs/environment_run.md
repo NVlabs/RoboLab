@@ -377,7 +377,7 @@ The built-in `policies/pi0_family/run.py` supports the full set of evaluation fe
 | `--remote-host HOST` | Policy server host | `localhost` |
 | `--remote-port PORT` | Policy server port | `8000` |
 | `--output-folder-name NAME` | Output folder under `output/`. Reusing a previous folder skips completed episodes. | `<timestamp>_<policy>` |
-| `--enable-subtask` | Enable subtask progress checking (records score, reason, subtask log) | `False` |
+| `--disable-subtask` | Disable subtask progress checking (drops score, reason, subtask log from results; tracking is on by default) | `False` |
 | `--record-image-data` | Record image observations to HDF5 | `False` |
 | `--video-mode MODE` | Which videos to save: `all` (sensor + viewport), `viewport` only, `sensor` only, or `none` | `all` |
 | `--renderer MODE` | RTX renderer: `realtime` (RaytracedLighting) or `pathtracing` (PathTracing). See [Renderer Selection](#renderer-selection). | `realtime` |
@@ -411,11 +411,11 @@ python policies/pi0_family/run.py --task BananaInBowlTask RubiksCubeTask
 # Run tasks by tag
 python policies/pi0_family/run.py --tag pick_place
 
-# Run 20 parallel episodes with subtask tracking
-python policies/pi0_family/run.py --headless --num_envs 20 --enable-subtask
+# Run 20 parallel episodes
+python policies/pi0_family/run.py --headless --num_envs 20
 
 # If 20 envs don't fit in GPU memory, split into runs:
-python policies/pi0_family/run.py --headless --num_envs 10 --num-runs 2 --enable-subtask
+python policies/pi0_family/run.py --headless --num_envs 10 --num-runs 2
 
 # Use a different policy backend (each lives under policies/<policy>/run.py)
 python policies/gr00t/run.py --remote-host 10.0.0.1 --remote-port 5555
@@ -440,7 +440,7 @@ The built-in `run_eval.py` provides several features out of the box:
 - **Trajectory metrics** — At the end of each episode, trajectory metrics (SPARC smoothness, path length, speed, joint tracking error) are computed from the HDF5 data and written directly into `episode_results.jsonl`. See [Data Storage — Episode Results](data.md#episode-results) for the full list.
 - **Error event extraction** — Error events (wrong object grabbed, gripper hit table, object dropped, etc.) are extracted from the episode log and recorded in the results.
 - **Video recording** — Two videos per episode: observation camera view and viewport camera view, saved to the task output directory.
-- **Subtask tracking** — With `--enable-subtask`, subtask completion scores and reasons are recorded per episode.
+- **Subtask tracking** — On by default: subtask completion scores and reasons are recorded per episode (`score`/`reason` in `episode_results.jsonl`, synced with the HDF5 `subtask/score` dataset and the per-env event log). Disable with `--disable-subtask`.
 - **Result summarization** — After all tasks complete, a summary table is printed. For more detailed analysis, see [Analysis and Results Parsing](analysis.md).
 
 ## Robustness Evaluation Scripts
