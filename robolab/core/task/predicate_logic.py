@@ -117,6 +117,12 @@ def _and(a, b):
         return a & b
     return a and b
 
+def _or(a, b):
+    """Logical OR that works for both bool and Tensor."""
+    if isinstance(a, torch.Tensor) or isinstance(b, torch.Tensor):
+        return a | b
+    return a or b
+
 def _not(a):
     """Logical NOT that works for both bool and Tensor."""
     if isinstance(a, torch.Tensor):

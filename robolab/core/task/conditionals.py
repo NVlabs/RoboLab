@@ -21,7 +21,7 @@ import torch
 import robolab.constants
 from robolab.core.task.decorators import atomic, composite
 from robolab.core.task.predicate_logic import *
-from robolab.core.task.predicate_logic import _and, _not
+from robolab.core.task.predicate_logic import _and, _not, _or
 from robolab.core.task.subtask import Subtask
 from robolab.core.world.world_state import get_world
 
@@ -128,16 +128,33 @@ def object_in_contact(
         print(f"object_in_contact: {object1} and {object2} in contact (logical={logical}) -> {result}")
     return result
 
+def _gripper_in_contact(world, object: str, gripper_name: str | list[str], env_id: int | None = None):
+    """in_contact against one or more grippers; True if ANY of them touches `object`.
+
+    `in_contact` itself treats a list as "all pairs must hold", which is the wrong
+    logical for multi-end-effector robots (e.g. a dual-arm gripper pair) where either
+    gripper grabbing the object should count.
+    """
+    names = [gripper_name] if isinstance(gripper_name, str) else list(gripper_name)
+    result = in_contact(world, object, names[0], env_id=env_id)
+    for name in names[1:]:
+        result = _or(result, in_contact(world, object, name, env_id=env_id))
+    return result
+
 @atomic
 def object_grabbed(
     env,
     object: str,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     env_id: int | None = None,
 ):
-    """Check if an object is currently being grabbed by the gripper (in contact with gripper)."""
+    """Check if an object is currently being grabbed by the gripper (in contact with gripper).
+
+    `gripper_name` may be a list (e.g. for dual-arm robots) — the object counts as
+    grabbed if ANY of the listed grippers is touching it.
+    """
     world = get_world(env)
-    result = in_contact(world, object, gripper_name, env_id=env_id)
+    result = _gripper_in_contact(world, object, gripper_name, env_id=env_id)
     if robolab.constants.DEBUG:
         print(f"object_grabbed: '{object}' in contact with '{gripper_name}' -> {result}")
     return result
@@ -146,12 +163,12 @@ def object_grabbed(
 def object_dropped(
     env,
     object: str,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     env_id: int | None = None,
 ):
-    """Check if an object has been dropped (not in contact with gripper)."""
+    """Check if an object has been dropped (not in contact with any of gripper_name)."""
     world = get_world(env)
-    result = _not(in_contact(world, object, gripper_name, env_id=env_id))
+    result = _not(_gripper_in_contact(world, object, gripper_name, env_id=env_id))
     if robolab.constants.DEBUG:
         print(f"object_dropped: '{object}' not in contact with '{gripper_name}' -> {result}")
     return result
@@ -195,7 +212,7 @@ def object_in_container(
     require_gripper_detached: bool = False,
     require_stationary: bool = False,
     stationary_threshold: float = 0.05,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -219,7 +236,7 @@ def object_in_container(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         if require_stationary:
             result = _and(result, stationary(world, obj, linear_threshold=stationary_threshold, check_angular=False, env_id=env_id))
         return result
@@ -237,7 +254,7 @@ def object_on_top(
     tolerance: float = 0.01,
     require_contact_with: Union[str, list[str]] = None,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -260,7 +277,7 @@ def object_on_top(
         if require_contact_with is not None:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -278,7 +295,7 @@ def object_on_bottom(
     mode: str = "bbox",
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -291,7 +308,7 @@ def object_on_bottom(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -307,7 +324,7 @@ def object_on_center(
     tolerance: float = 0.01,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -320,7 +337,7 @@ def object_on_center(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -338,7 +355,7 @@ def object_left_of(
     cone_deg: int = 45,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -353,7 +370,7 @@ def object_left_of(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -371,7 +388,7 @@ def object_right_of(
     cone_deg: int = 45,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -386,7 +403,7 @@ def object_right_of(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -404,7 +421,7 @@ def object_in_front_of(
     cone_deg: int = 45,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -419,7 +436,7 @@ def object_in_front_of(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -437,7 +454,7 @@ def object_behind(
     cone_deg: int = 45,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -452,7 +469,7 @@ def object_behind(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -468,7 +485,7 @@ def object_next_to(
     dist: float = 0.05,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -481,7 +498,7 @@ def object_next_to(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -499,7 +516,7 @@ def object_below_top(
     mode: str = "bbox",
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -512,7 +529,7 @@ def object_below_top(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -530,7 +547,7 @@ def object_below(
     mode: str = "bbox",
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -543,7 +560,7 @@ def object_below(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -559,7 +576,7 @@ def object_enclosed(
     tolerance: float = 0.01,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -572,7 +589,7 @@ def object_enclosed(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -588,7 +605,7 @@ def object_inside(
     tolerance: float = 0.01,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -601,7 +618,7 @@ def object_inside(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -617,7 +634,7 @@ def object_outside_of(
     tolerance: float = 0.01,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -635,12 +652,52 @@ def object_outside_of(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
     if robolab.constants.DEBUG:
         print(f"object_outside_of: {object} outside '{container}' (logical={logical}) -> {result}")
+    return result
+
+@atomic
+def object_moved_to_container(
+    env,
+    object: str | list[str],
+    target_container: str,
+    source_container: str,
+    tolerance: float = 0.01,
+    require_contact_with: Union[bool, str, list[str]] = False,
+    require_gripper_detached: bool = False,
+    gripper_name: str | list[str] = "gripper",
+    logical: str = "all",
+    K: int = 1,
+    env_id: int | None = None,
+):
+    """Checks if objects have been moved out of source_container and into target_container.
+
+    Combines ``object_outside_of(source_container)`` and ``object_in_container(target_container)``
+    into a single check, for pick-and-place tasks where the destination alone (e.g. an object
+    that never left the source container, or was placed there directly) is not sufficient proof
+    of a pick-and-place transfer.
+    """
+    def condition(world, obj, env_id=None):
+        result = _and(
+            _not(in_opentop_container(world, obj, source_container, tolerance, env_id=env_id)),
+            in_opentop_container(world, obj, target_container, tolerance, env_id=env_id),
+        )
+        if require_contact_with is True:
+            result = _and(result, in_contact(world, obj, target_container, env_id=env_id))
+        elif require_contact_with:
+            result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
+        if require_gripper_detached:
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
+        return result
+
+    result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
+    if robolab.constants.DEBUG:
+        print(f"object_moved_to_container: {object} moved '{source_container}' -> '{target_container}' "
+              f"(logical={logical}) -> {result}")
     return result
 
 @atomic
@@ -651,7 +708,7 @@ def object_upright(
     up_axis: str = "z",
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -667,7 +724,7 @@ def object_upright(
         if require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -682,7 +739,7 @@ def object_at(
     position: tuple[float, float, float],
     tolerance: float = 0.02,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -700,14 +757,14 @@ def object_at(
         if env_id is not None:
             at_pos = torch.allclose(pos, pos_target, atol=tolerance)
             if require_gripper_detached:
-                at_pos = at_pos and not in_contact(world, obj, gripper_name, env_id=env_id)
+                at_pos = at_pos and not _gripper_in_contact(world, obj, gripper_name, env_id=env_id)
             return at_pos
         else:
             # pos: (N, 3)
             diff = torch.abs(pos - pos_target.unsqueeze(0))
             at_pos = (diff <= tolerance).all(dim=1)  # (N,)
             if require_gripper_detached:
-                at_pos = at_pos & _not(in_contact(world, obj, gripper_name, env_id=None))
+                at_pos = at_pos & _not(_gripper_in_contact(world, obj, gripper_name, env_id=None))
             return at_pos
 
     result = evaluate_spatial_condition(env, object, check_obj, logical, K, env_id=env_id)
@@ -725,7 +782,7 @@ def object_between(
     alignment_tolerance: float = 0.1,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -736,7 +793,7 @@ def object_between(
         if require_contact_with and require_contact_with is not True:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -789,7 +846,7 @@ def object_center_of(
     tolerance: float = 0.01,
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -802,7 +859,7 @@ def object_center_of(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -820,7 +877,7 @@ def object_above(
     mode: str = "bbox",
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -833,7 +890,7 @@ def object_above(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=env_id))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -851,7 +908,7 @@ def object_above_bottom(
     mode: str = "bbox",
     require_contact_with: Union[bool, str, list[str]] = False,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -875,7 +932,7 @@ def object_outside_of_and_on_surface(
     surface: str,
     tolerance: float = 0.01,
     require_gripper_detached: bool = False,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     logical: str = "all",
     K: int = 1,
     env_id: int | None = None,
@@ -891,7 +948,7 @@ def object_outside_of_and_on_surface(
             world.is_supported_on_surface(obj, surface, env_id=env_id)
         )
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=env_id)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=env_id)))
         return result
 
     result = evaluate_spatial_condition(env, object, condition, logical, K, env_id=env_id)
@@ -1019,13 +1076,19 @@ def get_wrong_object_grabbed(
 
 def gripper_hit_table(
     env,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] | None = None,
     table_name: str = "table",
     env_id: int | None = None,
 ):
     """Check if the gripper is in contact with the table."""
     world = get_world(env)
-    result = in_contact(world, gripper_name, table_name, env_id=env_id)
+    if gripper_name is None:
+        contact_gripper = getattr(getattr(env, "cfg", None), "contact_gripper", None)
+        if isinstance(contact_gripper, dict) and contact_gripper:
+            gripper_name = list(contact_gripper.keys())
+        else:
+            gripper_name = "gripper"
+    result = _gripper_in_contact(world, table_name, gripper_name, env_id=env_id)
     if robolab.constants.DEBUG:
         print(f"gripper_hit_table: '{gripper_name}' in contact with '{table_name}' -> {result}")
     return result
@@ -1109,7 +1172,7 @@ def objects_placed_in_container_in_order(
     tolerance: float = 0.01,
     require_contact_with: Union[bool, str, list[str]] = True,
     require_gripper_detached: bool = True,
-    gripper_name: str = "gripper",
+    gripper_name: str | list[str] = "gripper",
     strict: bool = False,
     key: str | None = None,
     env_id: int | None = None,
@@ -1155,7 +1218,7 @@ def objects_placed_in_container_in_order(
         elif require_contact_with:
             result = _and(result, in_contact(world, obj, require_contact_with, env_id=eid))
         if require_gripper_detached:
-            result = _and(result, _not(in_contact(world, obj, gripper_name, env_id=eid)))
+            result = _and(result, _not(_gripper_in_contact(world, obj, gripper_name, env_id=eid)))
         return result
 
     if env_id is None:

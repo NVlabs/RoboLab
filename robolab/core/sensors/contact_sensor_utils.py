@@ -75,11 +75,31 @@ def create_contact_sensors(env_cfg):
             contact_sensor = create_contact_sensor_cfg(gripper_prim_path, getattr(scene, obj_name).prim_path)
             setattr(scene, contact_sensor_name, contact_sensor)
 
-    objects = env_cfg.contact_object_list
-    for i in range(len(objects)):
-        for j in range(i + 1, len(objects)):
-            obj_name = objects[i]
-            other_obj_name = objects[j]
+    objects = list(env_cfg.contact_object_list)
+    sensor_body_objects = getattr(env_cfg, "contact_sensor_body_object_list", None)
+    if sensor_body_objects is None:
+        sensor_body_objects = objects
+    else:
+        sensor_body_objects = list(sensor_body_objects)
+
+    missing_sensor_body_objects = [obj for obj in sensor_body_objects if obj not in objects]
+    if missing_sensor_body_objects:
+        raise ValueError(
+            "contact_sensor_body_object_list must be a subset of contact_object_list. "
+            f"Missing: {missing_sensor_body_objects}; contact_object_list: {objects}"
+        )
+
+    created_object_pairs = set()
+    for obj_name in sensor_body_objects:
+        for other_obj_name in objects:
+            if obj_name == other_obj_name:
+                continue
+
+            pair_key = frozenset((obj_name, other_obj_name))
+            if pair_key in created_object_pairs:
+                continue
+            created_object_pairs.add(pair_key)
+
             contact_sensor_name = f"{obj_name}__{other_obj_name}"
             contact_sensor = create_contact_sensor_cfg(
                 getattr(scene, obj_name).prim_path,

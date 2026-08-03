@@ -26,7 +26,8 @@ class Task:
     rewards: Any = None  # Optional reward terms for RL training
     events: Any = None  # Optional event terms (e.g., randomization)
     subtasks: Any = None  # Subtasks for completion tracking
-    contact_object_list: list[str] | None = None  # list of objects that can be in contact with the robot and will be tracked for contact sensors
+    contact_object_list: list[str] | None = None  # list of objects referenced by task predicates and contact sensors
+    contact_sensor_body_object_list: list[str] | None = None  # optional subset allowed as object-object ContactSensor bodies
 
     episode_length_s: int = 60*10 # 10 minutes
     attributes: list[str] = None
@@ -88,7 +89,8 @@ def verify_task_valid(task_class: type[Task]) -> tuple[bool, str]:
             error = task_class.__name__ + " is not a valid task class. " + error
             return False, error
 
-        for obj_args in ["object", "container", "objects", "reference_object", "surface"]:
+        for obj_args in ["object", "container", "objects", "reference_object", "surface",
+                         "source_container", "target_container"]:
             if obj_args in params:
                 objects = params.get(obj_args, [])
                 if isinstance(objects, str):

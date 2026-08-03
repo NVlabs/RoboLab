@@ -62,7 +62,8 @@ def create_recorder_config(
     include_policy_observations: bool = False,
     include_subtask_tracking: bool = False,
     export_dir: str | None = None,
-    filename: str = "data.hdf5"
+    filename: str = "data.hdf5",
+    ee_body_name: str = "base_link",
 ) -> RecorderManagerBaseCfg:
     """Factory function to create appropriate recorder configuration.
 
@@ -81,6 +82,7 @@ def create_recorder_config(
         dataset_export_dir_path=export_dir,
         dataset_filename=filename
     )
+    config.record_ee_pose.ee_body_name = ee_body_name
 
     # Conditionally add policy observations
     if include_policy_observations:
@@ -121,6 +123,11 @@ class RobolabDefaultEnvCfg(ManagerBasedRLEnvCfg):
     rerender_on_reset: bool = True
     seed: int | None = 0
     subtasks: list[dict[str, dict]] | None = None
+    contact_object_list: list[str] | None = None
+    contact_sensor_body_object_list: list[str] | None = None
+    contact_gripper: dict[str, str] | None = None
+    instruction: str | dict[str, str] = ""
+    ee_body_name: str = "base_link"
 
     def __post_init__(self):
         if self.observations is None:
@@ -149,7 +156,8 @@ class RobolabDefaultEnvCfg(ManagerBasedRLEnvCfg):
                 include_policy_observations=enable_policy_observations,
                 include_subtask_tracking=enable_subtask_tracking,
                 export_dir=get_output_dir(),
-                filename="data.hdf5"
+                filename="data.hdf5",
+                ee_body_name=self.ee_body_name,
             )
 
         self.viewer.cam_prim_path = "/OmniverseKit_Persp"
@@ -172,6 +180,16 @@ class RobolabDefaultEnvCfg(ManagerBasedRLEnvCfg):
             "gpu_temp_buffer_capacity": 2**30,
             "gpu_heap_capacity": 2**30,
             "gpu_collision_stack_size": 2**30,
+            # High-contact scenes with many dropped rigid objects can exhaust
+            # the default narrow-phase GPU capacities long before the generic
+            # heap/temp buffers are saturated.
+            "gpu_max_rigid_contact_count": 2**23,
+            "gpu_max_rigid_patch_count": 2**18,
+            "gpu_found_lost_pairs_capacity": 2**21,
+            "gpu_found_lost_aggregate_pairs_capacity": 2**25,
+            "gpu_total_aggregate_pairs_capacity": 2**21,
+            "gpu_max_soft_body_contacts": 2**20,
+            "gpu_max_particle_contacts": 2**20,
             "enable_ccd": True,
             "contact_offset": 0.02,
             "rest_offset": 0.01,
