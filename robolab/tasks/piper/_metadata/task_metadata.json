@@ -1,0 +1,19 @@
+[
+  {
+    "task_name": "PiperSingleObjectPickPlaceTask",
+    "instruction": "Pick up the rubiks cube and place it in the box",
+    "instruction_variants": null,
+    "episode_s": "20",
+    "scene": "piper_single_object_pick_place.usda",
+    "filename": "piper_single_object_pick_place_task.py",
+    "contact_objects": "rubiks_cube, pick_box, place_box, table",
+    "terminations": "PiperPickAndPlaceTerminations",
+    "attributes": "",
+    "subtasks": "pick_and_place(groups=['rubiks_cube'], logical=all) score=1.0",
+    "num_sequential_stages": 1,
+    "num_atomic_conditions": 3,
+    "num_subtasks": 1,
+    "difficulty_score": 1,
+    "difficulty_label": "simple"
+  }
+]

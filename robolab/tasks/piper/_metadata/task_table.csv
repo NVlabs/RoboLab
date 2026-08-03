@@ -1,0 +1,2 @@
+task_name,scene,instruction,episode_s,attributes,num_subtasks,difficulty_label
+PiperSingleObjectPickPlaceTask (piper_single_object_pick_place_task.py),piper_single_object_pick_place.usda,Pick up the rubiks cube and place it in the box,20,,1,simple

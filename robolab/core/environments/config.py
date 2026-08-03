@@ -90,7 +90,8 @@ def generate_task_env_cfg(task_class: Task,
                          num_envs: int = 1,
                          eye: tuple[float, float, float] = (1.5, 0.0, 1.0),
                          lookat: tuple[float, float, float] = (0.2, 0.0, 0.0),
-                         env_spacing: float = 10.0) -> Type[RobolabDefaultEnvCfg]:
+                         env_spacing: float = 10.0,
+                         ee_body_name: str = "base_link") -> Type[RobolabDefaultEnvCfg]:
     """
     Generate a complete task environment configuration class.
 
@@ -142,9 +143,15 @@ def generate_task_env_cfg(task_class: Task,
             # Set task-specific configs
             self.scene = scene_env_cfg(num_envs=num_envs, env_spacing=env_spacing)
             self.contact_gripper = contact_gripper
+            self.ee_body_name = ee_body_name
             self.instruction = task_class.instruction
             self.terminations = task_class.terminations()
             self.contact_object_list = task_class.contact_object_list
+            self.contact_sensor_body_object_list = getattr(
+                task_class,
+                "contact_sensor_body_object_list",
+                self.contact_object_list,
+            )
 
             # Set optional rewards if provided by the task
             if getattr(task_class, 'rewards', None) is not None:

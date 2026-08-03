@@ -72,6 +72,9 @@ def load_demo_data(hdf5_path: str, demo_key: str = "demo_0") -> dict | None:
             data["joint_velocity"] = robot_state["joint_velocity"][:]
 
             # Load end-effector pose
+            if "ee_pose" not in demo:
+                print(f"Warning: {hdf5_path}/{demo_key} has no 'ee_pose' group; skipping trajectory metrics")
+                return None
             data["ee_position"] = demo["ee_pose"]["position"][:]
             data["ee_orientation"] = demo["ee_pose"]["orientation"][:]
 
@@ -80,7 +83,7 @@ def load_demo_data(hdf5_path: str, demo_key: str = "demo_0") -> dict | None:
                 data["ee_linear_velocity"] = demo["ee_pose"]["linear_velocity"][:]
 
     except Exception as e:
-        print(f"Error loading {hdf5_path}/{demo_key}: {e}")
+        print(f"Warning: could not load trajectory metrics input from {hdf5_path}/{demo_key}: {e}")
         return None
 
     return data

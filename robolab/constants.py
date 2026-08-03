@@ -23,6 +23,7 @@ ROBOTS_DIR = os.path.join(ASSET_DIR, "robots")
 TASK_DIR = os.path.join(SOURCE_DIR, "tasks")
 DEFAULT_TASK_SUBFOLDERS = [
     'benchmark',
+    'piper',
 ]
 
 

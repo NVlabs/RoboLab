@@ -428,9 +428,9 @@ class LocalLoader:
         more recent runs; the bare ``_<N>`` form is the legacy):
           * ``<instruction>_<run>_env<env>_viewport.mp4`` →  viewport (new)
           * ``<instruction>_env<env>_viewport.mp4``       →  viewport (new, run-implicit)
-          * ``<instruction>_<env>_viewport.mp4``          →  viewport (legacy)
+          * ``<instruction>_<run>_viewport.mp4``          →  viewport (legacy, single-env)
           * ``<instruction>_<run>_env<env>.mp4``          →  policy view / "recording" (new)
-          * ``<instruction>_<env>.mp4``                   →  policy view / "recording" (legacy)
+          * ``<instruction>_<run>.mp4``                   →  policy view / "recording" (legacy, single-env)
           * ``video_<run>_env<env>.mp4``                  →  playback-style
         """
         videos: list[CameraVideo] = []
@@ -446,13 +446,22 @@ class LocalLoader:
                 if png.exists():
                     e.last_frame_path = str(png)
 
-        # Viewport: most-specific patterns first.
-        for pat in (f"*_env{e.env_id}_viewport.mp4", f"*_{e.env_id}_viewport.mp4"):
+        # Viewport: most-specific patterns first.  In single-env evals the
+        # writer uses the run index as the only numeric suffix, not env_id.
+        for pat in (
+            f"*_{e.run_index}_env{e.env_id}_viewport.mp4",
+            f"*_env{e.env_id}_viewport.mp4",
+            f"*_{e.run_index}_viewport.mp4",
+        ):
             for p in task_dir.glob(pat):
                 _add("viewport", p)
 
         # Recording (non-viewport policy/cam mp4s).
-        for pat in (f"*_env{e.env_id}.mp4", f"*_{e.env_id}.mp4"):
+        for pat in (
+            f"*_{e.run_index}_env{e.env_id}.mp4",
+            f"*_env{e.env_id}.mp4",
+            f"*_{e.run_index}.mp4",
+        ):
             for p in task_dir.glob(pat):
                 if p in seen:
                     continue
