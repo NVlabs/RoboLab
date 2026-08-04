@@ -77,6 +77,10 @@ parser.add_argument("--dynamic-object-datasets", "--dynamic_object_datasets", na
                     help="Catalog dataset names to sample from, e.g. ycb hot3d objaverse.")
 parser.add_argument("--dynamic-object-pool", "--dynamic_object_pool", nargs="+", default=None,
                     help="Explicit catalog object names to sample random objects from.")
+parser.add_argument("--dynamic-object-sample-with-replacement", "--dynamic_object_sample_with_replacement",
+                    action="store_true",
+                    help=("Allow repeated catalog objects among dynamic-scene instances. "
+                          "Repeated instances receive unique prim names."))
 parser.add_argument("--dynamic-object-seed", "--dynamic_object_seed", type=int, default=None,
                     help="Seed for runtime object sampling and placement.")
 parser.add_argument("--dynamic-scene-base", "--dynamic_scene_base", type=str,
@@ -173,6 +177,7 @@ dynamic_requested = (
     or args_cli.dynamic_object_categories
     or args_cli.dynamic_object_datasets
     or args_cli.dynamic_object_pool
+    or args_cli.dynamic_object_sample_with_replacement
 )
 
 if dynamic_requested:
@@ -183,6 +188,7 @@ if dynamic_requested:
         categories=args_cli.dynamic_object_categories,
         datasets=args_cli.dynamic_object_datasets,
         object_pool=args_cli.dynamic_object_pool,
+        sample_with_replacement=args_cli.dynamic_object_sample_with_replacement,
         seed=args_cli.dynamic_object_seed,
         center=args_cli.dynamic_object_pos,
         area=args_cli.dynamic_object_area,

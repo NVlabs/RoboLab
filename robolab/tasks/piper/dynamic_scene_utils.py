@@ -84,6 +84,7 @@ def sample_dynamic_objects(
     categories: Iterable[str] | None = None,
     datasets: Iterable[str] | None = None,
     object_pool: Iterable[str] | None = None,
+    sample_with_replacement: bool = False,
     seed: int | None = None,
     center: Iterable[float] = DEFAULT_OBJECT_POS,
     area: Iterable[float] = (0.22, 0.20),
@@ -91,7 +92,12 @@ def sample_dynamic_objects(
     object_rot: Iterable[float] = DEFAULT_OBJECT_ROT,
     scale: Iterable[float] = DEFAULT_OBJECT_SCALE,
 ) -> tuple[DynamicObjectSpec, list[DynamicObjectSpec]]:
-    """Build target + randomized distractor specs for a dynamic pick-place scene."""
+    """Build target + randomized distractor specs for a dynamic pick-place scene.
+
+    By default, distractors are sampled without replacement and therefore need
+    distinct catalog entries. ``sample_with_replacement`` permits repeated
+    catalog entries; each repeated instance receives a unique USD prim name.
+    """
     if count < 1:
         raise ValueError("--dynamic-object-count must be >= 1.")
 
@@ -131,17 +137,24 @@ def sample_dynamic_objects(
     selected_entries = []
     distractor_count = count - 1
     if distractor_count > 0:
-        target_catalog_name = target_object_name or target_name
-        distractor_candidates = [
-            entry for entry in candidates
-            if entry.get("name") != target_catalog_name and entry.get("usd_path") != _catalog_relpath(target_usd)
-        ]
-        if len(distractor_candidates) < distractor_count:
-            raise ValueError(
-                f"Requested {distractor_count} distractor object(s), but only "
-                f"{len(distractor_candidates)} matched the filters."
-            )
-        selected_entries = rng.sample(distractor_candidates, distractor_count)
+        if sample_with_replacement:
+            # Include the target's catalog entry as a possible distractor. This
+            # is intentional: repeated instances are assigned distinct prim
+            # names below (e.g. ``lime01``, ``lime01_01``).
+            selected_entries = [rng.choice(candidates) for _ in range(distractor_count)]
+        else:
+            target_catalog_name = target_object_name or target_name
+            distractor_candidates = [
+                entry for entry in candidates
+                if entry.get("name") != target_catalog_name and entry.get("usd_path") != _catalog_relpath(target_usd)
+            ]
+            if len(distractor_candidates) < distractor_count:
+                raise ValueError(
+                    f"Requested {distractor_count} distractor object(s), but only "
+                    f"{len(distractor_candidates)} matched the filters. "
+                    "Use --dynamic-object-sample-with-replacement to allow repeated objects."
+                )
+            selected_entries = rng.sample(distractor_candidates, distractor_count)
 
     positions = _sample_positions(rng, count=count, center=center_tuple, area=area_tuple, z=z)
     rotations = [object_rot_tuple, *[_random_yaw_quat(rng) for _ in range(max(0, count - 1))]]
