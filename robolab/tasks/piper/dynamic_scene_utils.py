@@ -11,7 +11,7 @@ import random
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Mapping
 
 from robolab.constants import OBJECT_CATALOG_PATH, PACKAGE_DIR, SCENE_DIR, get_timestamp, resolve_catalog_path
 from robolab.core.scenes.utils import find_scene_file
@@ -25,6 +25,8 @@ GENERATED_SCENE_ENV = "ROBOLAB_PIPER_DYNAMIC_SCENE"
 OBJECT_NAME_ENV = "ROBOLAB_PIPER_DYNAMIC_OBJECT_NAME"
 OBJECT_NAMES_ENV = "ROBOLAB_PIPER_DYNAMIC_OBJECT_NAMES"
 INSTRUCTION_ENV = "ROBOLAB_PIPER_DYNAMIC_INSTRUCTION"
+DYNAMIC_DROP_PLAN_ENV = "ROBOLAB_PIPER_DYNAMIC_DROP_PLAN"
+DYNAMIC_EPISODE_LENGTH_ENV = "ROBOLAB_PIPER_DYNAMIC_EPISODE_LENGTH_S"
 
 _PAYLOAD_RE = re.compile(r"@([^@]+)@")
 _VALID_PRIM_CHARS_RE = re.compile(r"[^A-Za-z0-9_]")
@@ -222,8 +224,15 @@ def generate_dynamic_pick_place_scene_from_specs(
     distractors: Iterable[DynamicObjectSpec] = (),
     base_scene: str = DEFAULT_BASE_SCENE,
     output_dir: str | None = None,
+    initial_positions: Mapping[str, Iterable[float]] | None = None,
 ) -> str:
-    """Generate a scene by inserting target and distractor objects into a base Piper scene."""
+    """Generate a scene by inserting target and distractor objects into a base Piper scene.
+
+    ``initial_positions`` optionally overrides the authored USD positions while
+    retaining each spec's pose as its logical task/release pose.  Runtime
+    sequential-drop uses this to author every dynamic body in a safe holding
+    area; the reset event later releases the stored logical poses one by one.
+    """
     base_scene_path = find_scene_file(base_scene, SCENE_DIR)
     if not os.path.exists(base_scene_path):
         raise FileNotFoundError(f"Base scene not found: {base_scene}")
@@ -239,7 +248,13 @@ def generate_dynamic_pick_place_scene_from_specs(
         text = f.read()
 
     text = _rewrite_relative_payloads(text, os.path.dirname(base_scene_path))
-    object_block = "\n".join(_format_object_block_from_spec(spec) for spec in object_specs)
+    object_block = "\n".join(
+        _format_object_block_from_spec(
+            spec,
+            initial_pos=(initial_positions or {}).get(spec.name),
+        )
+        for spec in object_specs
+    )
 
     marker = '    def Xform "GroundPlane"'
     if marker not in text:
@@ -258,6 +273,8 @@ def export_dynamic_env(
     object_name: str,
     instruction: str | None = None,
     object_names: Iterable[str] | None = None,
+    drop_plan: Mapping | None = None,
+    episode_length_s: float | None = None,
 ) -> None:
     """Expose the generated scene to the runtime task module through env vars."""
     os.environ[GENERATED_SCENE_ENV] = scene_path
@@ -266,6 +283,84 @@ def export_dynamic_env(
         object_names = [object_name]
     os.environ[OBJECT_NAMES_ENV] = json.dumps([sanitize_prim_name(name) for name in object_names])
     os.environ[INSTRUCTION_ENV] = instruction or build_instruction(object_name)
+    if drop_plan is None:
+        os.environ.pop(DYNAMIC_DROP_PLAN_ENV, None)
+    else:
+        os.environ[DYNAMIC_DROP_PLAN_ENV] = json.dumps(drop_plan)
+    if episode_length_s is None:
+        os.environ.pop(DYNAMIC_EPISODE_LENGTH_ENV, None)
+    else:
+        if episode_length_s <= 0:
+            raise ValueError("Dynamic episode length must be positive.")
+        os.environ[DYNAMIC_EPISODE_LENGTH_ENV] = str(float(episode_length_s))
+
+
+def build_runtime_sequential_drop_plan(
+    specs: Iterable[DynamicObjectSpec],
+    *,
+    seed: int | None,
+    steps_per_object: int,
+    final_steps: int,
+    max_final_steps: int,
+    stable_linear_velocity: float,
+    stable_angular_velocity: float,
+    stable_frames: int,
+    record_setup_video: bool,
+    holding_origin: tuple[float, float, float] = (4.0, 4.0, 0.50),
+    holding_spacing: float = 0.45,
+) -> dict:
+    """Build the serializable reset-time drop plan for a generated scene.
+
+    Positions in this plan are local to an IsaacLab environment.  The reset
+    event adds each cloned environment's origin before writing them to PhysX.
+    Keeping the release pose separately from the authored USD pose is what
+    prevents all objects from appearing in the bin before reset has a chance
+    to stage them in the holding area.
+    """
+    spec_list = list(specs)
+    if not spec_list:
+        raise ValueError("Sequential drop requires at least one dynamic object.")
+    if steps_per_object < 1 or final_steps < 0 or max_final_steps < 1:
+        raise ValueError("Sequential-drop settle step counts must be positive (final steps may be zero).")
+    if stable_linear_velocity < 0 or stable_angular_velocity < 0 or stable_frames < 1:
+        raise ValueError("Sequential-drop stability thresholds must be non-negative and stable_frames >= 1.")
+
+    object_names = [sanitize_prim_name(spec.name) for spec in spec_list]
+    release_poses = {
+        sanitize_prim_name(spec.name): {
+            "pos": [float(v) for v in spec.pos],
+            "rot": [float(v) for v in spec.rot],
+        }
+        for spec in spec_list
+    }
+    holding_poses = {}
+    for idx, spec in enumerate(spec_list):
+        # Keep every body well outside the tabletop/camera frustum and spaced
+        # apart.  The reset event re-pins these bodies before every physics
+        # step until their individual release turn.
+        holding_poses[sanitize_prim_name(spec.name)] = {
+            "pos": [
+                float(holding_origin[0] + idx * holding_spacing),
+                float(holding_origin[1]),
+                float(holding_origin[2]),
+            ],
+            "rot": [float(v) for v in spec.rot],
+        }
+
+    return {
+        "version": 1,
+        "object_names": object_names,
+        "release_poses": release_poses,
+        "holding_poses": holding_poses,
+        "seed": seed,
+        "steps_per_object": int(steps_per_object),
+        "final_steps": int(final_steps),
+        "max_final_steps": int(max_final_steps),
+        "stable_linear_velocity": float(stable_linear_velocity),
+        "stable_angular_velocity": float(stable_angular_velocity),
+        "stable_frames": int(stable_frames),
+        "record_setup_video": bool(record_setup_video),
+    }
 
 
 def settle_scene_in_place(
@@ -584,11 +679,17 @@ def _format_object_block(
 '''
 
 
-def _format_object_block_from_spec(spec: DynamicObjectSpec) -> str:
+def _format_object_block_from_spec(
+    spec: DynamicObjectSpec,
+    initial_pos: Iterable[float] | None = None,
+) -> str:
+    pos = tuple(float(v) for v in (initial_pos if initial_pos is not None else spec.pos))
+    if len(pos) != 3:
+        raise ValueError("initial_positions entries must contain exactly 3 values.")
     return _format_object_block(
         object_name=sanitize_prim_name(spec.name),
         object_usd_path=_resolve_repo_path(spec.usd_path),
-        object_pos=tuple(float(v) for v in spec.pos),
+        object_pos=pos,
         object_rot=tuple(float(v) for v in spec.rot),
         object_scale=tuple(float(v) for v in spec.scale),
     )

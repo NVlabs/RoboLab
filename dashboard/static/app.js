@@ -1936,13 +1936,20 @@ async function loadAndRenderEvents(host, runId, task, envId, runIndex, camVideos
     return;
   }
 
+  // Policy events and HDF5 time series begin after reset.  A sequential-drop
+  // run may prepend setup frames to the same MP4, so translate policy seconds
+  // onto the video's clock without changing the canonical event timestamps.
+  const setupOffset = Math.max(0, Number(ep && ep.setup_video_duration_s) || 0);
+  const eventVideoTime = (time_s) => (Number(time_s) || 0) + setupOffset;
+  const videoPolicyTime = (time_s) => (Number(time_s) || 0) - setupOffset;
+
   // Without dt we can't anchor markers to a video timeline; just render the list.
   // maxTime = episode duration when we know it, so the strip spans the entire
   // episode (not just the range of recorded events). Floor at the last event
   // and at 1s so a degenerate empty episode still renders something.
   const dt = data.dt;
-  const eventsLast = Math.max(0, ...events.map((e) => e.time_s || 0));
-  let maxTime = dt ? Math.max(ep && ep.duration ? ep.duration : 0, eventsLast, 1) : null;
+  const eventsLast = Math.max(0, ...events.map((e) => eventVideoTime(e.time_s)));
+  let maxTime = dt ? Math.max(setupOffset + (ep && ep.duration ? ep.duration : 0), eventsLast, 1) : null;
   // If a camera video loads with a richer duration, use that instead — its
   // currentTime is what the playhead is anchored to, so the math should agree.
   if (dt && camVideos && camVideos[0]) {
@@ -1953,7 +1960,7 @@ async function loadAndRenderEvents(host, runId, task, envId, runIndex, camVideos
         // Reposition existing markers under the new span (only matters when
         // video.duration exceeds the recorded duration).
         for (const { ev, node } of markers) {
-          node.style.left = `${(ev.time_s / maxTime) * 100}%`;
+          node.style.left = `${(eventVideoTime(ev.time_s) / maxTime) * 100}%`;
         }
       }
     };
@@ -1970,12 +1977,12 @@ async function loadAndRenderEvents(host, runId, task, envId, runIndex, camVideos
     strip = el('div', { class: 'events-strip mb-2' });
     strip.appendChild(el('div', { class: 'events-strip-track' }));
     for (const ev of events) {
-      const x = (ev.time_s / maxTime) * 100;
+      const x = (eventVideoTime(ev.time_s) / maxTime) * 100;
       const m = el('div', {
         class: `events-strip-marker ${ev.severity}`,
         style: { left: `${x}%` },
-        title: `${(ev.time_s || 0).toFixed(2)}s · ${ev.name}\n${ev.info || ''}`,
-        onclick: (e) => { e.stopPropagation(); seekAll(camVideos, ev.time_s); },
+        title: `${(ev.time_s || 0).toFixed(2)}s policy · ${ev.name}\n${ev.info || ''}`,
+        onclick: (e) => { e.stopPropagation(); seekAll(camVideos, eventVideoTime(ev.time_s)); },
       });
       strip.appendChild(m);
       markers.push({ ev, node: m });
@@ -2037,7 +2044,7 @@ async function loadAndRenderEvents(host, runId, task, envId, runIndex, camVideos
   const rowEls = events.map((ev) =>
     el('div', {
       class: `events-row ${ev.severity}`,
-      onclick: () => { if (ev.time_s != null) seekAll(camVideos, ev.time_s); },
+      onclick: () => { if (ev.time_s != null) seekAll(camVideos, eventVideoTime(ev.time_s)); },
     },
       el('span', { class: 'ev-time' }, ev.time_s != null ? `${ev.time_s.toFixed(2)}s` : `step ${ev.step}`),
       el('span', { class: 'ev-info', title: ev.info || '' },
@@ -2054,12 +2061,13 @@ async function loadAndRenderEvents(host, runId, task, envId, runIndex, camVideos
     let lastScore = -1;  // -1 (not 0/1) so the first paint always fires
     const onTime = () => {
       const t = driver.currentTime;
+      const policyT = videoPolicyTime(t);
       // playhead
       if (playhead) playhead.style.left = `${Math.min(100, (t / maxTime) * 100)}%`;
       // find latest event with time_s <= t
       let idx = -1;
       for (let i = 0; i < events.length; i++) {
-        if ((events[i].time_s ?? Infinity) <= t) idx = i;
+        if ((events[i].time_s ?? Infinity) <= policyT) idx = i;
         else break;
       }
       if (idx !== activeIdx) {
@@ -2345,6 +2353,7 @@ function renderPlots(host, ts) {
   const cams = (window.__camVideosForSync || []);
   if (cams.length && plotDivs.length && ts.dt) {
     const driver = cams[0];
+    const setupOffset = Math.max(0, Number(ep && ep.setup_video_duration_s) || 0);
     const makeShape = (t) => [{
       type: 'line', x0: t, x1: t, yref: 'paper', y0: 0, y1: 1,
       line: { color: 'rgba(255,255,255,0.9)', width: 1.5 },
@@ -2357,7 +2366,7 @@ function renderPlots(host, ts) {
       pending = true;
       requestAnimationFrame(() => {
         pending = false;
-        const shapes = makeShape(driver.currentTime);
+        const shapes = makeShape(driver.currentTime - setupOffset);
         for (const pd of plotDivs) {
           Plotly.relayout(pd, { shapes });
         }
@@ -2369,7 +2378,7 @@ function renderPlots(host, ts) {
 
     for (const pd of plotDivs) {
       pd.on('plotly_click', (ev) => {
-        if (ev.points && ev.points.length) seekAll(cams, ev.points[0].x);
+        if (ev.points && ev.points.length) seekAll(cams, ev.points[0].x + setupOffset);
       });
       pd.style.cursor = 'crosshair';
     }

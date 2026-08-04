@@ -83,10 +83,18 @@ def run_episode(env, env_cfg, episode, client: InferenceClient, *, headless=Fals
     """
     timer = TimingStats()
 
-    obs, _ = env.reset()
+    # Keep the historical warm-up reset, but suppress a generated task's
+    # expensive reset pre-roll here.  The second reset below is the actual
+    # episode reset and is the only one allowed to perform/record setup.
+    env._dynamic_setup_enabled = False
     obs, _ = env.reset()
     max_steps = env.max_episode_length
     video_fps = 1 / (env_cfg.sim.render_interval * env_cfg.sim.dt) # Hz
+    # The policy loop can run faster than the configured render cadence.  Write
+    # only at that cadence so one second of policy time remains one second of
+    # MP4 time (and matches reset pre-roll frames, which are rendered at the
+    # same cadence).
+    video_write_stride = max(1, round(1 / (env.step_dt * video_fps)))
     instruction = env_cfg.instruction
     # Pull action dim from the env's action manager (IsaacLab canonical),
     # falling back to the gym action space if the manager isn't available.
@@ -97,12 +105,6 @@ def run_episode(env, env_cfg, episode, client: InferenceClient, *, headless=Fals
     ) or env.action_space.shape[-1]
 
     subtask_status = []
-
-    # Set up per-run HDF5 file and per-env demo indices
-    if env.recorder_manager is not None and hasattr(env.recorder_manager, 'set_hdf5_file'):
-        env.recorder_manager.set_hdf5_file(f"run_{episode}.hdf5")
-        for env_id in range(env.num_envs):
-            env.recorder_manager.set_episode_index(env_id, env_ids=[env_id])
 
     # Setup per-env streaming video writers
     save_sensor = save_videos and video_mode in ("all", "sensor")
@@ -120,6 +122,46 @@ def run_episode(env, env_cfg, episode, client: InferenceClient, *, headless=Fals
             if save_viewport:
                 video_path_viewport = os.path.join(get_output_dir(), f"{cleaned_instruction}{suffix}_viewport.mp4")
                 video_writers_viewport.append(VideoWriter(video_path_viewport, video_fps))
+
+    def write_video_frames(frame_obs, *, skip_frozen: bool = False) -> None:
+        """Append a synchronized frame to each enabled per-env video stream."""
+        if not save_videos:
+            return
+        for env_id in range(env.num_envs):
+            if skip_frozen and env._frozen_envs[env_id]:
+                continue
+            if save_sensor:
+                sensor_frame = unpack_image_obs(frame_obs, scale=0.5, env_id=env_id).get("combined_image")
+                video_writers_obs[env_id].write(sensor_frame)
+            if save_viewport:
+                viewport_frame = unpack_viewport_cams(frame_obs, env_id=env_id).get("combined_image")
+                video_writers_viewport[env_id].write(viewport_frame)
+
+    # The reset event owns setup physics.  It calls this lightweight callback
+    # only after it rendered a setup frame; the same writers are then retained
+    # for policy frames, yielding one continuous dashboard MP4.
+    def capture_setup_frame(reset_env) -> None:
+        setup_obs = reset_env.observation_manager.compute(update_history=False)
+        write_video_frames(setup_obs)
+
+    record_setup_video = bool(
+        save_videos
+        and getattr(env_cfg, "record_setup_video", False)
+        and (save_sensor or save_viewport)
+    )
+    env._dynamic_setup_capture = capture_setup_frame if record_setup_video else None
+    env._dynamic_setup_enabled = True
+    obs, _ = env.reset()
+    # Do not retain a callback into closed video writers on later incidental
+    # resets (e.g. teardown or a caller's next episode warm-up).
+    env._dynamic_setup_capture = None
+
+    # Set up per-run HDF5 file and per-env demo indices only after reset.  The
+    # reset pre-roll is intentionally not a policy trajectory/action history.
+    if env.recorder_manager is not None and hasattr(env.recorder_manager, 'set_hdf5_file'):
+        env.recorder_manager.set_hdf5_file(f"run_{episode}.hdf5")
+        for env_id in range(env.num_envs):
+            env.recorder_manager.set_episode_index(env_id, env_ids=[env_id])
 
     import omni.kit.app
     import omni.timeline
@@ -166,17 +208,12 @@ def run_episode(env, env_cfg, episode, client: InferenceClient, *, headless=Fals
             subtask_status.append(per_env_infos)
 
             # Write per-env video frames (skip frozen envs)
-            if save_videos:
+            if save_videos and actual_steps % video_write_stride == 0:
                 timer.start("video_write")
-                for env_id in range(env.num_envs):
-                    if env._frozen_envs[env_id]:
-                        continue
-                    if save_sensor:
-                        frame_obs = unpack_image_obs(obs, scale=0.5, env_id=env_id).get("combined_image")
-                        video_writers_obs[env_id].write(frame_obs)
-                    if save_viewport:
-                        frame_vp = unpack_viewport_cams(obs, env_id=env_id).get("combined_image")
-                        video_writers_viewport[env_id].write(frame_vp)
+                # Keep the old frozen-env behavior for policy frames. Setup
+                # frames are written by the reset callback before freezing can
+                # occur, so both streams remain continuous and synchronized.
+                write_video_frames(obs, skip_frozen=True)
                 timer.stop("video_write")
 
             actual_steps += 1
@@ -196,4 +233,10 @@ def run_episode(env, env_cfg, episode, client: InferenceClient, *, headless=Fals
             logger.exception("Failed to reset client after episode")
 
     timing = timer.to_dict(actual_steps)
+    setup_sim = getattr(env, "_dynamic_setup_sim_duration_s", {})
+    setup_video = getattr(env, "_dynamic_setup_video_duration_s", {})
+    if setup_sim:
+        timing["setup_sim_s"] = round(max(setup_sim.values()), 3)
+    if setup_video:
+        timing["setup_video_s"] = round(max(setup_video.values()), 3)
     return env.get_env_results(), subtask_status, timing

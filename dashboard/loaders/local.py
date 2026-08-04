@@ -134,6 +134,8 @@ class EpisodeRow:
     attributes: list[str] = field(default_factory=list)
     metrics: dict = field(default_factory=dict)
     timing: dict = field(default_factory=dict)  # policy_inference_avg_ms, env_step_avg_ms, …
+    setup_sim_duration_s: float = 0.0
+    setup_video_duration_s: float = 0.0
     policy: str | None = None
     videos: list[CameraVideo] = field(default_factory=list)
     last_frame_path: str | None = None   # absolute path, may be None
@@ -417,6 +419,8 @@ class LocalLoader:
                 attributes=list(d.get("attributes") or []),
                 metrics=_json_safe(d.get("metrics") or {}),
                 timing=_json_safe(d.get("timing") or {}),
+                setup_sim_duration_s=float(d.get("setup_sim_duration_s") or 0.0),
+                setup_video_duration_s=float(d.get("setup_video_duration_s") or 0.0),
                 policy=d.get("policy"),
             ))
         return rows
