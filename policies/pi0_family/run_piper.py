@@ -67,6 +67,15 @@ parser.add_argument("--dynamic-object-name", "--dynamic_object_name", type=str, 
 parser.add_argument("--dynamic-object-count", "--dynamic_object_count", type=int, default=1,
                     help=("Total number of runtime-spawned objects in the generated scene. "
                           "Includes the target object; additional objects are random distractors."))
+episode_length_group = parser.add_mutually_exclusive_group()
+episode_length_group.add_argument("--dynamic-seconds-per-object", "--dynamic_seconds_per_object",
+                    type=float, default=None, metavar="SECONDS",
+                    help=("Policy-control time budget per generated object. The dynamic episode length becomes "
+                          "SECONDS × --dynamic-object-count; reset-time sequential drop is excluded."))
+episode_length_group.add_argument("--dynamic-episode-length-s", "--dynamic_episode_length_s",
+                    type=float, default=None, metavar="SECONDS",
+                    help=("Total policy-control time budget for the dynamic task in seconds, independent of "
+                          "object count; reset-time sequential drop is excluded."))
 parser.add_argument("--dynamic-object-categories", "--dynamic-object-classes",
                     "--dynamic_object_categories", "--dynamic_object_classes",
                     nargs="+", default=None,
@@ -106,16 +115,29 @@ parser.add_argument("--dynamic-instruction", "--dynamic_instruction", type=str, 
 parser.add_argument("--settle-dynamic-scene", "--settle_dynamic_scene", action="store_true",
                     help="Run physics settling on the generated scene before registering the env.")
 parser.add_argument("--dynamic-sequential-drop", "--dynamic_sequential_drop", action="store_true",
-                    help=("When settling a generated dynamic scene, release objects one by one "
-                          "instead of dropping all objects at the same time. Implies "
-                          "--settle-dynamic-scene."))
+                    help=("Release generated dynamic objects one by one during the formal env.reset() "
+                          "before policy inference begins. This supersedes the former offline USD "
+                          "settling behavior and does not imply --settle-dynamic-scene."))
+parser.add_argument("--dynamic-record-setup-video", "--dynamic_record_setup_video", action="store_true",
+                    help=("With --dynamic-sequential-drop, prepend the reset-time drop/settle process "
+                          "to the same dashboard MP4 as the policy episode. Default: start video only "
+                          "after all objects are settled."))
 parser.add_argument("--dynamic-settle-steps", "--dynamic_settle_steps", type=int, default=300,
                     help="All-at-once dynamic settle step count (default: 300).")
 parser.add_argument("--dynamic-settle-steps-per-object", "--dynamic_settle_steps_per_object",
                     type=int, default=120,
-                    help="Sequential dynamic settle steps after each released object (default: 120).")
+                    help=("Maximum runtime physics steps to wait for stability after each sequential "
+                          "release (default: 120)."))
 parser.add_argument("--dynamic-settle-final-steps", "--dynamic_settle_final_steps", type=int, default=120,
-                    help="Extra settle steps after the last sequential object is released (default: 120).")
+                    help="Minimum extra runtime settle steps after the final sequential release (default: 120).")
+parser.add_argument("--dynamic-settle-max-steps", "--dynamic_settle_max_steps", type=int, default=600,
+                    help="Maximum additional runtime settle steps while waiting for final stability (default: 600).")
+parser.add_argument("--dynamic-stable-linear-velocity", "--dynamic_stable_linear_velocity", type=float, default=0.02,
+                    help="Linear-speed threshold in m/s used by runtime sequential settling (default: 0.02).")
+parser.add_argument("--dynamic-stable-angular-velocity", "--dynamic_stable_angular_velocity", type=float, default=0.2,
+                    help="Angular-speed threshold in rad/s used by runtime sequential settling (default: 0.2).")
+parser.add_argument("--dynamic-stable-frames", "--dynamic_stable_frames", type=int, default=15,
+                    help="Consecutive quiet physics frames required for runtime sequential settling (default: 15).")
 
 from robolab.constants import DEFAULT_TASK_SUBFOLDERS, PACKAGE_DIR  # noqa: E402
 from robolab.eval.runner import add_common_eval_args, run_evaluation  # noqa: E402
@@ -156,6 +178,7 @@ import robolab.constants  # noqa: E402
 from robolab.registrations.piper.auto_env_registrations_jointpos import auto_register_piper_envs  # noqa: E402
 from robolab.tasks.piper.dynamic_scene_utils import (  # noqa: E402
     build_instruction,
+    build_runtime_sequential_drop_plan,
     export_dynamic_env,
     generate_dynamic_pick_place_scene_from_specs,
     sample_dynamic_objects,
@@ -178,9 +201,16 @@ dynamic_requested = (
     or args_cli.dynamic_object_datasets
     or args_cli.dynamic_object_pool
     or args_cli.dynamic_object_sample_with_replacement
+    or args_cli.dynamic_seconds_per_object is not None
+    or args_cli.dynamic_episode_length_s is not None
 )
 
 if dynamic_requested:
+    if args_cli.dynamic_seconds_per_object is not None and args_cli.dynamic_seconds_per_object <= 0:
+        parser.error("--dynamic-seconds-per-object must be positive.")
+    if args_cli.dynamic_episode_length_s is not None and args_cli.dynamic_episode_length_s <= 0:
+        parser.error("--dynamic-episode-length-s must be positive.")
+
     target_spec, distractor_specs = sample_dynamic_objects(
         target_object_name=args_cli.dynamic_object,
         target_object_usd_path=args_cli.dynamic_object_usd,
@@ -199,36 +229,79 @@ if dynamic_requested:
         from dataclasses import replace
         target_spec = replace(target_spec, name=sanitize_prim_name(args_cli.dynamic_object_name))
 
+    object_specs = [target_spec, *distractor_specs]
+    dynamic_episode_length_s = (
+        args_cli.dynamic_seconds_per_object * len(object_specs)
+        if args_cli.dynamic_seconds_per_object is not None
+        else args_cli.dynamic_episode_length_s
+    )
+    runtime_drop_plan = None
+    initial_positions = None
+    if args_cli.dynamic_sequential_drop:
+        runtime_drop_plan = build_runtime_sequential_drop_plan(
+            object_specs,
+            seed=args_cli.dynamic_object_seed,
+            steps_per_object=args_cli.dynamic_settle_steps_per_object,
+            final_steps=args_cli.dynamic_settle_final_steps,
+            max_final_steps=args_cli.dynamic_settle_max_steps,
+            stable_linear_velocity=args_cli.dynamic_stable_linear_velocity,
+            stable_angular_velocity=args_cli.dynamic_stable_angular_velocity,
+            stable_frames=args_cli.dynamic_stable_frames,
+            record_setup_video=args_cli.dynamic_record_setup_video,
+        )
+        initial_positions = {
+            name: pose["pos"]
+            for name, pose in runtime_drop_plan["holding_poses"].items()
+        }
+
     scene_path = generate_dynamic_pick_place_scene_from_specs(
         target=target_spec,
         distractors=distractor_specs,
         base_scene=args_cli.dynamic_scene_base,
         output_dir=args_cli.dynamic_scene_output_dir,
+        initial_positions=initial_positions,
     )
     object_name = sanitize_prim_name(target_spec.name)
     object_names = [target_spec.name, *(spec.name for spec in distractor_specs)]
-    if args_cli.settle_dynamic_scene or args_cli.dynamic_sequential_drop:
+    if args_cli.settle_dynamic_scene and not args_cli.dynamic_sequential_drop:
         print(f"\033[96m[RoboLab] Settling generated dynamic scene: {scene_path}\033[0m")
         settle_scene_in_place(
             scene_path,
             simulation_app,
             object_names=object_names,
-            sequential_drop=args_cli.dynamic_sequential_drop,
+            sequential_drop=False,
             steps=args_cli.dynamic_settle_steps,
             steps_per_object=args_cli.dynamic_settle_steps_per_object,
             final_steps=args_cli.dynamic_settle_final_steps,
         )
+    elif args_cli.settle_dynamic_scene and args_cli.dynamic_sequential_drop:
+        print(
+            "\033[96m[RoboLab] --dynamic-sequential-drop uses reset-time physics; "
+            "skipping offline --settle-dynamic-scene.\033[0m"
+        )
 
     instruction = args_cli.dynamic_instruction or build_instruction(object_name)
-    export_dynamic_env(scene_path, object_name, instruction, object_names=object_names)
+    export_dynamic_env(
+        scene_path,
+        object_name,
+        instruction,
+        object_names=object_names,
+        drop_plan=runtime_drop_plan,
+        episode_length_s=dynamic_episode_length_s,
+    )
     dynamic_task_file = os.path.join(PACKAGE_DIR, "robolab", "tasks", "piper", "piper_dynamic_pick_place_task.py")
     args_cli.task = ["PiperDynamicPickPlaceTask"]
     registration_task = [dynamic_task_file]
+    episode_length_message = (
+        f"[RoboLab] Policy episode length: {dynamic_episode_length_s:g}s\n"
+        if dynamic_episode_length_s is not None else ""
+    )
     print(
         f"\033[96m[RoboLab] Generated dynamic Piper scene: {scene_path}\n"
         f"[RoboLab] Target object: {object_name} ({target_spec.usd_path})\n"
         f"[RoboLab] All objects: {', '.join(object_names)}\n"
-        f"[RoboLab] Instruction: {instruction}\033[0m"
+        + episode_length_message
+        + f"[RoboLab] Instruction: {instruction}\033[0m"
     )
 
 else:

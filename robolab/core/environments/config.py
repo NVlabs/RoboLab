@@ -145,6 +145,7 @@ def generate_task_env_cfg(task_class: Task,
             self.contact_gripper = contact_gripper
             self.ee_body_name = ee_body_name
             self.instruction = task_class.instruction
+            self.record_setup_video = bool(getattr(task_class, "record_setup_video", False))
             self.terminations = task_class.terminations()
             self.contact_object_list = task_class.contact_object_list
             self.contact_sensor_body_object_list = getattr(

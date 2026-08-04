@@ -279,6 +279,17 @@ def summarize_run(
         events_list_for_env = (
             per_env_events_list[env_id] if env_id < len(per_env_events_list) else []
         )
+        per_env_extra = dict(extra_fields or {})
+        # Reset-time sequential drop is not part of the policy trajectory, but
+        # when its frames were prepended to an MP4 the dashboard needs the
+        # video offset to align policy events and plots with that MP4.
+        setup_sim = getattr(env, "_dynamic_setup_sim_duration_s", {})
+        setup_video = getattr(env, "_dynamic_setup_video_duration_s", {})
+        if isinstance(setup_sim, dict) and env_id in setup_sim:
+            per_env_extra["setup_sim_duration_s"] = float(setup_sim[env_id])
+        if isinstance(setup_video, dict) and env_id in setup_video:
+            per_env_extra["setup_video_duration_s"] = float(setup_video[env_id])
+
         run_summary = build_run_summary(
             env_result=r,
             env_id=env_id,
@@ -297,7 +308,7 @@ def summarize_run(
             instruction_type=instruction_type,
             timing=timing,
             task_name=task_name,
-            extra_fields=extra_fields,
+            extra_fields=per_env_extra,
             final_score=final_score,
         )
 

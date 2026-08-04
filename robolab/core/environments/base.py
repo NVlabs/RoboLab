@@ -128,6 +128,10 @@ class RobolabDefaultEnvCfg(ManagerBasedRLEnvCfg):
     contact_gripper: dict[str, str] | None = None
     instruction: str | dict[str, str] = ""
     ee_body_name: str = "base_link"
+    # Runtime-generated tasks may record a reset pre-roll into the same video
+    # stream.  Kept in the generic cfg so the evaluator need not import a
+    # task-specific module to discover the behavior.
+    record_setup_video: bool = False
 
     def __post_init__(self):
         if self.observations is None:
