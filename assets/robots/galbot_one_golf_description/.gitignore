@@ -1,0 +1,22 @@
+# 3rd_party
+3rd_party/
+
+# ai trash
+.codex/
+.omx/
+
+# ros build artifacts
+build/
+install/
+log/
+
+.colcon/
+
+__pycache__/
+*.py[cod]
+transform_report.json
+
+.vscode/
+.idea/
+*.swp
+*~

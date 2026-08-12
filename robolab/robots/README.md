@@ -9,6 +9,7 @@ This is the canonical list of robot embodiments that ship with RoboLab. For how 
 | <img src="../../docs/images/robots/droid.png" width="480"> | **DROID**<br>(Franka + Robotiq 2F-85)<br>`droid.py` | `single-arm` `fixed-base` `parallel-jaw` | joint position, absolute EE IK, relative EE IK | wrist |
 | <img src="../../docs/images/robots/franka.png" width="480"> | **Franka Panda**<br>`franka.py`, `franka_high_pd.py` | `single-arm` `fixed-base` `parallel-jaw` | joint position, absolute EE IK, relative EE IK | — |
 | <img src="../../docs/images/robots/kinova_gen3.png" width="480"> | **Kinova Gen3**<br>(Gen3 7-DoF + Robotiq 2F-85)<br>`kinova_gen3.py` | `single-arm` `fixed-base` `parallel-jaw` | joint position | wrist |
+| <img src="../../docs/images/robots/galbot_one_golf.png" width="480"> | **Galbot One Golf**<br>`galbot_golf.py` | `bi-manual` `mobile-base`&nbsp;(fixed&nbsp;in&nbsp;sim) `parallel-jaw ×2` `torso` `head` | dual-arm joint position, whole-body joint position, dual-arm absolute TCP IK (each with binary or continuous grippers) | left wrist, right wrist, front + left ego (replay) |
 
 Gripper convention for all binary gripper actions: a scalar per gripper, `> 0.5` closes, `≤ 0.5` opens.
 Quaternions are `(w, x, y, z)`; absolute IK targets are expressed in the robot root frame, translations in meters.
@@ -98,9 +99,44 @@ from robolab.robots.kinova_gen3 import (
 Actuator gains are simulation defaults, not measured from hardware — this is a functional
 simulation model rather than a calibrated digital twin.
 
+## Galbot One Golf
+
+`tags: bi-manual · mobile-base (fixed in sim) · parallel-jaw ×2 · torso · head · L/R wrist-cams · USD-authored drives · replay`
+
+A dual-arm mobile manipulator: 5-DoF torso lift ("legs"), 2-DoF head, two 7-DoF arms, and one
+parallel gripper per arm. The wheeled base exists in the model but ships welded
+(`fix_root_link=True`) — RoboLab currently evaluates it as a static-base manipulator. All joint
+drive gains are preserved from the vendor-authored USD rather than overridden.
+
+| Action config | Layout | Dim |
+|---------------|--------|-----|
+| `GalbotGolfJointPositionActionCfg` | 14 arm joint targets + 2 binary grippers | 16 |
+| `GalbotGolfWholeBodyJointPositionActionCfg` | 21 body joint targets (legs + head + arms) + 2 binary grippers | 23 |
+| `GalbotGolfWholeBodyContinuousGripperActionCfg` | 21 body joint targets + 2 continuous gripper joint targets | 23 |
+| `GalbotGolfDifferentialIKActionCfg` | per arm: absolute TCP pose `(x, y, z, qw, qx, qy, qz)` + binary gripper | 16 |
+| `GalbotGolfDifferentialIKContinuousGripperActionCfg` | per arm: absolute TCP pose + continuous gripper joint target | 16 |
+
+The continuous-gripper variants exist for native replay of recorded trajectories; policy evaluation
+uses the binary-gripper variants.
+
+- **Config classes:** `GalbotGolfFixedBaseCfg` (+ wrist cameras), `GalbotGolfFixedBaseDefaultPoseCfg`
+  (manipulation reset posture), `GalbotGolfTabletopCfg` (root sunk 0.697 m for standard table
+  scenes), and `...ReplayCfg` variants that add report-only front and left-ego cameras
+- **Proprioception:** `ProprioceptionObservationCfg` — 21 body joint positions, per-gripper closed
+  fraction, per-arm TCP pose (root frame, includes the tool-center-point offset)
+- **Contact gripper:** `{"left": ..., "right": ..., "gripper": ["left", "right"]}` — benchmark
+  tasks' generic `"gripper"` matches either hand
+- **Registrations:** `robolab/registrations/galbot/` (jointpos, abs-IK)
+
+```python
+from robolab.robots.galbot_golf import GalbotGolfTabletopCfg
+from robolab.robots.galbot_golf_definitions import GalbotGolfJointPositionActionCfg, contact_gripper
+```
+
 ---
 
 Also in this folder: `delta_actions.py`, a helper that converts a target EE pose into a relative
 (delta) pose action — used by trajectory replay, not an action space itself.
 
-The robot stills above are rendered in an empty scene at each robot's reset posture.
+The robot stills above are rendered in an empty scene at each robot's reset posture
+(Galbot shown with legs extended; its tabletop configs use a lowered crouch).

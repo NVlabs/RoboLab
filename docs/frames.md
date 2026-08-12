@@ -8,7 +8,7 @@ frame. This document is the contract that removes that assumption.
 |-------|------------|
 | **world** | The simulator's global frame. Multi-env replication places envs at `env_origins` offsets in this frame. |
 | **env-local** | World minus the env's `scene.env_origins` translation. Replication is pure translation, so env-local and world share axes and orientations. Task scenes, objects, and the ground plane are authored in this frame; the origin sits at the table-mount plane (the ground is authored *below* it, at the canonical z = −0.697; a few legacy scenes keep −0.65, see `tests/test_scene_ground.py`). |
-| **robot-root** | The robot articulation's root-link pose. For Franka-family robots the root is at the env origin with identity rotation, so robot-root and env-local coincide **numerically** — this is a coincidence of those embodiments, not a rule. Floor-standing robots author their root elsewhere. |
+| **robot-root** | The robot articulation's root-link pose. For Franka-family robots the root is at the env origin with identity rotation, so robot-root and env-local coincide **numerically** — this is a coincidence of those embodiments, not a rule. Floor-standing robots (e.g. Galbot One Golf) author their root elsewhere. |
 
 **Conventions:** translations in meters; quaternions `(w, x, y, z)`; env-local
 = world with `env_origins` subtracted from positions only (orientations are
@@ -22,7 +22,8 @@ Where a robot's root goes is part of the robot declaration, not an assumption:
 
 - Default: root at the env origin (Franka-family).
 - Floor-standing robots author a fixed root z in the robot cfg against the
-  canonical scene ground (z = -0.697, see docs/robots.md).
+  canonical scene ground (z = -0.697, see docs/robots.md), e.g.
+  `GALBOT_GOLF_TABLETOP_ROOT_POS`.
 
 Whatever the placement, the resulting root pose is recorded per step (see
 `robot_root_pose` below). Consumers must read it rather than assume the root is

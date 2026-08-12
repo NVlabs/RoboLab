@@ -38,7 +38,7 @@ class MyRobotCfg:
 # Standard pedestal (also the default for robots without the label):
 MyRobotCfg.table_fixture = FRANKA_TABLE_FIXTURE
 
-# Robots with their own base — no fixture:
+# Robots with their own base (e.g. Galbot One Golf) — no fixture:
 MyRobotCfg.table_fixture = None
 ```
 
@@ -78,8 +78,8 @@ missing. Use `{}` to explicitly disable EE-pose recording.
 # Single-arm (DROID: Robotiq gripper base):
 DroidCfg.ee_recorder_bodies = {"ee_pose": "base_link"}
 
-# Bimanual: one channel per arm
-MyBimanualCfg.ee_recorder_bodies = {
+# Bimanual (Galbot One Golf): one channel per arm
+GalbotGolfFixedBaseCfg.ee_recorder_bodies = {
     "left_ee_pose": "left_arm_link7",
     "right_ee_pose": "right_arm_link7",
 }
