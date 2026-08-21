@@ -24,9 +24,9 @@ import time
 import uuid
 
 import numpy as np
-import websockets.sync.client
 
 from robolab.eval.base_client import InferenceClient
+from robolab.eval.websocket_transport import MsgPackWebSocketTransport
 
 logger = logging.getLogger(__name__)
 
@@ -40,51 +40,6 @@ RECV_TIMEOUT_SECS = 300
 MAX_CONNECT_RETRIES = 5
 MAX_INFER_RETRIES = 3
 RETRY_BACKOFF_BASE_SECS = 2
-
-
-class MsgPackNumpy:
-    """Simple msgpack wrapper with numpy support.
-
-    Mirrors the client_lib.msgpack_numpy from dreamzero.
-    """
-
-    def __init__(self):
-        import msgpack
-        self._msgpack = msgpack
-
-    def pack(self, obj):
-        # Don't use strict_types=True - it breaks tuple serialization
-        return self._msgpack.packb(obj, default=self._encode_numpy)
-
-    def unpack(self, data):
-        return self._msgpack.unpackb(data, object_hook=self._decode_numpy, strict_map_key=False)
-
-    def _encode_numpy(self, obj):
-        if isinstance(obj, np.ndarray):
-            if obj.dtype.kind in ("V", "O", "c"):
-                raise ValueError(f"Unsupported dtype: {obj.dtype}")
-            return {
-                b"__ndarray__": True,
-                b"data": obj.tobytes(),
-                b"dtype": obj.dtype.str,
-                b"shape": obj.shape,
-            }
-
-        if isinstance(obj, np.generic):
-            return {
-                b"__npgeneric__": True,
-                b"data": obj.item(),
-                b"dtype": obj.dtype.str,
-            }
-
-        return obj
-
-    def _decode_numpy(self, obj):
-        if b"__ndarray__" in obj:
-            return np.ndarray(buffer=obj[b"data"], dtype=np.dtype(obj[b"dtype"]), shape=obj[b"shape"])
-        if b"__npgeneric__" in obj:
-            return np.dtype(obj[b"dtype"]).type(obj[b"data"])
-        return obj
 
 
 class DreamZeroClient(InferenceClient):
@@ -105,8 +60,8 @@ class DreamZeroClient(InferenceClient):
         open_loop_horizon: int = 24,
         image_height: int = 180,
         image_width: int = 320,
-        remote_uri: str = None,
-        api_token: str = None,
+        remote_uri: str | None = None,
+        api_token: str | None = None,
         binarize_gripper: bool = False,
         resize: str = "area",
         cam2_source: str = "black",
@@ -121,20 +76,27 @@ class DreamZeroClient(InferenceClient):
         self.resize = resize
         self.cam2_source = cam2_source
 
-        # Auth: explicit param takes priority, then env var, then no auth
+        # Auth: explicit param takes priority, then env var, then no auth.
         token = api_token or os.environ.get("DREAMZERO_API_TOKEN")
-        self._auth_headers = {"Authorization": f"Bearer {token}"} if token else {}
 
         # Per-env session IDs. The server uses session_id to track temporal
         # history; parallel envs must not share one or their histories get mixed.
         self._env_session_id: dict[int, str] = {}
 
-        # MsgPack for numpy serialization
-        self._packer = MsgPackNumpy()
-
-        # Connect to server
+        # Connect to the server through the shared wire transport. Retry and
+        # session invalidation remain DreamZero-specific below.
         self._uri = remote_uri if remote_uri is not None else f"ws://{remote_host}:{remote_port}"
-        self._ws = None
+        self._transport = MsgPackWebSocketTransport(
+            self._uri,
+            api_token=token,
+            connect_kwargs={
+                "open_timeout": CONNECT_TIMEOUT_SECS,
+                "ping_interval": PING_INTERVAL_SECS,
+                "ping_timeout": PING_TIMEOUT_SECS,
+            },
+            metadata_timeout=RECV_TIMEOUT_SECS,
+        )
+        self._packer = self._transport.packer
         self._connect_with_retries()
 
     # ---- required hooks -----------------------------------------------
@@ -244,12 +206,10 @@ class DreamZeroClient(InferenceClient):
         print(f"[{self.__class__.__name__}] Reset complete (env_id={env_id}).")
 
     def close(self) -> None:
-        if self._ws is not None:
-            try:
-                self._ws.close()
-            except Exception:
-                pass
-            self._ws = None
+        try:
+            self._transport.close()
+        except Exception:
+            pass
 
     # ---- connection internals -----------------------------------------
 
@@ -278,40 +238,16 @@ class DreamZeroClient(InferenceClient):
             if attempt > 1:
                 print(f"{tag} Connection attempt {attempt}/{MAX_CONNECT_RETRIES}...")
             try:
-                try:
-                    self._ws = websockets.sync.client.connect(
-                        self._uri,
-                        additional_headers=self._auth_headers,
-                        compression=None,
-                        max_size=None,
-                        open_timeout=CONNECT_TIMEOUT_SECS,
-                        ping_interval=PING_INTERVAL_SECS,
-                        ping_timeout=PING_TIMEOUT_SECS,
-                    )
-                except TypeError:
-                    # Older websockets (e.g. 11.x bundled with Isaac Sim) lacks ping_interval/ping_timeout
-                    self._ws = websockets.sync.client.connect(
-                        self._uri,
-                        additional_headers=self._auth_headers,
-                        compression=None,
-                        max_size=None,
-                        open_timeout=CONNECT_TIMEOUT_SECS,
-                    )
-
-                self._server_metadata = self._packer.unpack(
-                    self._ws.recv(timeout=RECV_TIMEOUT_SECS)
-                )
+                self._server_metadata = self._transport.connect()
                 print(f"{tag} Server metadata: {self._server_metadata}")
                 print(f"{tag} Connected successfully.")
                 return
 
             except Exception as e:
-                if self._ws is not None:
-                    try:
-                        self._ws.close()
-                    except Exception:
-                        pass
-                    self._ws = None
+                try:
+                    self._transport.close()
+                except Exception:
+                    pass
 
                 if attempt == MAX_CONNECT_RETRIES:
                     raise ConnectionError(
@@ -329,11 +265,8 @@ class DreamZeroClient(InferenceClient):
 
     def _ensure_connected(self):
         """Reconnect if the WebSocket has been closed or lost."""
-        try:
-            if self._ws is not None and self._ws.socket is not None:
-                return
-        except Exception:
-            pass
+        if self._transport.connected:
+            return
         tag = f"[{self.__class__.__name__}]"
         print(f"{tag} Connection lost. Reconnecting...")
         self._connect_with_retries()
@@ -354,17 +287,13 @@ class DreamZeroClient(InferenceClient):
                 print(f"{tag} send/recv attempt {attempt}/{MAX_INFER_RETRIES}...")
             try:
                 self._ensure_connected()
-                assert self._ws is not None
-                self._ws.send(data)
-                return self._ws.recv(timeout=timeout)
+                return self._transport.send_recv(data, timeout=timeout)
             except Exception as e:
                 last_exc = e
-                if self._ws is not None:
-                    try:
-                        self._ws.close()
-                    except Exception:
-                        pass
-                    self._ws = None
+                try:
+                    self._transport.close()
+                except Exception:
+                    pass
 
                 if attempt == MAX_INFER_RETRIES:
                     break
