@@ -114,11 +114,25 @@ class MsgPackWebSocketTransport:
             if isinstance(raw_metadata, str):
                 raise RuntimeError(f"Policy server returned text metadata: {raw_metadata}")
             self.server_metadata = self.packer.unpack(raw_metadata)
+            if isinstance(self.server_metadata, dict) and self.server_metadata.get("type") == "error":
+                message = self.server_metadata.get("message") or self.server_metadata.get("error")
+                raise RuntimeError(f"Policy server rejected the metadata handshake: {message}")
             return self.server_metadata
-        except Exception:
+        except Exception as exc:
             try:
                 self.close()
             except Exception:
+                pass
+            try:
+                from websockets.exceptions import ConnectionClosed
+
+                if isinstance(exc, ConnectionClosed):
+                    raise ConnectionError(
+                        "Policy WebSocket closed before sending its metadata handshake. "
+                        "Verify the URI and Bearer token, confirm that policy serving is enabled, "
+                        "and inspect the server log for its rejection reason."
+                    ) from exc
+            except ImportError:
                 pass
             raise
 

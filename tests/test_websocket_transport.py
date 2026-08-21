@@ -132,3 +132,34 @@ def test_transport_closes_connection_after_invalid_handshake(monkeypatch):
 
     assert ws.closed is True
     assert transport.connected is False
+
+
+def test_transport_rejects_structured_handshake_error(monkeypatch):
+    codec = MsgPackNumpy()
+    ws = _FakeWebSocket([codec.pack({"type": "error", "message": "policy disabled"})])
+    monkeypatch.setattr(websocket_transport.websockets.sync.client, "connect", lambda *_args, **_kwargs: ws)
+    transport = MsgPackWebSocketTransport("ws://localhost:8000")
+
+    with pytest.raises(RuntimeError, match="policy disabled"):
+        transport.connect()
+
+    assert ws.closed is True
+
+
+def test_transport_explains_close_before_handshake(monkeypatch):
+    class ClosedBeforeMetadata(Exception):
+        pass
+
+    class ClosingWebSocket(_FakeWebSocket):
+        def recv(self, timeout=None):
+            raise ClosedBeforeMetadata("closed")
+
+    ws = ClosingWebSocket([])
+    monkeypatch.setattr(websocket_transport.websockets.sync.client, "connect", lambda *_args, **_kwargs: ws)
+    monkeypatch.setattr("websockets.exceptions.ConnectionClosed", ClosedBeforeMetadata)
+    transport = MsgPackWebSocketTransport("ws://localhost:8000")
+
+    with pytest.raises(ConnectionError, match="closed before sending its metadata handshake"):
+        transport.connect()
+
+    assert ws.closed is True
