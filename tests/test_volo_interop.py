@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from policies.volo.client import VoloCosmos3Client
 from policies.volo.metadata import OrchestratorMetadataMixin
 from robolab.eval.base_client import InferenceClient
 
@@ -87,6 +88,28 @@ def test_begin_episode_is_part_of_the_core_contract():
     client = _Client()
     client.begin_episode(5)
     assert client._eval_episode_idx == 5
+
+
+def test_volo_cosmos3_keeps_backend_session_and_orchestrator_episode_ids():
+    client = VoloCosmos3Client.__new__(VoloCosmos3Client)
+    InferenceClient.__init__(client)
+    client._image_h = 2
+    client._image_w = 2
+    client.begin_episode(7)
+    extracted = {
+        "left_image": np.zeros((2, 2, 3), dtype=np.uint8),
+        "right_image": np.zeros((2, 2, 3), dtype=np.uint8),
+        "wrist_image": np.zeros((2, 2, 3), dtype=np.uint8),
+        "joint_position": np.zeros(7, dtype=np.float32),
+        "gripper_position": np.zeros(1, dtype=np.float32),
+        "session_id": "robolab-episode-7-env-3",
+        "_orchestrator_keys": {},
+    }
+
+    request = client._pack_request(extracted, "pick")
+
+    assert request["session_id"] == "robolab-episode-7-env-3"
+    assert request["__episode_id"] == 7
 
 
 def test_orchestrator_keys_are_optional():

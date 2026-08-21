@@ -19,6 +19,22 @@ parser.add_argument(
 parser.add_argument(
     "--remote-port", default=8000, type=int, help="Remote port for policy server (default: 8000)."
 )
+parser.add_argument(
+    "--remote-uri",
+    "--remote_uri",
+    default=None,
+    help=(
+        "Full WebSocket URI for the policy server, for example "
+        "ws://localhost:8000/v1/realtime/robot/openpi. "
+        "Overrides --remote-host and --remote-port when set."
+    ),
+)
+parser.add_argument(
+    "--remote-token",
+    "--remote_token",
+    default=None,
+    help="Bearer token for the remote server. Falls back to COSMOS3_API_TOKEN.",
+)
 
 from robolab.eval.runner import add_common_eval_args, run_evaluation
 
@@ -40,7 +56,12 @@ auto_register_droid_envs(task=args_cli.task, cameras=WRIST_LEFT_RIGHT_HEAD)
 
 def make_client(args: argparse.Namespace) -> Cosmos3Client:
     """ """
-    return Cosmos3Client(remote_host=args.remote_host, remote_port=args.remote_port)
+    return Cosmos3Client(
+        remote_host=args.remote_host,
+        remote_port=args.remote_port,
+        remote_uri=args.remote_uri,
+        api_token=args.remote_token,
+    )
 
 
 def main() -> None:

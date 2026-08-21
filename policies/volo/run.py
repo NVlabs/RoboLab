@@ -28,7 +28,10 @@ parser.add_argument("--remote-port", "--remote_port", type=int, default=8000,
                     help="Remote port for the proxy/policy server (default: 8000).")
 parser.add_argument("--remote-uri", "--remote_uri", type=str, default=None,
                     help=("Full WebSocket URI for the proxy/policy server, e.g. wss://host.lepton.run. "
-                          "Overrides --remote-host and --remote-port when set. Pi0-family backends only."))
+                          "Overrides --remote-host and --remote-port when set."))
+parser.add_argument("--remote-token", "--remote_token", type=str, default=None,
+                    help=("Bearer token for an authenticated Cosmos3 proxy/policy server. "
+                          "Falls back to COSMOS3_API_TOKEN. Cosmos3 backend only."))
 parser.add_argument("--open-loop-horizon", "--open_loop_horizon", type=int, default=None,
                     help=("Number of actions to execute from each predicted chunk before requesting a "
                           "new one. If omitted, the backend client uses its default. "
@@ -68,7 +71,12 @@ def make_client(args: argparse.Namespace):
     if args.policy == "cosmos3":
         from policies.volo.client import VoloCosmos3Client
 
-        return VoloCosmos3Client(remote_host=args.remote_host, remote_port=args.remote_port)
+        return VoloCosmos3Client(
+            remote_host=args.remote_host,
+            remote_port=args.remote_port,
+            remote_uri=args.remote_uri,
+            api_token=args.remote_token,
+        )
 
     from policies.volo.client import VoloPi0Client
 

@@ -2,13 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+import os
+
 import numpy as np
 import torch
 import torch.nn.functional as F
 
-from openpi_client import image_tools, websocket_client_policy
-
+from robolab.core.utils.image_utils import resize_with_pad
 from robolab.eval.base_client import InferenceClient
+from robolab.eval.websocket_transport import MsgPackWebSocketTransport
 
 logger = logging.getLogger(__name__)
 
@@ -20,33 +22,44 @@ class Cosmos3Client(InferenceClient):
     IMAGE_H = 360
     OPEN_LOOP_HORIZON = 32
 
-    def __init__(self, remote_host: str = "localhost", remote_port: int = 8000):
+    def __init__(
+        self,
+        remote_host: str = "localhost",
+        remote_port: int = 8000,
+        remote_uri: str | None = None,
+        api_token: str | None = None,
+    ) -> None:
         """ """
         super().__init__()
         self._remote_host = remote_host
         self._remote_port = remote_port
+        self._remote_uri = remote_uri
+        self._api_token = api_token or os.environ.get("COSMOS3_API_TOKEN")
+        self._uri = remote_uri if remote_uri is not None else f"ws://{remote_host}:{remote_port}"
 
         self._image_w = self.IMAGE_W
         self._image_h = self.IMAGE_H
 
         self.open_loop_horizon = self.OPEN_LOOP_HORIZON
 
-        display = f"{self._remote_host}:{self._remote_port}"
+        display = self._uri
         print(f"[{self.__class__.__name__}] Awaiting for server on {display} to be ready...")
         self.client = self._connect()
         print(f"[{self.__class__.__name__}] Connected to {display}.")
 
-    def _connect(self) -> websocket_client_policy.WebsocketClientPolicy:
+    def _connect(self) -> MsgPackWebSocketTransport:
         """ """
-        return websocket_client_policy.WebsocketClientPolicy(self._remote_host, self._remote_port)
+        transport = MsgPackWebSocketTransport(self._uri, api_token=self._api_token)
+        transport.connect()
+        return transport
 
-    def _infer_with_retry(self, request: dict, max_retries: int = 3) -> dict:
+    def _infer_with_retry(self, request: dict, max_retries: int = 3) -> object:
         """ """
         import websockets.exceptions
 
         for attempt in range(max_retries):
             try:
-                return self.client.infer(request)
+                return self.client.request(request)
             except (
                 websockets.exceptions.ConnectionClosedError,
                 websockets.exceptions.ConnectionClosedOK,
@@ -61,6 +74,10 @@ class Cosmos3Client(InferenceClient):
                     attempt + 1,
                     max_retries,
                 )
+                try:
+                    self.client.close()
+                except Exception:
+                    pass
                 self.client = self._connect()
                 # Flush chunk cache so all envs re-request on next step.
                 self._chunks.clear()
@@ -69,11 +86,11 @@ class Cosmos3Client(InferenceClient):
     def _extract_observation(self, raw_obs: dict, *, env_id: int = 0) -> dict:
         """ """
         left_image = raw_obs["image_obs"]["over_shoulder_left_camera"][env_id].cpu().numpy()
-        left_image = image_tools.resize_with_pad(left_image, self._image_h, self._image_w)
+        left_image = resize_with_pad(left_image, self._image_h, self._image_w)
         right_image = raw_obs["image_obs"]["over_shoulder_right_camera"][env_id].cpu().numpy()
-        right_image = image_tools.resize_with_pad(right_image, self._image_h, self._image_w)
+        right_image = resize_with_pad(right_image, self._image_h, self._image_w)
         wrist_image = raw_obs["image_obs"]["wrist_cam"][env_id].cpu().numpy()
-        wrist_image = image_tools.resize_with_pad(wrist_image, self._image_h, self._image_w)
+        wrist_image = resize_with_pad(wrist_image, self._image_h, self._image_w)
 
         joint_position = raw_obs["proprio_obs"]["arm_joint_pos"][env_id].cpu().numpy()
         gripper_position = raw_obs["proprio_obs"]["gripper_pos"][env_id].cpu().numpy()
@@ -84,6 +101,10 @@ class Cosmos3Client(InferenceClient):
             "wrist_image": wrist_image,
             "joint_position": joint_position,
             "gripper_position": gripper_position,
+            # ``begin_episode`` receives the run index, while one run may fan
+            # out over several envs. Include both so parallel envs never share
+            # a policy session identifier.
+            "session_id": f"robolab-episode-{self._eval_episode_idx}-env-{env_id}",
         }
 
     def _pack_request(self, extracted_obs: dict, instruction: str) -> dict:
@@ -104,15 +125,31 @@ class Cosmos3Client(InferenceClient):
             "observation/joint_position": extracted_obs["joint_position"],
             "observation/gripper_position": extracted_obs["gripper_position"],
             "prompt": instruction,
+            "session_id": extracted_obs["session_id"],
         }
 
-    def _query_server(self, request: dict) -> dict:
+    def _query_server(self, request: dict) -> object:
         """ """
         return self._infer_with_retry(request)
 
-    def _unpack_response(self, response: dict) -> np.ndarray:
-        """ """
-        return np.asarray(response["action"])
+    def _unpack_response(self, response: object) -> np.ndarray:
+        """Accept Cosmos reference, vLLM-Omni, and proxy action replies."""
+        if isinstance(response, dict):
+            if response.get("type") == "error":
+                raise RuntimeError(str(response.get("message") or "Policy inference failed"))
+            if "action" in response:
+                response = response["action"]
+            elif "actions" in response:
+                response = response["actions"]
+            else:
+                raise RuntimeError("Policy response did not contain 'action' or 'actions'")
+        return np.asarray(response)
+
+    def close(self) -> None:
+        try:
+            self.client.close()
+        except Exception:
+            pass
 
     def _postprocess_chunk(self, chunk: np.ndarray) -> np.ndarray:
         """ """
