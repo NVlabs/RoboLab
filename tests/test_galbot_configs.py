@@ -4,6 +4,7 @@
 """Focused contracts for the fixed-base Galbot One Golf embodiment."""
 
 import pytest
+from pxr import Usd
 
 from robolab.constants import TASK_DIR
 from robolab.core.environments.config import generate_scene_env_cfg
@@ -17,6 +18,7 @@ from robolab.core.environments.scene_fixture import (
 from robolab.core.task.task_utils import load_task_from_file, resolve_task_path
 from robolab.robots.droid import DroidCfg
 from robolab.robots.galbot_golf import (
+    GALBOT_GOLF_USD_PATH,
     GalbotGolfFixedBaseCfg,
     GalbotGolfFixedBaseDefaultPoseCfg,
     GalbotGolfLeftEgoCameraCfg,
@@ -53,19 +55,19 @@ def test_joint_actions_seed_uncommanded_targets_on_reset():
     assert whole_body.joint_names == BODY_JOINTS
 
 
-def test_left_ego_camera_uses_golf_sensor_calibration():
+def test_left_ego_camera_uses_policy_calibration():
     camera = GalbotGolfLeftEgoCameraCfg().left_ego_cam
     assert camera.prim_path.endswith("/robot/head_link2/head_end_effector_mount_link/camera_front_head_left_rgb")
-    assert camera.offset.pos == pytest.approx((0.082781626, -0.053015078, 0.031427263))
-    assert camera.offset.rot == pytest.approx((0.698790116, -0.094725615, 0.702703943, 0.094480690))
+    assert camera.offset.pos == pytest.approx((0.07026692, -0.05334402, 0.02098859))
+    assert camera.offset.rot == pytest.approx((0.69873623, -0.09626416, 0.70197894, 0.09862283))
     assert camera.offset.convention == "ros"
     assert (camera.width, camera.height) == (640, 480)
-    assert camera.spawn.clipping_range == pytest.approx((0.1, 15.0))
+    assert camera.spawn.clipping_range == pytest.approx((0.08, 15.0))
     assert camera.width * camera.spawn.focal_length / camera.spawn.horizontal_aperture == pytest.approx(
-        198.96716907989332
+        244.20991653
     )
     assert camera.height * camera.spawn.focal_length / camera.spawn.vertical_aperture == pytest.approx(
-        198.96716907989332
+        244.262371375
     )
 
 
@@ -78,6 +80,31 @@ def test_wrist_cameras_use_golf_sensor_calibration():
         assert camera.width * camera.spawn.focal_length / camera.spawn.horizontal_aperture == pytest.approx(202)
         assert camera.height * camera.spawn.focal_length / camera.spawn.vertical_aperture == pytest.approx(202)
         assert camera.spawn.clipping_range == pytest.approx((0.03, 10.0))
+
+
+def test_usd_contains_split_fingertip_collision_meshes():
+    assert GALBOT_GOLF_USD_PATH.endswith("galbot_one_golf.usda")
+    stage = Usd.Stage.Open(GALBOT_GOLF_USD_PATH, load=Usd.Stage.LoadAll)
+    root = stage.GetDefaultPrim()
+    physics_variant = root.GetVariantSets().GetVariantSet("Physics")
+    assert physics_variant.SetVariantSelection("physx")
+
+    finger_links = (
+        "left_gripper_l_finger_link",
+        "left_gripper_r_finger_link",
+        "right_gripper_l_finger_link",
+        "right_gripper_r_finger_link",
+    )
+    collision_meshes = (
+        ("link_3_collision_01", "mesh_71"),
+        ("link_3_collision_02", "mesh_72"),
+        ("link_3_collision_03", "mesh_73"),
+    )
+    for finger_link in finger_links:
+        for collision, mesh in collision_meshes:
+            prim = stage.GetPrimAtPath(f"/galbot_one_golf/{finger_link}/collisions/{collision}/{mesh}")
+            assert prim.IsDefined()
+            assert prim.IsActive()
 
 
 def test_tabletop_and_replay_root_frames_remain_separate():
