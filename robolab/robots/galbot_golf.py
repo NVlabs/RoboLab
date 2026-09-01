@@ -14,9 +14,10 @@ from isaaclab.utils import configclass
 from robolab.constants import ROBOTS_DIR
 from robolab.robots.galbot_golf_definitions import *  # noqa
 
+GALBOT_GOLF_ASSET_DIR = os.path.join(ROBOTS_DIR, "galbot_one_golf_description")
 GALBOT_GOLF_USD_PATH = os.environ.get(
     "GALBOT_GOLF_USD_PATH",
-    os.path.join(ROBOTS_DIR, "galbot_one_golf_description", "usd", "galbot_one_golf.usda"),
+    os.path.join(GALBOT_GOLF_ASSET_DIR, "usd", "galbot_one_golf.usda"),
 )
 
 GALBOT_GOLF_USD_VARIANTS = {
@@ -115,16 +116,14 @@ _LEFT_EGO_CAM = TiledCameraCfg(
     width=640,
     data_types=["rgb"],
     spawn=sim_utils.PinholeCameraCfg(
-        focal_length=198.96716907989332 * 0.02,
-        focus_distance=0.0,
-        horizontal_aperture=640 * 0.02,
-        vertical_aperture=480 * 0.02,
-        clipping_range=(0.1, 15.0),
+        focal_length=0.488472287905,
+        horizontal_aperture=1.280137468212909,
+        vertical_aperture=0.9598969209810818,
+        clipping_range=(0.08, 15.0),
     ),
     offset=TiledCameraCfg.OffsetCfg(
-        pos=(0.082781626, -0.053015078, 0.031427263),
-        # golf_sensors.json stores xyzw; Isaac Lab expects wxyz.
-        rot=(0.698790116, -0.094725615, 0.702703943, 0.094480690),
+        pos=(0.07026692, -0.05334402, 0.02098859),
+        rot=(0.69873623, -0.09626416, 0.70197894, 0.09862283),
         convention="ros",
     ),
 )
@@ -142,8 +141,13 @@ def _galbot_golf_robot_cfg(
             usd_path=GALBOT_GOLF_USD_PATH,
             variants=GALBOT_GOLF_USD_VARIANTS,
             activate_contact_sensors=True,
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                max_depenetration_velocity=5.0,
+            ),
             articulation_props=sim_utils.ArticulationRootPropertiesCfg(
                 fix_root_link=True,
+                solver_position_iteration_count=128,
+                solver_velocity_iteration_count=4,
             ),
         ),
         init_state=ArticulationCfg.InitialStateCfg(
@@ -187,10 +191,10 @@ def _galbot_golf_robot_cfg(
             ),
             "grippers": ImplicitActuatorCfg(
                 joint_names_expr=["left_gripper_joint", "right_gripper_joint"],
-                effort_limit_sim=None,
-                velocity_limit_sim=None,
-                stiffness=None,
-                damping=None,
+                effort_limit_sim=1.0,
+                velocity_limit_sim=3.5,
+                stiffness=40.0,
+                damping=5.0,
             ),
             "wheels": ImplicitActuatorCfg(
                 joint_names_expr=WHEEL_JOINTS,

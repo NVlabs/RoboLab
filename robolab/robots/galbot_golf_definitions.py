@@ -50,28 +50,32 @@ GRIPPER_FINGER_LINK_LENGTH = 0.045
 GRIPPER_PAD_INSET = 0.0062
 
 GALBOT_GOLF_DEFAULT_JOINT_POS = {
-    "leg_joint1": 0.8,
-    "leg_joint2": 2.3,
-    "leg_joint3": 1.55,
+    # Coordinated linkage pose that pitches the torso 8 degrees toward the
+    # tabletop and lowers its mount by 15 cm without shifting it horizontally.
+    "leg_joint1": 0.3558,
+    "leg_joint2": 1.5059,
+    "leg_joint3": 1.3397,
     "leg_joint4": 0.0,
     "leg_joint5": 0.0,
     "head_joint1": 0.0,
-    "head_joint2": 0.36,
-    "left_arm_joint1": -0.1535,
-    "left_arm_joint2": -1.0087,
-    "left_arm_joint3": -0.0895,
-    "left_arm_joint4": -1.5743,
-    "left_arm_joint5": 0.2422,
-    "left_arm_joint6": -0.0009,
-    "left_arm_joint7": 0.9143,
+    "head_joint2": 0.48,
+    # Based on a valid Galbot training window whose wrist cameras both face
+    # the tabletop, with both end effectors lowered 8 cm for the RoboLab table.
+    "left_arm_joint1": 2.1164,
+    "left_arm_joint2": -1.3879,
+    "left_arm_joint3": -0.5284,
+    "left_arm_joint4": -1.7833,
+    "left_arm_joint5": -0.1364,
+    "left_arm_joint6": -0.8220,
+    "left_arm_joint7": -0.1354,
     "left_gripper_joint": GRIPPER_OPEN,
-    "right_arm_joint1": 0.1535,
-    "right_arm_joint2": 1.0087,
-    "right_arm_joint3": 0.0895,
-    "right_arm_joint4": 1.5743,
-    "right_arm_joint5": -0.2422,
-    "right_arm_joint6": -0.0009,
-    "right_arm_joint7": -0.9143,
+    "right_arm_joint1": -2.1079,
+    "right_arm_joint2": 1.1210,
+    "right_arm_joint3": 0.3646,
+    "right_arm_joint4": 1.8331,
+    "right_arm_joint5": 0.2758,
+    "right_arm_joint6": 0.7966,
+    "right_arm_joint7": -0.0235,
     "right_gripper_joint": GRIPPER_OPEN,
 }
 
