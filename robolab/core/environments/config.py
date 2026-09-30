@@ -125,7 +125,8 @@ def generate_task_env_cfg(task_class: Task,
                          gripper_closure_cfg: dict | None = None,
                          lazy_sensor_update: bool = True,
                          ee_recorder_bodies: dict[str, str] | None = None,
-                         object_state_obs: bool = False) -> Type[RobolabDefaultEnvCfg]:
+                         object_state_obs: bool = False,
+                         solver_type: int | None = None) -> Type[RobolabDefaultEnvCfg]:
     """
     Generate a complete task environment configuration class.
 
@@ -152,6 +153,8 @@ def generate_task_env_cfg(task_class: Task,
             meters), ``<object>_quat`` (world-frame w, x, y, z), and
             ``<object>_vel`` (world-frame) terms for every entry of the
             task's ``contact_object_list`` (minus fixtures). Default False.
+        solver_type: Optional PhysX contact solver override; 0 selects PGS and
+            1 selects TGS. When None, retain the global default.
 
     Returns:
         A complete environment configuration class
@@ -193,6 +196,9 @@ def generate_task_env_cfg(task_class: Task,
 
         def __post_init__(self):
             super().__post_init__()  # Set all defaults first
+
+            if solver_type is not None:
+                self.sim.physx.solver_type = solver_type
 
             self.episode_length_s: int = task_class.episode_length_s
             self.decimation: int = decimation
