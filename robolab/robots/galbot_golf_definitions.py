@@ -79,6 +79,73 @@ GALBOT_GOLF_DEFAULT_JOINT_POS = {
     "right_gripper_joint": GRIPPER_OPEN,
 }
 
+# Symmetric mean of the most common first-frame arm poses in the galbot
+# nvidia-20260828 dataset with left joint1 > 2.1 / right joint1 < -2.1: the left
+# and right bin means (661 / 778 episodes) averaged with the right arm negated.
+GALBOT_GOLF_DATASET_MEAN_JOINT_POS = {
+    "leg_joint1": 0.4807,
+    "leg_joint2": 1.2565,
+    "leg_joint3": 0.7878,
+    "leg_joint4": -0.0589,
+    "leg_joint5": 0.0,
+    "head_joint1": -0.0047,
+    "head_joint2": 0.2618,
+    "left_arm_joint1": 2.7054,
+    "left_arm_joint2": -1.4940,
+    "left_arm_joint3": -0.5666,
+    "left_arm_joint4": -2.1985,
+    "left_arm_joint5": -0.0450,
+    "left_arm_joint6": -0.8195,
+    "left_arm_joint7": -0.0072,
+    "left_gripper_joint": GRIPPER_OPEN,
+    "right_arm_joint1": -2.7054,
+    "right_arm_joint2": 1.4940,
+    "right_arm_joint3": 0.5666,
+    "right_arm_joint4": 2.1985,
+    "right_arm_joint5": 0.0450,
+    "right_arm_joint6": 0.8195,
+    "right_arm_joint7": 0.0072,
+    "right_gripper_joint": GRIPPER_OPEN,
+}
+
+GALBOT_GOLF_INIT_POSES = {
+    "default": GALBOT_GOLF_DEFAULT_JOINT_POS,
+    "dataset_mean": GALBOT_GOLF_DATASET_MEAN_JOINT_POS,
+}
+
+# Arm PD gains per actuator group. "default" is the Sim2Real profile; "reduced"
+# lowers stiffness only (damping unchanged).
+GALBOT_GOLF_ARM_GAIN_PROFILES = {
+    "default": {
+        "shoulder": {
+            "stiffness": {".*_arm_joint1": 3542, ".*_arm_joint2": 3438},
+            "damping": {".*_arm_joint1": 100, ".*_arm_joint2": 96},
+        },
+        "elbow": {
+            "stiffness": {".*_arm_joint3": 1145, ".*_arm_joint4": 1143},
+            "damping": 32,
+        },
+        "wrist": {
+            "stiffness": {".*_arm_joint5": 286, ".*_arm_joint[67]": 284},
+            "damping": 8,
+        },
+    },
+    "reduced": {
+        "shoulder": {
+            "stiffness": {".*_arm_joint1": 1000, ".*_arm_joint2": 960},
+            "damping": {".*_arm_joint1": 100, ".*_arm_joint2": 96},
+        },
+        "elbow": {
+            "stiffness": {".*_arm_joint3": 320, ".*_arm_joint4": 320},
+            "damping": 32,
+        },
+        "wrist": {
+            "stiffness": {".*_arm_joint5": 80, ".*_arm_joint[67]": 80},
+            "damping": 8,
+        },
+    },
+}
+
 contact_gripper = {
     "left": "{ENV_REGEX_NS}/robot/left_gripper_l_finger_link",
     "right": "{ENV_REGEX_NS}/robot/right_gripper_l_finger_link",

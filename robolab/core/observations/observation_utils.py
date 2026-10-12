@@ -297,6 +297,11 @@ def unpack_image_obs(obs, obs_group_name="image_obs", camera_suffix=["_camera", 
             image = tensor.cpu().numpy()
             image_dict[key] = image
             images.append(image)
+    max_h = max(image.shape[0] for image in images)
+    images = [
+        image if image.shape[0] == max_h else np.pad(image, ((0, max_h - image.shape[0]), (0, 0), (0, 0)))
+        for image in images
+    ]
     combined_image = np.concatenate(images, axis=1)
     image_dict["combined_image"] = combined_image
     return image_dict
