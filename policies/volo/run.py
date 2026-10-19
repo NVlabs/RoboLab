@@ -32,9 +32,10 @@ parser.add_argument("--remote-uri", "--remote_uri", type=str, default=None,
 parser.add_argument("--remote-token", "--remote_token", type=str, default=None,
                     help=("Bearer token for an authenticated Cosmos3 proxy/policy server. "
                           "Falls back to COSMOS3_API_TOKEN. Cosmos3 backend only."))
-parser.add_argument("--open-loop-horizon", "--open_loop_horizon", type=int, default=None,
+parser.add_argument("--open-loop-horizon", "--open_loop_horizon", type=int, default=8,
                     help=("Number of actions to execute from each predicted chunk before requesting a "
-                          "new one. If omitted, the backend client uses its default. "
+                          "new one (default: 8, the length of the grasp/place tool and hold chunks the "
+                          "VoLo proxy serves; a longer horizon indexes past the end of those chunks). "
                           "Pi0-family backends only."))
 
 from robolab.eval.runner import add_common_eval_args, run_evaluation  # noqa: E402
