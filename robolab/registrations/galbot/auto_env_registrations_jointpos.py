@@ -107,6 +107,7 @@ def auto_register_galbot_envs(
         dt=dt,
         render_interval=render_interval,
         decimation=decimation,
+        solver_iterations=(128, 4),
         solver_type=solver_type,
         seed=1,
     )

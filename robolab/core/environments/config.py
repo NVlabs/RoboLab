@@ -126,6 +126,7 @@ def generate_task_env_cfg(task_class: Task,
                          lazy_sensor_update: bool = True,
                          ee_recorder_bodies: dict[str, str] | None = None,
                          object_state_obs: bool = False,
+                         solver_iterations: tuple[int, int] | None = None,
                          solver_type: int | None = None) -> Type[RobolabDefaultEnvCfg]:
     """
     Generate a complete task environment configuration class.
@@ -155,6 +156,8 @@ def generate_task_env_cfg(task_class: Task,
             task's ``contact_object_list`` (minus fixtures). Default False.
         solver_type: Optional PhysX contact solver override; 0 selects PGS and
             1 selects TGS. When None, retain the global default.
+        solver_iterations: Optional scene solver limits (position, velocity),
+            applied after global defaults so robot iteration requests are not capped.
 
     Returns:
         A complete environment configuration class
@@ -199,6 +202,12 @@ def generate_task_env_cfg(task_class: Task,
 
             if solver_type is not None:
                 self.sim.physx.solver_type = solver_type
+
+            if solver_iterations is not None:
+                for axis, count in zip(("position", "velocity"), solver_iterations):
+                    for field in (f"num_{axis}_iterations", f"max_{axis}_iteration_count"):
+                        if hasattr(self.sim.physx, field):
+                            setattr(self.sim.physx, field, count)
 
             self.episode_length_s: int = task_class.episode_length_s
             self.decimation: int = decimation

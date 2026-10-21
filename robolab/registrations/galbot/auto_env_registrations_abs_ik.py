@@ -21,8 +21,14 @@ def auto_register_galbot_abs_ik_envs(
     dt=1 / 60,
     render_interval=6,
     decimation=6,
+    solver_type=0,
 ):
-    """Discover and register tasks with fixed-base Golf absolute TCP control."""
+    """Discover and register tasks with fixed-base Golf absolute TCP control.
+
+    Defaults to PGS (0) for the same GPU startup contact-stability workaround
+    as joint-position control. Pass ``1`` for TGS or ``None`` to retain the
+    global solver default.
+    """
     from robolab.core.environments.factory import auto_discover_and_create_cfgs
     from robolab.core.observations.observation_utils import generate_image_obs_from_cameras, generate_obs_cfg
     from robolab.robots.galbot_golf import (
@@ -92,6 +98,8 @@ def auto_register_galbot_abs_ik_envs(
         dt=dt,
         render_interval=render_interval,
         decimation=decimation,
+        solver_iterations=(128, 4),
+        solver_type=solver_type,
         seed=1,
     )
 

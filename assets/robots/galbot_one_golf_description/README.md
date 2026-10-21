@@ -83,3 +83,10 @@ not a floating-base balancing or mobile-base gravity-compensation controller.
 ## LICENSE
 
 This software is licensed under the Apache License 2.0. See `LICENSE` for details.
+
+## Fingertip contact regions
+
+Fingertip collisions use upstream revision `46c0b7447edc8254e8b44dd669df86fb6985d876`,
+packed into the existing `usd/payloads/geometries.usd`. The 1 mm inner pads use
+static/dynamic friction `1.5/1.5`; outer shells use `0.3/0.2`, with zero restitution.
+The collision envelope and gripper opening are preserved.

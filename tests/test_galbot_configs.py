@@ -4,7 +4,7 @@
 """Focused contracts for the fixed-base Galbot One Golf embodiment."""
 
 import pytest
-from pxr import Usd
+from pxr import Usd, UsdGeom, UsdPhysics, UsdShade
 
 from robolab.constants import TASK_DIR
 from robolab.core.environments.config import generate_scene_env_cfg
@@ -82,29 +82,42 @@ def test_wrist_cameras_use_golf_sensor_calibration():
         assert camera.spawn.clipping_range == pytest.approx((0.03, 10.0))
 
 
-def test_usd_contains_split_fingertip_collision_meshes():
-    assert GALBOT_GOLF_USD_PATH.endswith("galbot_one_golf.usda")
-    stage = Usd.Stage.Open(GALBOT_GOLF_USD_PATH, load=Usd.Stage.LoadAll)
-    root = stage.GetDefaultPrim()
-    physics_variant = root.GetVariantSets().GetVariantSet("Physics")
-    assert physics_variant.SetVariantSelection("physx")
-
-    finger_links = (
-        "left_gripper_l_finger_link",
-        "left_gripper_r_finger_link",
-        "right_gripper_l_finger_link",
-        "right_gripper_r_finger_link",
-    )
-    collision_meshes = (
-        ("link_3_collision_01", "mesh_71"),
-        ("link_3_collision_02", "mesh_72"),
-        ("link_3_collision_03", "mesh_73"),
-    )
-    for finger_link in finger_links:
-        for collision, mesh in collision_meshes:
-            prim = stage.GetPrimAtPath(f"/galbot_one_golf/{finger_link}/collisions/{collision}/{mesh}")
-            assert prim.IsDefined()
-            assert prim.IsActive()
+@pytest.mark.parametrize("root_path", ["/galbot_one_golf", "/World/Robot"])
+def test_usd_fingertips_have_separate_pad_and_shell_friction(root_path):
+    if root_path == "/galbot_one_golf":
+        stage = Usd.Stage.Open(GALBOT_GOLF_USD_PATH)
+    else:
+        stage = Usd.Stage.CreateInMemory()
+        stage.DefinePrim(root_path).GetReferences().AddReference(GALBOT_GOLF_USD_PATH)
+    root = stage.GetPrimAtPath(root_path)
+    assert root.GetVariantSets().GetVariantSet("Physics").SetVariantSelection("physx")
+    for arm in ("left", "right"):
+        for side in ("l", "r"):
+            finger = stage.GetPrimAtPath(f"{root_path}/{arm}_gripper_{side}_finger_link")
+            colliders = [
+                prim for prim in Usd.PrimRange(finger, Usd.TraverseInstanceProxies())
+                if prim.HasAPI(UsdPhysics.CollisionAPI)
+                and UsdPhysics.CollisionAPI(prim).GetCollisionEnabledAttr().Get()
+            ]
+            assert len(colliders) == 5
+            assert sum(prim.GetName().endswith("_pad") for prim in colliders) == 2
+            for prim in colliders:
+                assert "/collisions/" in str(prim.GetPath())
+                assert prim.IsA(UsdGeom.Mesh)
+                assert UsdPhysics.MeshCollisionAPI(prim).GetApproximationAttr().Get() == "convexHull"
+                transform = UsdGeom.XformCache().ComputeRelativeTransform(prim, finger)[0]
+                assert transform.GetDeterminant() > 0  # No mirrored collider scales.
+                material, _ = UsdShade.MaterialBindingAPI(prim).ComputeBoundMaterial("physics")
+                assert material and material.GetPrim().HasAPI(UsdPhysics.MaterialAPI)
+                api = UsdPhysics.MaterialAPI(material)
+                pad = prim.GetName().endswith("_pad")
+                assert api.GetStaticFrictionAttr().Get() == pytest.approx(1.5 if pad else 0.3)
+                assert api.GetDynamicFrictionAttr().Get() == pytest.approx(1.5 if pad else 0.2)
+                assert api.GetRestitutionAttr().Get() == 0
+                if pad:
+                    inward = [p[1] * (1 if side == "l" else -1) for p in UsdGeom.Mesh(prim).GetPointsAttr().Get()]
+                    assert min(inward) == pytest.approx(0.0052)
+                    assert max(inward) == pytest.approx(0.0062)
 
 
 def test_tabletop_and_replay_root_frames_remain_separate():
