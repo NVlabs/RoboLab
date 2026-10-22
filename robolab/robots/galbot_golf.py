@@ -132,6 +132,7 @@ def _galbot_golf_robot_cfg(
     init_joint_pos: dict[str, float] | None = None,
     init_pos: tuple[float, float, float] = (0.0, 0.0, 0.0),
     gain_profile: str = "default",
+    position_iterations: int = 128,
 ) -> ArticulationCfg:
     """Build a Golf articulation config with Sim2Real gains and controller gravity compensation.
 
@@ -166,7 +167,7 @@ def _galbot_golf_robot_cfg(
             ),
             articulation_props=sim_utils.ArticulationRootPropertiesCfg(
                 fix_root_link=True,
-                solver_position_iteration_count=128,
+                solver_position_iteration_count=position_iterations,
                 solver_velocity_iteration_count=4,
             ),
         ),
@@ -358,15 +359,19 @@ def make_galbot_golf_tabletop_cfg(
     *,
     init_pose: str = "default",
     gain_profile: str = "default",
+    position_iterations: int = 128,
 ):
     """Return a tabletop Golf robot cfg class with the left-ego head camera attached.
 
     ``init_pose`` is a key of ``GALBOT_GOLF_INIT_POSES``, ``gain_profile`` a key of
-    ``GALBOT_GOLF_ARM_GAIN_PROFILES``. Besides the head camera, the defaults match
-    ``GalbotGolfTabletopCfg``.
+    ``GALBOT_GOLF_ARM_GAIN_PROFILES``. ``position_iterations`` sets the robot's
+    position-solver request; the scene cap must be raised separately. Besides
+    the head camera, the defaults match ``GalbotGolfTabletopCfg``.
     """
     if init_pose not in GALBOT_GOLF_INIT_POSES:
         raise ValueError(f"Unknown init_pose {init_pose!r}. Choose from {sorted(GALBOT_GOLF_INIT_POSES)}.")
+    if not 1 <= position_iterations <= 255:
+        raise ValueError("position_iterations must be between 1 and 255")
 
     @configclass
     class _GalbotGolfTabletopVariantCfg(GalbotGolfTabletopCfg):
@@ -374,6 +379,7 @@ def make_galbot_golf_tabletop_cfg(
             init_joint_pos=GALBOT_GOLF_INIT_POSES[init_pose],
             init_pos=GALBOT_GOLF_TABLETOP_ROOT_POS,
             gain_profile=gain_profile,
+            position_iterations=position_iterations,
         )
         left_ego_cam = _LEFT_EGO_CAM
 

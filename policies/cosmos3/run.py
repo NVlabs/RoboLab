@@ -42,6 +42,12 @@ parser.add_argument(
     type=int,
     help="Galbot only: physics steps per control step; also sets render interval (default: registration default).",
 )
+parser.add_argument(
+    "--galbot-position-iterations",
+    type=int,
+    default=128,
+    help="Galbot only: robot position solver iterations and scene cap (1–255; default: 128).",
+)
 
 from robolab.eval.runner import add_common_eval_args, run_evaluation
 
@@ -70,7 +76,9 @@ else:
         make_galbot_golf_tabletop_cfg,
     )
 
-    galbot_sim_kwargs = {}
+    if not 1 <= args_cli.galbot_position_iterations <= 255:
+        parser.error("--galbot-position-iterations must be between 1 and 255")
+    galbot_sim_kwargs = {"solver_iterations": (args_cli.galbot_position_iterations, 4)}
     if args_cli.galbot_sim_hz is not None:
         galbot_sim_kwargs["dt"] = 1.0 / args_cli.galbot_sim_hz
     if args_cli.galbot_decimation is not None:
@@ -83,6 +91,7 @@ else:
         robot_cfg=make_galbot_golf_tabletop_cfg(
             init_pose=args_cli.galbot_init_pose,
             gain_profile=args_cli.galbot_gain_profile,
+            position_iterations=args_cli.galbot_position_iterations,
         ),
         **galbot_sim_kwargs,
     )
