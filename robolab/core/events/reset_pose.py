@@ -12,6 +12,13 @@ from isaaclab.utils import configclass
 
 import robolab.constants
 import robolab.core.utils.usd_utils as usd_utils
+from robolab.core.utils.isaaclab_compat import (
+    as_torch,
+    write_joint_state,
+    write_nodal_state,
+    write_root_pose,
+    write_root_velocity,
+)
 
 
 ########################################################
@@ -170,7 +177,7 @@ def sample_pose_uniform(
         Tuple of (positions, orientations, velocities) tensors.
     """
     # get default root state
-    root_states = asset.data.default_root_state[env_ids].clone()
+    root_states = as_torch(asset.data.default_root_state)[env_ids].clone()
 
     # poses
     range_list = [pose_range.get(key, (0.0, 0.0)) for key in ["x", "y", "z", "roll", "pitch", "yaw"]]
@@ -304,8 +311,8 @@ def reset_pose_uniform(
                 placed_positions[env_id_int].append((positions[idx].clone(), obj_radius))
 
         # set into the physics simulation
-        asset.write_root_pose_to_sim(torch.cat([positions, orientations], dim=-1), env_ids=env_ids)
-        asset.write_root_velocity_to_sim(velocities, env_ids=env_ids)
+        write_root_pose(asset, torch.cat([positions, orientations], dim=-1), env_ids)
+        write_root_velocity(asset, velocities, env_ids)
 
 def _reset_assets_to_default(
     env: ManagerBasedEnv,
@@ -324,35 +331,35 @@ def _reset_assets_to_default(
         if name not in asset_names_set:
             continue
         # obtain default and deal with the offset for env origins
-        default_root_state = rigid_object.data.default_root_state[env_ids].clone()
+        default_root_state = as_torch(rigid_object.data.default_root_state)[env_ids].clone()
         default_root_state[:, 0:3] += env.scene.env_origins[env_ids]
         # set into the physics simulation
-        rigid_object.write_root_pose_to_sim(default_root_state[:, :7], env_ids=env_ids)
-        rigid_object.write_root_velocity_to_sim(default_root_state[:, 7:], env_ids=env_ids)
+        write_root_pose(rigid_object, default_root_state[:, :7], env_ids)
+        write_root_velocity(rigid_object, default_root_state[:, 7:], env_ids)
 
     # Reset articulations that are in the asset list
     for name, articulation_asset in env.scene.articulations.items():
         if name not in asset_names_set:
             continue
         # obtain default and deal with the offset for env origins
-        default_root_state = articulation_asset.data.default_root_state[env_ids].clone()
+        default_root_state = as_torch(articulation_asset.data.default_root_state)[env_ids].clone()
         default_root_state[:, 0:3] += env.scene.env_origins[env_ids]
         # set into the physics simulation
-        articulation_asset.write_root_pose_to_sim(default_root_state[:, :7], env_ids=env_ids)
-        articulation_asset.write_root_velocity_to_sim(default_root_state[:, 7:], env_ids=env_ids)
+        write_root_pose(articulation_asset, default_root_state[:, :7], env_ids)
+        write_root_velocity(articulation_asset, default_root_state[:, 7:], env_ids)
         # obtain default joint positions
-        default_joint_pos = articulation_asset.data.default_joint_pos[env_ids].clone()
-        default_joint_vel = articulation_asset.data.default_joint_vel[env_ids].clone()
+        default_joint_pos = as_torch(articulation_asset.data.default_joint_pos)[env_ids].clone()
+        default_joint_vel = as_torch(articulation_asset.data.default_joint_vel)[env_ids].clone()
         # set into the physics simulation
-        articulation_asset.write_joint_state_to_sim(default_joint_pos, default_joint_vel, env_ids=env_ids)
+        write_joint_state(articulation_asset, default_joint_pos, default_joint_vel, env_ids)
 
     # Reset deformable objects that are in the asset list
     for name, deformable_object in env.scene.deformable_objects.items():
         if name not in asset_names_set:
             continue
         # obtain default and set into the physics simulation
-        nodal_state = deformable_object.data.default_nodal_state_w[env_ids].clone()
-        deformable_object.write_nodal_state_to_sim(nodal_state, env_ids=env_ids)
+        nodal_state = as_torch(deformable_object.data.default_nodal_state_w)[env_ids].clone()
+        write_nodal_state(deformable_object, nodal_state, env_ids)
 
 
 def _get_all_asset_names(env: ManagerBasedEnv) -> set[str]:

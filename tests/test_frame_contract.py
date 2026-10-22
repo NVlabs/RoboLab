@@ -22,6 +22,11 @@ import torch
 from isaaclab.utils.math import combine_frame_transforms, subtract_frame_transforms
 
 from robolab.core.logging.frame_compat import demo_robot_root_pose
+from robolab.core.utils.isaaclab_compat import (
+    as_torch,
+    quat_isaaclab_to_wxyz,
+    quat_wxyz_to_isaaclab,
+)
 
 
 def test_frame_compat_fallback(tmp_path):
@@ -71,12 +76,20 @@ def test_ee_frame_math_with_offset_root():
     ee_world_pos = torch.tensor([[1.0, 2.5, -0.4]])
     ee_world_quat = root_quat.clone()
 
-    pos, quat = subtract_frame_transforms(root_pos, root_quat, ee_world_pos, ee_world_quat)
+    root_quat_internal = quat_wxyz_to_isaaclab(root_quat)
+    ee_world_quat_internal = quat_wxyz_to_isaaclab(ee_world_quat)
+    pos, quat_internal = subtract_frame_transforms(
+        root_pos, root_quat_internal, ee_world_pos, ee_world_quat_internal
+    )
+    quat = quat_isaaclab_to_wxyz(quat_internal)
     torch.testing.assert_close(pos, ee_local_pos, atol=1e-6, rtol=0.0)
     torch.testing.assert_close(quat, ee_local_quat, atol=1e-6, rtol=0.0)
 
     # Round trip: robot-root EE + recorded root pose -> world again.
-    back_pos, back_quat = combine_frame_transforms(root_pos, root_quat, pos, quat)
+    back_pos, back_quat_internal = combine_frame_transforms(
+        root_pos, root_quat_internal, pos, quat_internal
+    )
+    back_quat = quat_isaaclab_to_wxyz(back_quat_internal)
     torch.testing.assert_close(back_pos, ee_world_pos, atol=1e-6, rtol=0.0)
     torch.testing.assert_close(back_quat, ee_world_quat, atol=1e-6, rtol=0.0)
 
@@ -114,9 +127,11 @@ def test_recorded_episode_frame_contract():
             robot = env.scene["robot"]
             body_idx = robot.data.body_names.index("base_link")
             expected_ee_pos.append(
-                (robot.data.body_pos_w[:, body_idx, :] - env.scene.env_origins[:, 0:3]).cpu().numpy()[0]
+                (as_torch(robot.data.body_pos_w)[:, body_idx, :] - env.scene.env_origins[:, 0:3]).cpu().numpy()[0]
             )
-            expected_ee_quat.append(robot.data.body_quat_w[:, body_idx, :].cpu().numpy()[0])
+            expected_ee_quat.append(
+                quat_isaaclab_to_wxyz(as_torch(robot.data.body_quat_w)[:, body_idx, :]).cpu().numpy()[0]
+            )
         export_dir = env.recorder_manager.cfg.dataset_export_dir_path
         end_episode(env)
     finally:

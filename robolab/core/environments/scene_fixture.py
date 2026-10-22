@@ -31,7 +31,6 @@ import isaaclab.sim as sim_utils
 from isaaclab.assets import AssetBaseCfg
 from isaaclab.sim.utils import clone
 from isaaclab.utils import configclass
-from isaacsim.core.utils.stage import get_current_stage
 from pxr import Usd, UsdGeom
 
 from robolab.constants import ASSET_DIR
@@ -114,7 +113,7 @@ def spawn_scene_without_table_fixture(
         orientation=orientation,
         **kwargs,
     )
-    fixture = get_current_stage().GetPrimAtPath(f"{prim_path}/{TABLE_FIXTURE_PRIM}")
+    fixture = sim_utils.get_current_stage().GetPrimAtPath(f"{prim_path}/{TABLE_FIXTURE_PRIM}")
     if fixture.IsValid():
         # This removes the payload from rendering and physics; it is not a
         # visibility-only override.

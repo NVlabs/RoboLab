@@ -6,6 +6,8 @@ import os
 import numpy as np
 from PIL import Image
 
+from robolab.core.utils.isaaclab_compat import ISAACLAB_USES_XYZW
+
 
 def render_stage_frame(app,
                         usd_path,
@@ -45,18 +47,41 @@ def render_stage_frame(app,
         embedded camera settings. This prevents the "far away" rendering issue
         caused by inconsistent camera intrinsics in USD files.
     """
-    import omni.isaac.core.utils.prims as prim_utils
     import omni.usd
-    from isaacsim.core.api import World
-    from isaacsim.core.api.objects.ground_plane import GroundPlane
-    from isaacsim.core.utils.stage import open_stage
-    from isaacsim.sensors.camera import Camera
-    from omni.isaac.core.utils.viewports import set_camera_view
     from pxr import Gf, UsdGeom
 
+    if ISAACLAB_USES_XYZW:
+        import isaaclab.sim as prim_utils
+        from isaaclab.sim import SimulationCfg, SimulationContext
+        from isaacsim.core.experimental.utils import app as app_utils
+        from isaacsim.core.rendering_manager import ViewportManager
+
+        app_utils.enable_extension("isaacsim.sensors.experimental.rtx")
+        from isaacsim.sensors.experimental.rtx import CameraSensor, RtxCamera
+
+        open_stage = prim_utils.open_stage
+        world = None
+
+        def set_camera_view(*, eye, target, camera_prim_path):
+            ViewportManager.set_camera_view(
+                camera_prim_path, eye=list(eye), target=list(target)
+            )
+
+    else:
+        from isaacsim.core.api import World
+        from isaacsim.core.api.objects.ground_plane import GroundPlane
+        from isaacsim.core.utils import prims as prim_utils
+        from isaacsim.core.utils.stage import open_stage
+        from isaacsim.core.utils.viewports import set_camera_view
+        from isaacsim.sensors.camera import Camera
+
     _ = open_stage(str(usd_path))
-    stage = omni.usd.get_context().get_stage()
-    world = World(physics_dt=0.0167, rendering_dt=1/60)
+    if ISAACLAB_USES_XYZW:
+        world = SimulationContext(SimulationCfg(dt=0.0167, render_interval=1))
+        stage = world.stage
+    else:
+        stage = omni.usd.get_context().get_stage()
+        world = World(physics_dt=0.0167, rendering_dt=1/60)
     world.reset()
 
     # prim = stage.GetDefaultPrim()
@@ -69,7 +94,15 @@ def render_stage_frame(app,
     # orient_op = xform.AddOrientOp(UsdGeom.XformOp.PrecisionFloat)
     # orient_op.Set(Gf.Quatf(0.7071068, Gf.Vec3f(1, 0, 0)))
 
-    camera = Camera(prim_path="/OmniverseKit_Persp", resolution=resolution, frequency=20)
+    if ISAACLAB_USES_XYZW:
+        rtx_camera = RtxCamera("/OmniverseKit_Persp", tick_rate=20.0)
+        camera = CameraSensor(
+            rtx_camera,
+            resolution=(resolution[1], resolution[0]),
+            annotators=["rgb"],
+        )
+    else:
+        camera = Camera(prim_path="/OmniverseKit_Persp", resolution=resolution, frequency=20)
 
     # Set default camera position if not provided to ensure consistent framing
     if camera_position is None or camera_target is None:
@@ -82,7 +115,8 @@ def render_stage_frame(app,
         target=np.array(camera_target),
         camera_prim_path="/OmniverseKit_Persp"
     )
-    camera.initialize()
+    if not ISAACLAB_USES_XYZW:
+        camera.initialize()
 
     # Set consistent camera intrinsics to ensure consistent framing regardless of USD file settings
     if focal_length is None:
@@ -122,7 +156,13 @@ def render_stage_frame(app,
             )
 
     if add_ground:
-        GroundPlane(prim_path="/World/GroundPlane", z_position=ground_position)
+        if ISAACLAB_USES_XYZW:
+            ground_cfg = prim_utils.GroundPlaneCfg()
+            ground_cfg.func(
+                "/World/GroundPlane", ground_cfg, translation=(0.0, 0.0, ground_position)
+            )
+        else:
+            GroundPlane(prim_path="/World/GroundPlane", z_position=ground_position)
 
     # Strip the extension from the USD path and keep only the filename
     usd_filename = os.path.splitext(os.path.basename(usd_path))[0]
@@ -131,11 +171,16 @@ def render_stage_frame(app,
     i = 0
     while app.is_running():
         world.step(render=True)
-        if i == skip_frames:
-            # Get the RGBA image from camera
-            rgba_image = camera.get_rgba()
-            # Convert to RGB (remove alpha channel)
-            rgb_image = rgba_image[:, :, :3]
+        if i >= skip_frames:
+            if ISAACLAB_USES_XYZW:
+                rgb_data, _ = camera.get_data("rgb")
+                if rgb_data is None:
+                    i += 1
+                    continue
+                rgb_image = rgb_data.numpy()
+            else:
+                # Convert the legacy RGBA image to RGB.
+                rgb_image = camera.get_rgba()[:, :, :3]
 
             # Save the image to PNG file
             if output_dir:
@@ -150,5 +195,8 @@ def render_stage_frame(app,
             break
         i += 1
 
-    omni.usd.get_context().close_stage()
+    if ISAACLAB_USES_XYZW:
+        SimulationContext.clear_instance()
+    else:
+        omni.usd.get_context().close_stage()
     return output_path

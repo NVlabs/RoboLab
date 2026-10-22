@@ -63,8 +63,17 @@ def env_name_arg(request):
 
 
 def pytest_sessionfinish(session, exitstatus):
-    """Close the Isaac Sim app cleanly so the pytest process exits 0."""
+    """Close Isaac Sim without letting its ``SystemExit(0)`` mask failures."""
+    if exitstatus:
+        # SimulationApp.close() terminates the process with status 0 in some
+        # packaged Isaac Sim builds.  Let pytest return the failure status;
+        # process teardown will release the app resources.
+        return
     try:
         simulation_app.close()
+    except SystemExit:
+        # SimulationApp.close() may terminate with status 0.  Suppress that so
+        # pytest can report and return its real session exit status instead.
+        pass
     except Exception:
         pass

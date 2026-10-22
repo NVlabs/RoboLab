@@ -27,6 +27,7 @@ simulation_app = app_launcher.app
 import robolab.constants  # noqa
 from robolab.core.environments.factory import get_envs  # noqa
 from robolab.core.environments.runtime import create_env, end_episode  # noqa
+from robolab.core.utils.isaaclab_compat import as_torch, quat_isaaclab_to_wxyz  # noqa
 from robolab.core.utils.vis_utils import visualize_axes  # noqa
 from robolab.registrations.droid.auto_env_registrations_abs_ik import auto_register_droid_abs_ik_envs  # noqa
 from robolab.robots.droid import EEF_OFFSET_ROT  # noqa
@@ -91,8 +92,10 @@ def main():
 
     def read_eef_pose():
         return (
-            frames.data.target_pos_w[0, eef_idx, :].cpu().clone(),
-            frames.data.target_quat_w[0, eef_idx, :].cpu().clone(),
+            as_torch(frames.data.target_pos_w)[0, eef_idx, :].cpu().clone(),
+            quat_isaaclab_to_wxyz(
+                as_torch(frames.data.target_quat_w)[0, eef_idx, :]
+            ).cpu().clone(),
         )
 
     initial_pos, initial_quat = read_eef_pose()
@@ -166,7 +169,7 @@ def main():
             obs, _, term, trunc, _ = env.step(action)
             if verbose:
                 eef_p, eef_q = read_eef_pose()
-                joint_pos = robot.data.joint_pos[0, panda_joint_indices].cpu().tolist()
+                joint_pos = as_torch(robot.data.joint_pos)[0, panda_joint_indices].cpu().tolist()
                 joints_str = " ".join(f"{j:+.3f}" for j in joint_pos)
                 print(
                     f"  [s{step:03d}] eef pos=({eef_p[0]:+.3f},{eef_p[1]:+.3f},{eef_p[2]:+.3f}) "

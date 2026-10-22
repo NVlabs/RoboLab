@@ -14,6 +14,7 @@ import numpy as np
 import torch
 
 from robolab.core.utils.file_utils import load_hdf5_initial_state, load_hdf5_states
+from robolab.core.utils.isaaclab_compat import scene_state_from_isaaclab, scene_state_to_isaaclab
 
 
 def restore_recorded_initial_state(env, hdf5_path: str, episode: int) -> None:
@@ -43,9 +44,9 @@ def restore_recorded_initial_state(env, hdf5_path: str, episode: int) -> None:
         print(f"WARNING: no recorded initial state to restore ({err}); "
               "replaying from default reset state, which may diverge from the recording.")
         return
-    state = env.scene.get_state(is_relative=True)
+    state = scene_state_from_isaaclab(env.scene.get_state(is_relative=True))
     _overlay(state, recorded_state)
-    env.reset_to(state, env_ids=None, is_relative=True)
+    env.reset_to(scene_state_to_isaaclab(state), env_ids=None, is_relative=True)
 
 
 def _flatten_state_tree(tree: dict, prefix: str = "") -> dict:
@@ -83,7 +84,7 @@ class StateValidator:
     def check_step(self, env, step: int) -> None:
         if step >= self.num_steps:
             return
-        current = _flatten_state_tree(env.scene.get_state(is_relative=True))
+        current = _flatten_state_tree(scene_state_from_isaaclab(env.scene.get_state(is_relative=True)))
         for path, series in self.recorded.items():
             if path not in current:
                 continue

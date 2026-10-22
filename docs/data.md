@@ -141,7 +141,7 @@ static per-env translation.
   - **`orientation`**: EE orientation as a world-frame quaternion `(w, x, y, z)`, `(T, 4)`
   - **`linear_velocity`** / **`angular_velocity`**: EE velocities in world frame, `(T, 3)`
 - **`initial_state`**: Starting configuration of robot, objects, and cameras
-  - **`cameras/{name}`**: Per-camera extrinsics captured after reset/randomization — `position` (env-local, `(1, 3)`) and `orientation` (world-frame ROS quaternion `(x, y, z, w)`, `(1, 4)`). One entry per camera sensor in the scene.
+  - **`cameras/{name}`**: Per-camera extrinsics captured after reset/randomization — `position` (env-local, `(1, 3)`) and `orientation` (world-frame quaternion using ROS camera axes and `(w, x, y, z)` component storage, `(1, 4)`). One entry per camera sensor in the scene.
 - **`obs`**: Observations including joint positions, camera images, and gripper state
 - **`states`**: Full state trajectory of robot and objects over time
 - **`subtask`**: Task progress tracking metrics

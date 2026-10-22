@@ -6,6 +6,8 @@ import torch
 from isaaclab.utils.math import unmake_pose
 from scipy.spatial.transform import Rotation as R
 
+from robolab.core.utils.isaaclab_compat import quat_wxyz_to_isaaclab
+
 
 def get_bbox_corners(lower, upper):
     corners = np.array([
@@ -60,9 +62,9 @@ def transform_bbox_to_pose(lower, upper, translation, quaternion_wxyz, inverse=T
 
 
 def pose_from_pos_quat(pos: torch.Tensor, quat: torch.Tensor) -> torch.Tensor:
-    """Build a 4×4 pose given xy (Tensor[2]), z, and quaternion."""
+    """Build a 4×4 pose from a position and RoboLab WXYZ quaternion."""
     import isaaclab.utils.math as math_utils
-    rot = math_utils.matrix_from_quat(quat)
+    rot = math_utils.matrix_from_quat(quat_wxyz_to_isaaclab(quat))
     return math_utils.make_pose(pos, rot) # Returns a [..., 4, 4] tensor
 
 def spatial_condition_check_position_based(pose1: torch.Tensor,

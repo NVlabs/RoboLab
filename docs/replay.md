@@ -62,7 +62,7 @@ The overlay restores config **values**, not code or assets. It cannot protect ag
 
 Contact-rich physics amplifies tiny numerical differences, so reproducing a recorded outcome requires matching the recording context:
 
-1. **Same simulator stack.** IsaacSim 5.0 and 5.1 ship different PhysX builds; recorded outcomes are not invariant across them. Recordings carry `isaaclab_version` / `isaacsim_version` / `recorded_at` HDF5 attrs and playback prints a notice on mismatch.
+1. **Same simulator stack.** Isaac Sim 5.x and 6.0 ship different PhysX builds; recorded outcomes are not invariant across them. RoboLab translates recorded WXYZ scene states for Isaac Lab 3's internal XYZW convention, but that does not remove physics drift. Recordings carry `isaaclab_version` / `isaacsim_version` / `recorded_at` HDF5 attrs and playback prints a notice on mismatch.
 2. **Single env, recorded and replayed.** All parallel envs share one batched physics scene, so a trajectory recorded in a multi-env batch evolves slightly differently when replayed alone (and vice versa). Record with `--num_envs 1` and replay with `--num_envs 1` (the default); playback prints a notice when replaying with more.
 3. **Recorded env config in effect.** Keep the `env_cfg.json` sidecar next to the recording and leave `--env-config recorded` (the default).
 4. **Bundle the replay's own export.** Replay→replay is deterministic. To create a demonstration file that reproduces reliably, replay a recorded success once and keep the HDF5 that the *replay* exports (`output/playback_.../run_0.hdf5`, small — no image observations) together with the `env_cfg.json` from that same playback folder. The bundled `examples/recorded_data/RubiksCubeAndBananaTask/` demo was produced this way.

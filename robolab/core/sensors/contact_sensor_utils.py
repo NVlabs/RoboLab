@@ -138,9 +138,14 @@ def get_contact_sensors(scene):
     Args:
         scene (InteractiveScene): The scene to get the contact sensors from.
     """
+    # Isaac Lab 3 instantiates sensors through a backend factory.  The runtime
+    # object is consequently an isaaclab_physx ContactSensor rather than an
+    # instance of the public isaaclab.sensors.ContactSensor facade.  The config
+    # class remains backend-independent in both Isaac Lab 2.x and 3.x.
     contact_sensors = {
         name: sensor for name, sensor in scene.sensors.items()
         if isinstance(sensor, ContactSensor)
+        or isinstance(getattr(sensor, "cfg", None), ContactSensorCfg)
     }
     return contact_sensors
 

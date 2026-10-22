@@ -6,6 +6,7 @@ Trajectory smoothness and quality metrics.
 """
 
 import numpy as np
+from scipy.integrate import trapezoid
 
 
 def compute_joint_isj_from_velocity(joint_velocity: np.ndarray, dt: float) -> float:
@@ -31,7 +32,7 @@ def compute_joint_isj_from_velocity(joint_velocity: np.ndarray, dt: float) -> fl
     squared_jerk_sum = np.sum(jerk**2, axis=1)  # (T,)
 
     # Integrate over time using trapezoidal rule
-    isj = np.trapz(squared_jerk_sum, dx=dt)
+    isj = trapezoid(squared_jerk_sum, dx=dt)
 
     return isj
 
@@ -56,7 +57,7 @@ def compute_joint_isj_per_joint_from_velocity(
     jerk = np.gradient(acceleration, dt, axis=0)
 
     # Integrate squared jerk for each joint
-    isj_per_joint = np.trapz(jerk**2, dx=dt, axis=0)  # (n_joints,)
+    isj_per_joint = trapezoid(jerk**2, dx=dt, axis=0)  # (n_joints,)
 
     return isj_per_joint
 
@@ -85,7 +86,7 @@ def compute_joint_isj_from_position(joint_positions: np.ndarray, dt: float) -> f
     squared_jerk_sum = np.sum(jerk**2, axis=1)  # (T,)
 
     # Integrate over time using trapezoidal rule
-    isj = np.trapz(squared_jerk_sum, dx=dt)
+    isj = trapezoid(squared_jerk_sum, dx=dt)
 
     return isj
 
@@ -109,7 +110,7 @@ def compute_joint_isj_per_joint_from_position(joint_positions: np.ndarray, dt: f
     jerk = np.gradient(acceleration, dt, axis=0)
 
     # Integrate squared jerk for each joint
-    isj_per_joint = np.trapz(jerk**2, dx=dt, axis=0)  # (n_joints,)
+    isj_per_joint = trapezoid(jerk**2, dx=dt, axis=0)  # (n_joints,)
 
     return isj_per_joint
 
@@ -142,7 +143,7 @@ def compute_ee_isj_from_position(ee_position: np.ndarray, dt: float) -> float:
     squared_jerk_magnitude = np.sum(jerk**2, axis=1)  # (T,)
 
     # Integrate over time using trapezoidal rule
-    isj = np.trapz(squared_jerk_magnitude, dx=dt)
+    isj = trapezoid(squared_jerk_magnitude, dx=dt)
 
     return isj
 
@@ -170,7 +171,7 @@ def compute_ee_isj_from_velocity(ee_velocity: np.ndarray, dt: float) -> float:
     squared_jerk_magnitude = np.sum(jerk**2, axis=1)  # (T,)
 
     # Integrate over time using trapezoidal rule
-    isj = np.trapz(squared_jerk_magnitude, dx=dt)
+    isj = trapezoid(squared_jerk_magnitude, dx=dt)
 
     return isj
 

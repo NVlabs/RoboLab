@@ -12,9 +12,12 @@ frame. This document is the contract that removes that assumption.
 
 **Conventions:** translations in meters; quaternions `(w, x, y, z)`; env-local
 = world with `env_origins` subtracted from positions only (orientations are
-unaffected by the replication offset). One exception to the quaternion
-ordering: recorded camera extrinsics use IsaacLab's `quat_w_ros`, which is ROS
-order `(x, y, z, w)` — see the table below.
+unaffected by the replication offset). Camera extrinsics use ROS camera axes,
+but follow the same recorded `(w, x, y, z)` component ordering.
+
+Isaac Lab 3 uses `(x, y, z, w)` internally. RoboLab converts at simulator,
+math, action, and recording boundaries so this public contract and recordings
+remain unchanged across Isaac Sim 5 and 6.
 
 ## Robot placement
 
@@ -41,7 +44,7 @@ channels are **env-local**; the recorded root pose is the bridge between them.
 | `robot_root_pose/*` | HDF5 per step | env-local | world/env axes |
 | `states/**` (incl. `articulation/robot/root_pose`) | HDF5 per step | env-local | world/env axes |
 | `initial_state/**` | HDF5 per episode | env-local | world/env axes |
-| camera extrinsics | HDF5 per episode | env-local | world/env axes, **ROS order (x, y, z, w)** |
+| camera extrinsics | HDF5 per episode | env-local | world/env axes, ROS camera convention, **(w, x, y, z)** storage |
 | `WorldState` / object poses / predicates | runtime | env-local | world/env axes |
 
 ## Action frames

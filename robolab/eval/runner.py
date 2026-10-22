@@ -133,7 +133,7 @@ def run_evaluation(
 
     Args:
         args: Parsed argparse namespace. Must include the flags from
-            :func:`add_common_eval_args` plus ``device`` and ``headless`` from
+            :func:`add_common_eval_args` plus ``device`` from
             ``AppLauncher.add_app_launcher_args``.
         policy: Backend label stamped into the output folder name and
             ``env_cfg.policy``. No behavioral branching.
@@ -270,6 +270,10 @@ def run_evaluation(
                     f"(run {run_idx}, {num_envs} envs)\033[0m"
                 )
 
+                # Isaac Lab 2 exposes has_gui() as a method; Lab 3 uses a
+                # property and no longer supplies the legacy args.headless.
+                has_gui = env.sim.has_gui
+                headless = not (has_gui() if callable(has_gui) else has_gui)
                 env_results, msgs, timing = episode_runner(
                     env=env,
                     env_cfg=env_cfg,
@@ -277,7 +281,7 @@ def run_evaluation(
                     client=client,
                     save_videos=save_videos,
                     video_mode=args.video_mode,
-                    headless=args.headless,
+                    headless=headless,
                     enable_gt_state=args.enable_gt_state,
                 )
 

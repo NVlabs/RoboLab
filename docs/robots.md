@@ -13,6 +13,16 @@ Each robot file defines:
 - **Proprioception observations** — Joint positions, gripper state, EE pose
 - **Contact gripper** — Prim paths for contact detection on gripper fingers
 
+### DROID asset on Isaac Sim 6
+
+The DROID configuration uses `assets/robots/franka_robotiq_2f_85_isaac60.usd`.
+It is a compatibility derivative of the original flattened Franka + Robotiq
+asset: exactly eight Robotiq visual prototype roots are de-instanced because
+Isaac Sim 6 can otherwise omit them from RTX renders. The articulation, rigid
+bodies, joints, collision prims, meshes, link paths, and the original asset are
+unchanged. `tests/test_droid_isaac60_asset.py` locks those structural invariants
+when USD Python bindings are available.
+
 Coordinate frames for observations, actions, and recorded data are a contract,
 not a convention — see [frames.md](frames.md). In short: EE observations and
 recordings are relative to the robot's root link, Cartesian actions are always

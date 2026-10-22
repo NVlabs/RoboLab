@@ -16,6 +16,7 @@ import torch
 from isaaclab.envs import ManagerBasedRLEnv
 
 from robolab.core.logging.recorder_manager import RobolabRecorderManager
+from robolab.core.utils.isaaclab_compat import prepare_env_cfg
 from robolab.core.world.world_state import get_world
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,7 @@ class RobolabEnv(ManagerBasedRLEnv):
     """
 
     def __init__(self, cfg, **kwargs):
+        prepare_env_cfg(cfg)
         super().__init__(cfg, **kwargs)
         self._frozen_envs = torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
         self._pre_step_frozen = self._frozen_envs.clone()  # snapshot before each step()

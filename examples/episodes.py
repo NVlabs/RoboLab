@@ -25,6 +25,7 @@ from robolab.constants import PACKAGE_DIR, get_output_dir
 from robolab.core.logging.results import extract_initial_state_info, extract_subtask_info
 from robolab.core.observations.observation_utils import unpack_image_obs, unpack_viewport_cams
 from robolab.core.replay import StateValidator, restore_recorded_initial_state
+from robolab.core.utils.isaaclab_compat import as_torch
 from robolab.core.utils.version_utils import warn_on_stack_mismatch
 from robolab.core.utils.video_utils import VideoWriter
 
@@ -75,7 +76,7 @@ def run_gripper_toggle_episode(env, env_cfg=None, *, save_videos=True, video_mod
                 toggle_gripper = not toggle_gripper
                 print(f"[Step {count:04d}] Gripper state: {'open' if toggle_gripper else 'closed'}")
 
-            current_joint_pos = robot.data.joint_pos[0, :7]
+            current_joint_pos = as_torch(robot.data.joint_pos)[0, :7]
             gripper_width = 0.0 if toggle_gripper else 0.785398163
             gripper_action = torch.tensor([gripper_width], device=env.device)
             actions = torch.cat([current_joint_pos, gripper_action]).unsqueeze(0)

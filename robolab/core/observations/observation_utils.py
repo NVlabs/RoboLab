@@ -12,6 +12,8 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.sensors import CameraCfg
 from isaaclab.utils import configclass
 
+from robolab.core.utils.isaaclab_compat import as_torch, quat_isaaclab_to_wxyz
+
 
 def _image_observation_func():
     """Resolve the IsaacLab image observation function across versions.
@@ -59,13 +61,13 @@ def image_safe(
 def camera_pos(env: Any, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
     """Camera position, env-local frame (world minus env origin), meters. Shape (num_envs, 3)."""
     sensor = env.scene.sensors[sensor_cfg.name]
-    return sensor.data.pos_w - env.scene.env_origins
+    return as_torch(sensor.data.pos_w) - env.scene.env_origins
 
 
 def camera_quat(env: Any, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
     """Camera orientation, world frame, OpenGL convention, (w, x, y, z). Shape (num_envs, 4)."""
     sensor = env.scene.sensors[sensor_cfg.name]
-    return sensor.data.quat_w_opengl
+    return quat_isaaclab_to_wxyz(as_torch(sensor.data.quat_w_opengl))
 
 
 def camera_intrinsics(env: Any, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
@@ -74,23 +76,23 @@ def camera_intrinsics(env: Any, sensor_cfg: SceneEntityCfg) -> torch.Tensor:
     matrices = getattr(sensor.data, "intrinsic_matrices", None)
     if matrices is None:
         return torch.zeros((env.num_envs, 3, 3), device=env.device, dtype=torch.float32)
-    return matrices
+    return as_torch(matrices)
 
 
 def object_pos(env: Any, asset_cfg: SceneEntityCfg) -> torch.Tensor:
     """Object root position, env-local frame (world minus env origin), meters. Shape (num_envs, 3)."""
     asset = env.scene[asset_cfg.name]
-    return asset.data.root_pos_w - env.scene.env_origins
+    return as_torch(asset.data.root_pos_w) - env.scene.env_origins
 
 
 def object_quat(env: Any, asset_cfg: SceneEntityCfg) -> torch.Tensor:
     """Object root orientation, world frame, (w, x, y, z). Shape (num_envs, 4)."""
-    return env.scene[asset_cfg.name].data.root_quat_w
+    return quat_isaaclab_to_wxyz(as_torch(env.scene[asset_cfg.name].data.root_quat_w))
 
 
 def object_vel(env: Any, asset_cfg: SceneEntityCfg) -> torch.Tensor:
     """Object root velocity, world frame, linear (m/s) + angular (rad/s). Shape (num_envs, 6)."""
-    return env.scene[asset_cfg.name].data.root_vel_w
+    return as_torch(env.scene[asset_cfg.name].data.root_vel_w)
 
 
 def generate_object_state_obs(object_names: List[str]):

@@ -66,14 +66,15 @@ def test_adaptive_rejects_nonzero_offset():
 def runner_harness(monkeypatch, tmp_path):
     import robolab.constants as constants
 
-    state = SimpleNamespace(saved=[], executed=[])
-    state.env = SimpleNamespace(close=Mock(), reset_eval_state=Mock())
+    state = SimpleNamespace(saved=[], executed=[], headless=[])
+    state.env = SimpleNamespace(close=Mock(), reset_eval_state=Mock(), sim=SimpleNamespace(has_gui=Mock(return_value=False)))
     state.client = SimpleNamespace(close=Mock())
     cfg = SimpleNamespace(sim=SimpleNamespace(dt=0.01), decimation=10, instruction='test')
     state.create_env = Mock(return_value=(state.env, cfg))
 
     def execute(**kwargs):
         state.executed.append(kwargs['episode'])
+        state.headless.append(kwargs['headless'])
         assert len(state.executed) < 10, 'Runner failed to stop at its budget'
         return [], [], {}
 
@@ -104,12 +105,13 @@ def runner_harness(monkeypatch, tmp_path):
     monkeypatch.setattr(constants, 'set_output_dir', lambda folder: None)
     monkeypatch.setattr(constants, 'ENABLE_SUBTASK_PROGRESS_CHECKING', False)
 
-    def run(*cli):
+    def run(*cli, legacy_headless=True):
         parser = argparse.ArgumentParser()
         add_common_eval_args(parser)
         args = parser.parse_args(['--task', 'Task', '--output-folder-name', 'test', *cli])
         args.device = 'cpu'
-        args.headless = True
+        if legacy_headless:
+            args.headless = True
         original_args = vars(args).copy()
         def make_client(received_args):
             assert received_args is args
@@ -119,6 +121,15 @@ def runner_harness(monkeypatch, tmp_path):
 
     state.run = run
     return state
+
+
+@pytest.mark.parametrize('has_gui', [False, True])
+@pytest.mark.parametrize('gui_is_property', [False, True])
+def test_runner_uses_actual_gui_state_without_legacy_headless_argument(runner_harness, has_gui, gui_is_property):
+    h = runner_harness
+    h.env.sim.has_gui = has_gui if gui_is_property else Mock(return_value=has_gui)
+    h.run(legacy_headless=False)
+    assert h.headless == [not has_gui]
 
 
 def test_runner_resumes_adaptive_after_saved_first_batch(runner_harness):

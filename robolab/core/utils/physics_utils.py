@@ -114,23 +114,21 @@ def add_friction(static_friction: float=5.0,
 
     data_dict = {}
 
-    from isaacsim.core.api.materials.physics_material import PhysicsMaterial
-
-    material = PhysicsMaterial(
-                prim_path=root_prim_path + "/physics_material",
-                name=f"physics_material",
-                static_friction=static_friction,
-                dynamic_friction=dynamic_friction,
-                restitution=restitution,)
+    material_path = root_prim_path + "/physics_material"
+    material_prim = stage.DefinePrim(material_path, "Material")
+    material_api = UsdPhysics.MaterialAPI.Apply(material_prim)
+    material_api.CreateStaticFrictionAttr(static_friction)
+    material_api.CreateDynamicFrictionAttr(dynamic_friction)
+    material_api.CreateRestitutionAttr(restitution)
 
     for prim in Usd.PrimRange(root_prim):
         if prim.IsA(UsdGeom.Mesh):
             print(f"\tStatic friction: {static_friction} Dynamic friction: {dynamic_friction} Restitution: {restitution}")
-            add_physics_material_to_prim(stage, prim, material.prim_path)
+            add_physics_material_to_prim(stage, prim, material_path)
             data_dict[root_prim_path] = {'static': static_friction,
                                                    'dynamic':dynamic_friction,
                                                    'restitution': restitution,
-                                                   'physics_material': material.prim_path}
+                                                   'physics_material': material_path}
     return data_dict
 
 def add_mass_api(mass: float, root_prim_path: str=None) -> dict:
@@ -405,9 +403,13 @@ def add_attributes_to_prim(attribute_dict: dict, root_prim_path: str=None) -> di
 
 def add_semantics_to_prim(semantic_labels: dict,
                             root_prim_path=None) -> dict:
+    from pxr import UsdGeom
 
-    from omni.isaac.core.utils.semantics import add_update_semantics, get_semantics
-    from pxr import Sdf, UsdGeom
+    try:
+        from isaaclab.sim.utils.semantics import add_labels, get_labels
+    except ImportError:
+        # Isaac Sim 5 fallback. The omni.isaac compatibility shims are removed in 6.0.
+        from isaacsim.core.utils.semantics import add_update_semantics, get_semantics
 
     data_dict={}
 
@@ -416,11 +418,16 @@ def add_semantics_to_prim(semantic_labels: dict,
     # Apply semantic label to the root of the xform.
     if root_prim.IsA(UsdGeom.Xform):
         i = 0
-        for type, label in semantic_labels.items():
-            add_update_semantics(root_prim, semantic_label=label, type_label=type, suffix=f"{i}")
+        for semantic_type, label in semantic_labels.items():
+            if "add_labels" in locals():
+                add_labels(root_prim, [label], instance_name=f"{semantic_type}_{i}")
+            else:
+                add_update_semantics(
+                    root_prim, semantic_label=label, type_label=semantic_type, suffix=f"{i}"
+                )
             i += 1
 
-        semantics = get_semantics(root_prim)
+        semantics = get_labels(root_prim) if "get_labels" in locals() else get_semantics(root_prim)
         print(f"Added semantics to {root_prim}, semantics: {semantics}")
         data_dict[root_prim_path] = semantic_labels
 

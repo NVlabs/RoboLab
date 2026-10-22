@@ -43,6 +43,7 @@ The core concepts are:
 - **[Replaying Recorded Episodes](replay.md)** — Playing back recorded HDF5 episodes: initial-state restore, recorded env config, faithful-reproduction checklist, and state validation
 - **[Analysis and Results Parsing](analysis.md)** — Scripts for summarizing, comparing, and auditing experiment results
 #### Debug
+- **[Isaac Sim 6 support](isaac_sim_6.md)** — Installation, compatibility boundaries, and validation guidance
 - **[Debugging](debug.md)** — Verbose/debug flags, world state inspection, and diagnostic scripts
 - **[Known Issues](known_issues.md)** — Documented bugs and workarounds
 #### Ecosystem

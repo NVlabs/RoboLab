@@ -3,14 +3,18 @@
 ## Prerequisites
 
 - Docker with NVIDIA Container Toolkit (`nvidia-docker2`)
-- Access to `nvcr.io/nvidia/isaac-lab:2.2.0` (base image; use `:2.3.0` for the IsaacSim 5.1 / IsaacLab 2.3 stack)
-- To push an image, set `ROBOLAB_REGISTRY` to an image repository you can write to (for example, `registry.example.com/team/robolab`). Local builds default to `robolab`.
+- Access to `nvcr.io/nvidia/isaac-lab:2.2.0` (default), `:2.3.0` (Isaac Sim 5.1), or `:3.0.0-beta2` (Isaac Sim 6).
+- To push an image, set `ROBOLAB_REGISTRY` to an image repository you can write to. Local builds default to `robolab`.
 
 ## Build
 
 ```bash
 # Uses git short SHA as tag by default
 ./docker/build_docker.sh
+
+# Alternative simulator stacks
+./docker/build_docker.sh --isaac51
+./docker/build_docker.sh --isaac60
 
 # Custom tag
 ./docker/build_docker.sh my-tag
@@ -64,7 +68,7 @@ docker run --rm -it \
 
 ## What's in the image
 
-- **Base**: `nvcr.io/nvidia/isaac-lab:2.2.0` (IsaacSim 5.0) or `:2.3.0` (IsaacSim 5.1), selected via the `ISAACLAB_TAG` build arg (`build_docker.sh --isaac51`)
+- **Base**: `nvcr.io/nvidia/isaac-lab:2.2.0` (Isaac Sim 5.0) by default; select Isaac Sim 5.1 with `--isaac51` or Isaac Sim 6 with `--isaac60`
 - **Code**: `robolab/`, `scripts/`, `examples/`, `tests/`
 - **Assets**: `assets/` (~6.5GB)
 - **Python packages**: Everything in `requirements.txt`, installed via `pip install -e .`

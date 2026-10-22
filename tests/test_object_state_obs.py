@@ -15,6 +15,7 @@ from robolab.core.observations.observation_utils import (
     object_quat,
     object_vel,
 )
+from robolab.core.utils.isaaclab_compat import quat_wxyz_to_isaaclab
 
 
 class _FakeScene:
@@ -29,7 +30,9 @@ class _FakeScene:
 def _make_env():
     banana = SimpleNamespace(data=SimpleNamespace(
         root_pos_w=torch.tensor([[0.5, 0.0, 0.1], [10.5, 0.0, 0.2]]),
-        root_quat_w=torch.tensor([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0]]),
+        root_quat_w=quat_wxyz_to_isaaclab(
+            torch.tensor([[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0]])
+        ),
         root_vel_w=torch.zeros(2, 6),
     ))
     return SimpleNamespace(scene=_FakeScene({"banana": banana}))

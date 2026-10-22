@@ -218,13 +218,14 @@ class RobolabDefaultEnvCfg(ManagerBasedRLEnvCfg):
         self.scene.env_spacing = 2.0
         self.sim.use_fabric = True
 
-        # PhysX settings. Field availability differs between IsaacLab 2.2
-        # (IsaacSim 5.0) and IsaacLab 2.3 (IsaacSim 5.1): the solver iteration
-        # fields were renamed from num_{position,velocity}_iterations to
-        # max_{position,velocity}_iteration_count. Both name sets are listed
-        # below and each assignment is guarded with hasattr so a single block
-        # configures whichever PhysxCfg schema is present.
+        # Isaac Lab 3 moved the backend config from sim.physx to sim.physics.
         physx = getattr(self.sim, "physx", None)
+        if physx is None and hasattr(self.sim, "physics"):
+            if self.sim.physics is None:
+                from isaaclab_physx.physics import PhysxCfg
+
+                self.sim.physics = PhysxCfg()
+            physx = self.sim.physics
         physx_settings = {
             "gpu_temp_buffer_capacity": 2**30,
             "gpu_heap_capacity": 2**30,

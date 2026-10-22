@@ -84,12 +84,16 @@ def _scrape_scene_cached(scene_path: str, objects_of_interest_tuple: tuple = Non
 
     scene_dict = {}
     scene = AssetBaseCfg(
-            prim_path="{ENV_REGEX_NS}/scene",
-            spawn = sim_utils.UsdFileCfg(
-                usd_path=str(scene_path),
-                activate_contact_sensors=True,
-                ),
-            )
+        prim_path="{ENV_REGEX_NS}/scene",
+        spawn=sim_utils.UsdFileCfg(
+            usd_path=str(scene_path),
+            activate_contact_sensors=True,
+        ),
+        # RoboLab authors config quaternions as WXYZ.  Do not inherit Isaac
+        # Lab 3's XYZW default here: prepare_env_cfg() would convert that
+        # already-internal value a second time and rotate the scene 180 deg.
+        init_state=AssetBaseCfg.InitialStateCfg(rot=(1.0, 0.0, 0.0, 0.0)),
+    )
     from robolab.core.utils.usd_utils import get_usd_objects_info
     scene_objects = get_usd_objects_info(scene_path)
     dynamic_bodies = [obj for obj in scene_objects if obj['rigid_body'] and not obj.get('kinematic', False)]

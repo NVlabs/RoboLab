@@ -16,6 +16,7 @@ docker run \
   --rm \
   --runtime nvidia \
   -v $ROBOLAB_DIR/.cache/ov:/root/.cache/ov \
+  -v $ROBOLAB_DIR/.cache/ov:/home/isaaclab/.cache/ov \
   -v $ROBOLAB_DIR/.cache/kit:/isaac-sim/kit/cache \
   -v $ROBOLAB_DIR:/workspace/robolab \
   -w /workspace/robolab \

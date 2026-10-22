@@ -32,6 +32,7 @@ from robolab.core.observations.observation_utils import (
     unpack_viewport_cams,
 )  # noqa: E402
 from robolab.core.utils.video_utils import VideoWriter  # noqa: E402
+from robolab.core.utils.isaaclab_compat import as_torch  # noqa: E402
 from robolab.robots.kinova_gen3 import GRIPPER_JOINT_COMMANDS  # noqa: E402
 from robolab.registrations.kinova.auto_env_registrations_jointpos import (  # noqa: E402
     auto_register_kinova_envs,
@@ -80,7 +81,7 @@ def main() -> None:
     try:
         obs, _ = env.reset()
         robot = env.scene["robot"]
-        home = robot.data.default_joint_pos[0, :7].clone()
+        home = as_torch(robot.data.default_joint_pos)[0, :7].clone()
         print(f"Environment: {env_name}")
         print(f"Bodies: {robot.data.body_names}")
         print(f"Joints: {robot.data.joint_names}")
@@ -99,7 +100,7 @@ def main() -> None:
             obs, _, _, _, _ = env.step(action)
             if step == args_cli.num_steps // 2 - 1:
                 joint_positions = dict(
-                    zip(robot.data.joint_names, robot.data.joint_pos[0].tolist())
+                    zip(robot.data.joint_names, as_torch(robot.data.joint_pos)[0].tolist())
                 )
                 gripper_error = max(
                     abs(joint_positions[name] - target)
@@ -117,7 +118,7 @@ def main() -> None:
             raise RuntimeError(f"Gripper coupling error is {gripper_error}")
         print(f"Maximum gripper coupling error: {gripper_error:.6f} rad")
         tracking_error = torch.max(
-            torch.abs(robot.data.joint_pos[0, :7] - arm_target)
+            torch.abs(as_torch(robot.data.joint_pos)[0, :7] - arm_target)
         ).item()
         print(f"Final maximum arm tracking error: {tracking_error:.6f} rad")
         print(f"Saved video: {video_path}")

@@ -25,6 +25,7 @@ import robolab.constants
 from robolab.constants import DEBUG
 from robolab.core.task.hull_check import build_local_hull, point_in_hull
 from robolab.core.utils.geometry_utils import spatial_condition_check_vector_based
+from robolab.core.utils.isaaclab_compat import quat_wxyz_to_isaaclab
 from robolab.core.utils.transform_utils import transform_pose_from_w_to_b_vectorized
 from robolab.core.world.world_state import get_world
 
@@ -417,8 +418,10 @@ def _obj_centroid_in_container(
 
     N = obj_pos.shape[0]
     centroid_b = obj_centroid_local.unsqueeze(0).expand(N, 3)        # (N, 3)
-    pt_world = quat_apply(obj_quat, centroid_b) + obj_pos              # (N, 3)
-    pt_cav = quat_apply_inverse(cav_quat, pt_world - cav_pos)          # (N, 3)
+    pt_world = quat_apply(quat_wxyz_to_isaaclab(obj_quat), centroid_b) + obj_pos
+    pt_cav = quat_apply_inverse(
+        quat_wxyz_to_isaaclab(cav_quat), pt_world - cav_pos
+    )
 
     inside = point_in_hull(pt_cav, cav_planes)                         # (N,) bool
 
