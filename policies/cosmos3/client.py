@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+
 import numpy as np
 import torch
 import torch.nn.functional as F
-
 from openpi_client import image_tools, websocket_client_policy
 
 from robolab.eval.base_client import InferenceClient
