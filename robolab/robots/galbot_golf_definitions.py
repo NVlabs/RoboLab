@@ -108,9 +108,37 @@ GALBOT_GOLF_DATASET_MEAN_JOINT_POS = {
     "right_gripper_joint": GRIPPER_OPEN,
 }
 
+# Same torso, head and grippers as the SDK pose, with different arm joints.
+GALBOT_GOLF_PC_JOINT_POS = {
+    "leg_joint1": 0.3,
+    "leg_joint2": 1.2,
+    "leg_joint3": 0.85,
+    "leg_joint4": 0.0,
+    "leg_joint5": 0.0,
+    "head_joint1": 0.0,
+    "head_joint2": 0.0,
+    "left_arm_joint1": 1.9813,
+    "left_arm_joint2": -1.5905,
+    "left_arm_joint3": -0.5428,
+    "left_arm_joint4": -2.3798,
+    "left_arm_joint5": 0.0711,
+    "left_arm_joint6": -0.1475,
+    "left_arm_joint7": -0.0282,
+    "left_gripper_joint": GRIPPER_OPEN,
+    "right_arm_joint1": -1.9778,
+    "right_arm_joint2": 1.4964,
+    "right_arm_joint3": 0.4484,
+    "right_arm_joint4": 2.3796,
+    "right_arm_joint5": -0.0317,
+    "right_arm_joint6": 0.2346,
+    "right_arm_joint7": 0.0591,
+    "right_gripper_joint": GRIPPER_OPEN,
+}
+
 GALBOT_GOLF_INIT_POSES = {
     "default": GALBOT_GOLF_DEFAULT_JOINT_POS,
     "dataset_mean": GALBOT_GOLF_DATASET_MEAN_JOINT_POS,
+    "pc": GALBOT_GOLF_PC_JOINT_POS,
 }
 
 # Arm PD gains per actuator group. "default" is the Sim2Real profile; "reduced"
