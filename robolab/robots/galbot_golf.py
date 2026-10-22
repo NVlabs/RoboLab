@@ -131,6 +131,8 @@ def _galbot_golf_robot_cfg(
     *,
     init_joint_pos: dict[str, float] | None = None,
     init_pos: tuple[float, float, float] = (0.0, 0.0, 0.0),
+    gain_profile: str = "default",
+    position_iterations: int = 128,
 ) -> ArticulationCfg:
     """Build a Golf articulation config with Sim2Real gains and controller gravity compensation.
 
@@ -147,6 +149,9 @@ def _galbot_golf_robot_cfg(
     physics engine (``disable_gravity=True``). This approximates ideal
     controller-side compensation for this fixed-base embodiment.
     """
+    if gain_profile not in GALBOT_GOLF_ARM_GAIN_PROFILES:
+        raise ValueError(f"Unknown gain_profile {gain_profile!r}. Choose from {sorted(GALBOT_GOLF_ARM_GAIN_PROFILES)}.")
+    arm_gains = GALBOT_GOLF_ARM_GAIN_PROFILES[gain_profile]
     return ArticulationCfg(
         prim_path="{ENV_REGEX_NS}/robot",
         spawn=sim_utils.UsdFileCfg(
@@ -162,7 +167,7 @@ def _galbot_golf_robot_cfg(
             ),
             articulation_props=sim_utils.ArticulationRootPropertiesCfg(
                 fix_root_link=True,
-                solver_position_iteration_count=128,
+                solver_position_iteration_count=position_iterations,
                 solver_velocity_iteration_count=4,
             ),
         ),
@@ -230,36 +235,24 @@ def _galbot_golf_robot_cfg(
                 joint_names_expr=["left_arm_joint[12]", "right_arm_joint[12]"],
                 effort_limit_sim=180,
                 velocity_limit_sim=3.141593,
-                stiffness={
-                    ".*_arm_joint1": 3542,
-                    ".*_arm_joint2": 3438,
-                },
-                damping={
-                    ".*_arm_joint1": 100,
-                    ".*_arm_joint2": 96,
-                },
+                stiffness=arm_gains["shoulder"]["stiffness"],
+                damping=arm_gains["shoulder"]["damping"],
             ),
             # --- Arm elbow (joints 3–4, ±90 N·m) ---
             "arm_elbow": ImplicitActuatorCfg(
                 joint_names_expr=["left_arm_joint[34]", "right_arm_joint[34]"],
                 effort_limit_sim=90,
                 velocity_limit_sim=3.926991,
-                stiffness={
-                    ".*_arm_joint3": 1145,
-                    ".*_arm_joint4": 1143,
-                },
-                damping=32,
+                stiffness=arm_gains["elbow"]["stiffness"],
+                damping=arm_gains["elbow"]["damping"],
             ),
             # --- Arm wrist (joints 5–7, ±30 N·m) ---
             "arm_wrist": ImplicitActuatorCfg(
                 joint_names_expr=["left_arm_joint[5-7]", "right_arm_joint[5-7]"],
                 effort_limit_sim=30,
                 velocity_limit_sim=3.926991,
-                stiffness={
-                    ".*_arm_joint5": 286,
-                    ".*_arm_joint[67]": 284,
-                },
-                damping=8,
+                stiffness=arm_gains["wrist"]["stiffness"],
+                damping=arm_gains["wrist"]["damping"],
             ),
             # --- DESC grippers (±1.5 N·m hardware rating) ---
             "grippers": ImplicitActuatorCfg(
@@ -360,3 +353,34 @@ GalbotGolfFixedBaseCfg.ee_recorder_bodies = {
 # ground. Only the Tabletop cfgs stand on the task-scene floor; the plain
 # fixed-base cfgs keep their explicit init pos.
 GalbotGolfTabletopCfg.root_z_above_ground = GALBOT_GOLF_ROOT_Z_ABOVE_GROUND
+
+
+def make_galbot_golf_tabletop_cfg(
+    *,
+    init_pose: str = "default",
+    gain_profile: str = "default",
+    position_iterations: int = 128,
+):
+    """Return a tabletop Golf robot cfg class with the left-ego head camera attached.
+
+    ``init_pose`` is a key of ``GALBOT_GOLF_INIT_POSES``, ``gain_profile`` a key of
+    ``GALBOT_GOLF_ARM_GAIN_PROFILES``. ``position_iterations`` sets the robot's
+    position-solver request; the scene cap must be raised separately. Besides
+    the head camera, the defaults match ``GalbotGolfTabletopCfg``.
+    """
+    if init_pose not in GALBOT_GOLF_INIT_POSES:
+        raise ValueError(f"Unknown init_pose {init_pose!r}. Choose from {sorted(GALBOT_GOLF_INIT_POSES)}.")
+    if not 1 <= position_iterations <= 255:
+        raise ValueError("position_iterations must be between 1 and 255")
+
+    @configclass
+    class _GalbotGolfTabletopVariantCfg(GalbotGolfTabletopCfg):
+        robot = _galbot_golf_robot_cfg(
+            init_joint_pos=GALBOT_GOLF_INIT_POSES[init_pose],
+            init_pos=GALBOT_GOLF_TABLETOP_ROOT_POS,
+            gain_profile=gain_profile,
+            position_iterations=position_iterations,
+        )
+        left_ego_cam = _LEFT_EGO_CAM
+
+    return _GalbotGolfTabletopVariantCfg

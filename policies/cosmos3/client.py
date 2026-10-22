@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import logging
+
 import numpy as np
 import torch
 import torch.nn.functional as F
-
 from openpi_client import image_tools, websocket_client_policy
 
 from robolab.eval.base_client import InferenceClient
@@ -125,4 +125,44 @@ class Cosmos3Client(InferenceClient):
         left = extracted_obs["left_image"]
         wrist = extracted_obs["wrist_image"]
         right = extracted_obs["right_image"]
+        return np.concatenate((left, wrist, right), axis=1)
+
+
+class Cosmos3GalbotClient(Cosmos3Client):
+    """ """
+
+    def _extract_observation(self, raw_obs: dict, *, env_id: int = 0) -> dict:
+        """ """
+        top_image = raw_obs["image_obs"]["left_ego_cam"][env_id].cpu().numpy()
+        left_wrist_image = raw_obs["image_obs"]["left_wrist_cam"][env_id].cpu().numpy()
+        right_wrist_image = raw_obs["image_obs"]["right_wrist_cam"][env_id].cpu().numpy()
+
+        joint_position = raw_obs["proprio_obs"]["joint_pos"][env_id].cpu().numpy()
+        left_gripper_position = raw_obs["proprio_obs"]["left_gripper_pos"][env_id].cpu().numpy()
+        right_gripper_position = raw_obs["proprio_obs"]["right_gripper_pos"][env_id].cpu().numpy()
+        gripper_position = np.concatenate((left_gripper_position, right_gripper_position))
+
+        return {
+            "left_image": left_wrist_image,
+            "right_image": right_wrist_image,
+            "wrist_image": top_image,
+            "joint_position": joint_position,
+            "gripper_position": gripper_position,
+        }
+
+    def _postprocess_chunk(self, chunk: np.ndarray) -> np.ndarray:
+        """ """
+        chunk = chunk.copy()
+        chunk[..., -2:] = (chunk[..., -2:] > 0.5).astype(chunk.dtype)
+        return chunk
+
+    def _build_visualization(self, extracted_obs: dict) -> np.ndarray:
+        """ """
+        wrist = extracted_obs["wrist_image"]
+
+        def _pad_to_wrist_height(image: np.ndarray) -> np.ndarray:
+            return np.pad(image, ((0, wrist.shape[0] - image.shape[0]), (0, 0), (0, 0)))
+
+        left = _pad_to_wrist_height(extracted_obs["left_image"])
+        right = _pad_to_wrist_height(extracted_obs["right_image"])
         return np.concatenate((left, wrist, right), axis=1)

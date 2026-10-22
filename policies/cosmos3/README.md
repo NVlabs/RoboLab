@@ -92,3 +92,19 @@ python policies/cosmos3/run.py \
   --num-envs 10 \
   --headless
 ```
+
+
+## Galbot contact setting
+
+Galbot evaluations use `--embodiment galbot`. To select the 120 Hz gripper
+contact setting tested with recorded `SauceBottlesCrateTask` actions, add:
+
+```text
+--galbot-init-pose dataset_mean --galbot-gain-profile reduced --galbot-sim-hz 120 --galbot-decimation 8 --galbot-position-iterations 255
+```
+
+The position iteration option raises both the robot solver request and the
+scene limit. With eight physics steps per action, the control rate stays at
+15 Hz. The option defaults to 128 iterations; these flags select the tested
+setting explicitly. The recorded-action tests reduced sampled overlap but did
+not eliminate it or establish closed-loop policy success.
