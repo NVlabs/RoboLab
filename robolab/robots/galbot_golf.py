@@ -358,15 +358,19 @@ def make_galbot_golf_tabletop_cfg(
     *,
     init_pose: str = "default",
     gain_profile: str = "default",
+    gripper_effort: float | None = None,
 ):
     """Return a tabletop Golf robot cfg class with the left-ego head camera attached.
 
     ``init_pose`` is a key of ``GALBOT_GOLF_INIT_POSES``, ``gain_profile`` a key of
     ``GALBOT_GOLF_ARM_GAIN_PROFILES``. Besides the head camera, the defaults match
-    ``GalbotGolfTabletopCfg``.
+    ``GalbotGolfTabletopCfg``. ``gripper_effort`` optionally overrides both
+    gripper drive torque limits in Nm without changing the shared defaults.
     """
     if init_pose not in GALBOT_GOLF_INIT_POSES:
         raise ValueError(f"Unknown init_pose {init_pose!r}. Choose from {sorted(GALBOT_GOLF_INIT_POSES)}.")
+    if gripper_effort is not None and not 0 < gripper_effort < float("inf"):
+        raise ValueError("gripper_effort must be a finite positive torque in Nm")
 
     @configclass
     class _GalbotGolfTabletopVariantCfg(GalbotGolfTabletopCfg):
@@ -376,5 +380,8 @@ def make_galbot_golf_tabletop_cfg(
             gain_profile=gain_profile,
         )
         left_ego_cam = _LEFT_EGO_CAM
+
+        if gripper_effort is not None:
+            robot.actuators["grippers"].effort_limit_sim = gripper_effort
 
     return _GalbotGolfTabletopVariantCfg
