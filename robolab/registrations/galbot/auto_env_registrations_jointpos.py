@@ -23,12 +23,13 @@ def auto_register_galbot_envs(
     render_interval=6,
     decimation=6,
     solver_type=0,
+    solver_iterations=(128, 4),
 ):
     """Discover and register tasks with fixed-base Golf joint-position actions.
 
-    Defaults to PGS (0), a validated workaround for GPU TGS startup contact
-    instability in the Isaac Sim 5.1 Galbot evaluation setup. Pass ``None`` to
-    use RoboLab's global solver default or ``1`` to select TGS explicitly.
+    Defaults to PGS (0) for compatibility. Pass ``None`` to use RoboLab's global
+    solver default or ``1`` to select TGS explicitly. ``solver_iterations`` sets
+    scene iteration caps; set matching articulation counts on ``robot_cfg``.
     """
     from robolab.core.environments.factory import auto_discover_and_create_cfgs
     from robolab.core.observations.observation_utils import generate_image_obs_from_cameras, generate_obs_cfg
@@ -107,7 +108,7 @@ def auto_register_galbot_envs(
         dt=dt,
         render_interval=render_interval,
         decimation=decimation,
-        solver_iterations=(128, 4),
+        solver_iterations=solver_iterations,
         solver_type=solver_type,
         seed=1,
     )

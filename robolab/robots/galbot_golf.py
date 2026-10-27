@@ -359,6 +359,7 @@ def make_galbot_golf_tabletop_cfg(
     init_pose: str = "default",
     gain_profile: str = "default",
     gripper_effort: float | None = None,
+    solver_iterations: tuple[int, int] = (128, 4),
 ):
     """Return a tabletop Golf robot cfg class with the left-ego head camera attached.
 
@@ -366,11 +367,20 @@ def make_galbot_golf_tabletop_cfg(
     ``GALBOT_GOLF_ARM_GAIN_PROFILES``. Besides the head camera, the defaults match
     ``GalbotGolfTabletopCfg``. ``gripper_effort`` optionally overrides both
     gripper drive torque limits in Nm without changing the shared defaults.
+    ``solver_iterations`` sets the articulation's position / velocity counts;
+    use the same pair for the environment's scene iteration caps.
     """
     if init_pose not in GALBOT_GOLF_INIT_POSES:
         raise ValueError(f"Unknown init_pose {init_pose!r}. Choose from {sorted(GALBOT_GOLF_INIT_POSES)}.")
     if gripper_effort is not None and not 0 < gripper_effort < float("inf"):
         raise ValueError("gripper_effort must be a finite positive torque in Nm")
+    if (
+        len(solver_iterations) != 2
+        or any(type(v) is not int for v in solver_iterations)
+        or not 1 <= solver_iterations[0] <= 255
+        or not 0 <= solver_iterations[1] <= 255
+    ):
+        raise ValueError("solver_iterations must be position in [1, 255] and velocity in [0, 255]")
 
     @configclass
     class _GalbotGolfTabletopVariantCfg(GalbotGolfTabletopCfg):
@@ -383,5 +393,7 @@ def make_galbot_golf_tabletop_cfg(
 
         if gripper_effort is not None:
             robot.actuators["grippers"].effort_limit_sim = gripper_effort
+        robot.spawn.articulation_props.solver_position_iteration_count = solver_iterations[0]
+        robot.spawn.articulation_props.solver_velocity_iteration_count = solver_iterations[1]
 
     return _GalbotGolfTabletopVariantCfg
