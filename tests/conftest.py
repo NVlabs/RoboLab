@@ -10,6 +10,7 @@ EULA so a fresh install works headless without any prompts.
 """
 
 import os
+import sys
 
 # Accept the Omniverse EULA non-interactively. Must be set before any
 # isaaclab import. setdefault → user can still override.
@@ -25,6 +26,7 @@ from isaaclab.app import AppLauncher  # noqa: E402
 _launcher = AppLauncher(
     headless=True,
     enable_cameras=True,
+    fast_shutdown=True,
     carb_settings={
         "/log/level": "warn",
         "/log/outputStreamLevel": "warn",
@@ -62,9 +64,25 @@ def env_name_arg(request):
     return request.config.getoption("--env-name")
 
 
+@pytest.fixture
+def app_launcher_class():
+    """The bootstrap class, before Kit replaces the isaaclab.app namespace."""
+    return AppLauncher
+
+
 def pytest_sessionfinish(session, exitstatus):
-    """Close the Isaac Sim app cleanly so the pytest process exits 0."""
+    session.config._robolab_exit_status = int(exitstatus)
+
+
+@pytest.hookimpl(trylast=True)
+def pytest_unconfigure(config):
+    """Release Kit after pytest prints its report, preserving pytest's status."""
     try:
+        import omni.kit.app
+
+        sys.stdout.flush()
+        sys.stderr.flush()
+        omni.kit.app.get_app().post_quit(getattr(config, "_robolab_exit_status", 0))
         simulation_app.close()
     except Exception:
         pass

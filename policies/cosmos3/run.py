@@ -35,12 +35,12 @@ parser.add_argument(
 parser.add_argument(
     "--galbot-sim-hz",
     type=float,
-    help="Galbot only: physics rate in Hz (dt = 1 / hz); default: 120.0.",
+    help="Galbot only: physics rate in Hz (dt = 1 / hz); default: 240.0.",
 )
 parser.add_argument(
     "--galbot-decimation",
     type=int,
-    help="Galbot only: physics steps per control step; also sets render interval (default: 12).",
+    help="Galbot only: physics steps per control step; also sets render interval (default: 24, or 10 Hz control).",
 )
 
 from robolab.eval.runner import add_common_eval_args, run_evaluation
@@ -70,8 +70,12 @@ else:
         make_galbot_golf_tabletop_cfg,
     )
 
-    # Resolve loaded gripper contacts while retaining 10 Hz policy control.
-    galbot_sim_kwargs = {"solver_type": 1, "dt": 1.0 / 120, "decimation": 12, "render_interval": 12}
+    # Loaded-contact replay regressions use one TGS velocity pass. The smaller
+    # physics step also limits mimic deflection when a finger presses the table.
+    galbot_sim_kwargs = {
+        "solver_type": 1, "solver_iterations": (128, 1),
+        "dt": 1.0 / 240, "decimation": 24, "render_interval": 24,
+    }
     if args_cli.galbot_sim_hz is not None:
         galbot_sim_kwargs["dt"] = 1.0 / args_cli.galbot_sim_hz
     if args_cli.galbot_decimation is not None:
@@ -85,6 +89,7 @@ else:
             init_pose=args_cli.galbot_init_pose,
             gain_profile=args_cli.galbot_gain_profile,
             gripper_effort=0.5,
+            solver_iterations=(128, 1),
         ),
         **galbot_sim_kwargs,
     )
