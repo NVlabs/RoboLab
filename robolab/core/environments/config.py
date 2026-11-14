@@ -423,6 +423,7 @@ def parse_env_cfg(
         cfg.viewer.lookat = lookat
     if env_spacing is not None:
         cfg.env_spacing = env_spacing
+        cfg.scene.env_spacing = env_spacing
 
     # disable fabric to read/write through USD
     if use_fabric is not None:
