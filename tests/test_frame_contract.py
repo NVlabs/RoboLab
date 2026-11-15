@@ -110,7 +110,10 @@ def test_recorded_episode_frame_contract():
     from robolab.registrations.droid.auto_env_registrations_jointpos import auto_register_droid_envs
 
     auto_register_droid_envs(task="BananaInBowlTask")
-    env_name = get_envs(task="BananaInBowlTask")[0]
+    # Other embodiment tests also register this task in the global factory.
+    # DROID uses the unsuffixed name; never select by registration order.
+    env_name = "BananaInBowlTask"
+    assert env_name in get_envs(task="BananaInBowlTask")
     env, _ = create_env(env_name, num_envs=1, use_fabric=True)
     num_steps = 5
     expected_ee_pos = []

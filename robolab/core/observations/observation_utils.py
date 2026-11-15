@@ -277,7 +277,9 @@ def unpack_image_obs(obs, obs_group_name="image_obs", camera_suffix=["_camera", 
                Resizing on GPU is faster than transferring full resolution then resizing on CPU.
 
     Returns:
-        Dictionary containing the unpacked image observations
+        Dictionary containing each unpacked image and a horizontal ``combined_image``.
+        Shorter views are padded at the bottom for the combined image; individual
+        images retain their resolution after applying ``scale``.
     """
     import torch.nn.functional as F
 
@@ -299,7 +301,11 @@ def unpack_image_obs(obs, obs_group_name="image_obs", camera_suffix=["_camera", 
             image = tensor.cpu().numpy()
             image_dict[key] = image
             images.append(image)
-    combined_image = np.concatenate(images, axis=1)
+    height = max(image.shape[0] for image in images)
+    combined_image = np.concatenate(
+        [np.pad(image, ((0, height - image.shape[0]), (0, 0), (0, 0))) for image in images],
+        axis=1,
+    )
     image_dict["combined_image"] = combined_image
     return image_dict
 
