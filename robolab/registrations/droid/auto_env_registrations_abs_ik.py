@@ -9,13 +9,16 @@ from robolab.constants import DEFAULT_TASK_SUBFOLDERS, TASK_DIR
 
 def auto_register_droid_abs_ik_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, task=None, cameras=None,
                                      randomize_background=False, background_seed=None,
-                                     env_postfix=""):
+                                     env_postfix="", lighting_selection=None):
     """Register tasks against ``DroidIKActionCfg`` (absolute end-effector pose IK).
 
     Mirrors :func:`robolab.registrations.droid.auto_env_registrations_jointpos.auto_register_droid_envs`
     but swaps the action config from joint-position to absolute differential-IK and
     appends ``AbsIK`` to every registered env name so they coexist with the
     joint-pos variants.
+
+    lighting_selection selects a complete rig from LIGHTING_SELECTIONS, including its HDR dome. Cannot be combined with randomize_background.
+    None preserves existing defaults.
     """
     from robolab.core.environments.factory import auto_discover_and_create_cfgs
     from robolab.core.observations.observation_utils import generate_image_obs_from_cameras, generate_obs_cfg
@@ -47,12 +50,20 @@ def auto_register_droid_abs_ik_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, task=None
     # order, causing the camera to spawn before its parent prim exists.
     scene_cameras = [c for c in cameras if c is not WristCameraCfg]
 
-    if randomize_background:
+    lighting_cfg = SphereLightCfg
+    if lighting_selection is not None:
+        if randomize_background:
+            raise ValueError("lighting_selection includes its HDR dome; disable randomize_background.")
+        from robolab.variations.lighting_selections import get_lighting_selection
+
+        lighting_cfg = get_lighting_selection(lighting_selection)
+        background_cfg = None
+    elif randomize_background:
         from robolab.variations.backgrounds import find_background_files, generate_background_config
 
         rng = random.Random(background_seed)
         all_bgs = find_background_files()
-        default_bg_path = HomeOfficeBackgroundCfg.dome_light.spawn.texture_file
+        default_bg_path = HomeOfficeBackgroundCfg().dome_light.spawn.texture_file
         all_bgs = [p for p in all_bgs if p != default_bg_path]
         if not all_bgs:
             raise FileNotFoundError(
@@ -77,7 +88,7 @@ def auto_register_droid_abs_ik_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, task=None
         actions_cfg=DroidIKActionCfg(),
         robot_cfg=DroidCfg,
         camera_cfg=[*scene_cameras, EgocentricMirroredCameraCfg],
-        lighting_cfg=SphereLightCfg,
+        lighting_cfg=lighting_cfg,
         background_cfg=background_cfg,
         contact_gripper=contact_gripper,
         dt=1 / (60 * 2),

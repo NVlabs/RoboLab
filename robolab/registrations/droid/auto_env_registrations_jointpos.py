@@ -28,12 +28,15 @@ The columns are:
 """
 def auto_register_droid_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, lighting_intensity=None, task=None, cameras=None,
                              randomize_background=False, background_seed=None, viewport_camera=None,
-                             lazy_sensor_update=True, object_state_obs=False):
+                             lazy_sensor_update=True, object_state_obs=False, lighting_selection=None):
     """Automatically discover and register tasks.
 
     Args:
         task_dirs: Subdirectories to search for tasks.
-        lighting_intensity: Optional lighting intensity override.
+        lighting_intensity: Optional lighting intensity override. Cannot be combined
+              with lighting_selection.
+        lighting_selection: Optional complete lighting name from LIGHTING_SELECTIONS. Includes its HDR dome; cannot be combined
+              with randomize_background. None preserves existing defaults.
         task: If provided, only register the specified task(s) instead of discovering
               all tasks. Accepts a single task name/filename/path (str) or a list of them.
               Significantly faster when running a subset of tasks.
@@ -90,13 +93,23 @@ def auto_register_droid_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, lighting_intensi
     # order, causing the camera to spawn before its parent prim exists.
     scene_cameras = [c for c in cameras if c is not WristCameraCfg]
 
-    if randomize_background:
+    lighting_cfg = SphereLightCfg
+    if lighting_selection is not None:
+        if randomize_background:
+            raise ValueError("lighting_selection includes its HDR dome; disable randomize_background.")
+        if lighting_intensity is not None:
+            raise ValueError("lighting_selection fixes light intensities; omit lighting_intensity.")
+        from robolab.variations.lighting_selections import get_lighting_selection
+
+        lighting_cfg = get_lighting_selection(lighting_selection)
+        background_cfg = None
+    elif randomize_background:
         from robolab.variations.backgrounds import find_background_files, generate_background_config
 
         rng = random.Random(background_seed)
         all_bgs = find_background_files()
         # Exclude the default so this is genuinely "besides the default"
-        default_bg_path = HomeOfficeBackgroundCfg.dome_light.spawn.texture_file
+        default_bg_path = HomeOfficeBackgroundCfg().dome_light.spawn.texture_file
         all_bgs = [p for p in all_bgs if p != default_bg_path]
         if not all_bgs:
             raise FileNotFoundError(
@@ -121,7 +134,7 @@ def auto_register_droid_envs(task_dirs=DEFAULT_TASK_SUBFOLDERS, lighting_intensi
         actions_cfg=DroidJointPositionActionCfg(),
         robot_cfg=DroidCfg,
         camera_cfg=[*scene_cameras, viewport_camera],
-        lighting_cfg=SphereLightCfg,
+        lighting_cfg=lighting_cfg,
         background_cfg=background_cfg,
         contact_gripper=contact_gripper,
         lazy_sensor_update=lazy_sensor_update,

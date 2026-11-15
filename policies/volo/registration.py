@@ -22,7 +22,7 @@ from robolab.constants import DEFAULT_TASK_SUBFOLDERS
 VOLO_TASK_SUBFOLDERS = [*DEFAULT_TASK_SUBFOLDERS, "robovolo"]
 
 
-def register_volo_envs(task_dirs=None, task=None, cameras=None):
+def register_volo_envs(task_dirs=None, task=None, cameras=None, lighting_selection=None):
     """Register DROID envs for VoLo proxy evaluation (depth cameras enabled).
 
     Args:
@@ -30,6 +30,7 @@ def register_volo_envs(task_dirs=None, task=None, cameras=None):
             ``VOLO_TASK_SUBFOLDERS`` (the standard benchmark subfolders plus
             the ``robovolo`` content pack).
         task: Optional task name(s) to register instead of discovering all tasks.
+        lighting_selection: Optional complete light and HDR preset.
         cameras: Camera preset (list of camera config classes) observed by the
             backend policy. Defaults to ``WRIST_LEFT``. The robot-mounted wrist
             camera is left rgb-only (its config is owned by ``DroidCfg``).
@@ -49,6 +50,7 @@ def register_volo_envs(task_dirs=None, task=None, cameras=None):
     auto_register_droid_envs(
         task_dirs=task_dirs,
         task=task,
+        lighting_selection=lighting_selection,
         cameras=depth_cameras,
         viewport_camera=with_depth(EgocentricMirroredCameraCfg),
         # Depth annotators only populate when sensors update eagerly.

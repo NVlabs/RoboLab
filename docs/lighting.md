@@ -114,7 +114,7 @@ IsaacLab provides the following light spawners through `isaaclab.sim`:
 | `sim_utils.DomeLightCfg` | Environment map light (HDR/EXR); used for [Backgrounds](background.md) |
 | `sim_utils.DiskLightCfg` | Area light from a disk |
 | `sim_utils.CylinderLightCfg` | Area light from a cylinder |
-| `sim_utils.RectLightCfg` | Area light from a rectangle |
+| `RectLightSpawnCfg` (RoboLab) | Area light from a rectangle; see complete selections below |
 
 ## Lighting Variation for Robustness Testing
 
@@ -127,3 +127,120 @@ The built-in evaluation script `policies/pi0_family/run_lighting.py` runs benchm
 - [Backgrounds](background.md) — HDR dome lights for environment backgrounds
 - [Environment Registration](environment_registration.md) — Passing lighting into registered environments
 - [Running Environments](environment_run.md) — Robustness evaluation scripts
+
+## Complete lighting selections
+
+The built-in selections bundle the main lights and the home-office HDR dome.
+They assume the standard RoboLab tabletop near `z=0`. Selecting one is opt-in:
+DROID keeps its original sphere and HDR default.
+
+| Selection | Config class | Main light | HDR intensity |
+| --- | --- | --- | --- |
+| `sphere_default` | `SphereDefaultLightingCfg` | Original sphere, intensity 5000 | 500 |
+| `ceiling_soft` | `CeilingSoftLightingCfg` | 1.5 × 1.5 m ceiling, 4000 at 5000 K | 350 |
+| `ceiling_cool` | `CeilingCoolLightingCfg` | 1.5 × 1.5 m ceiling, 1800 at 7000 K | 150 |
+| `window_neutral` | `WindowNeutralLightingCfg` | 1.2 × 1.5 m window, 5500 at 5600 K; ceiling fill 900 at 4500 K | 350 |
+| `window_warm` | `WindowWarmLightingCfg` | Same window rig, window at 4500 K | 350 |
+
+### Robustness lighting suites
+
+These four additional complete selections are available through the same Python
+API. They do not change any registration defaults.
+
+| Selection | Config class | Main light | HDR intensity |
+| --- | --- | --- | --- |
+| `dark` | `DarkLightingCfg` | Existing dim sphere, intensity 50 | 5 |
+| `harsh_shadows` | `HarshShadowsLightingCfg` | Angled distant light, intensity 3000, exposure 0; rays along (-0.6, -0.8, -1) | 20 |
+| `spotlight` | `SpotlightLightingCfg` | Overhead distant source: rays along -Z, intensity 3000, exposure 0 | 200 |
+| `soft_shadows` | `SoftShadowsLightingCfg` | 0.3 × 0.3 m area light, intensity 250000 at 5600 K | 100 |
+
+Directions use world axes. Both distant lights have a 0.53° angular
+size and spawn once globally, avoiding extra illumination from environment
+clones. `harsh_shadows` adds an oblique downward direction and reduces HDR fill
+for stronger cast shadows. `dark` reduces both sources so a bright dome cannot
+wash out the low-light effect.
+
+`soft_shadows` places a small bright source at `(0.55, 1.2, 1.1)`, aimed at the
+tabletop `(0.55, 0, 0)`. Its finite area gives softer shadow edges than
+`harsh_shadows`; bright highlights depend on camera angle and material roughness.
+`spotlight` uses an overhead distant source. These selections do not change
+materials, camera exposure, or renderer bloom. The legacy RGB light configs
+remain available separately in `lighting.py`.
+
+Register a programmable suite with distinct environment names, for example:
+
+```python
+from robolab.registrations.droid.auto_env_registrations_jointpos import auto_register_droid_envs
+
+for selection in ("dark", "harsh_shadows", "spotlight", "soft_shadows"):
+    auto_register_droid_envs(
+        task="GrabAFruitTask",
+        lighting_selection=selection,
+        env_postfix=f"Lighting_{selection}",
+    )
+```
+
+Create one lighting variant at a time: the HDR dome and distant light are global
+to the stage. Standard policy runners continue to use their existing defaults,
+with no lighting CLI argument.
+
+### Lighting choice cards
+
+The breakfast comparison shows the original four presets under fixed scene,
+camera, and renderer settings. `window_neutral` gives directional side lighting;
+`ceiling_soft` gives overhead illumination; `window_warm` adds a warmer cast.
+The historical `baseline` label means `sphere_default`.
+
+![Breakfast lighting choices](images/lighting/breakfast_comparison.png)
+
+The cooler `ceiling_cool` preset places its ceiling at `(0.55, 0, 1.9)`, aimed
+at `(0.55, 0, 0)`, with normalization disabled and exposure zero.
+
+### Selecting a preset
+
+Policy evaluation entrypoints use the embodiment's registration defaults: the
+original sphere/HDR setup for DROID. Lighting is
+configured through the Python registration API when defining a custom setup.
+The dedicated legacy lighting-variation experiment script defines its own sweep.
+
+Import the classes or select by name from
+`robolab.variations.lighting_selections`. The rectangle spawner uses IsaacLab's
+generic `LightCfg` with the USD `RectLight` schema, so it also works on the pinned
+IsaacLab 2.2 stack, which has no built-in `sim_utils.RectLightCfg`.
+
+```python
+from robolab.variations.lighting_selections import get_lighting_selection
+
+# Pass to auto_discover_and_create_cfgs or generate_scene_env_cfg:
+lighting_cfg = get_lighting_selection("window_neutral")
+background_cfg = None  # The selection already includes the HDR dome.
+```
+
+Set `lighting_selection="sphere_default"` to explicitly select the original sphere
+light and HDR dome. Use a different `env_postfix` for each lighting selection if
+registering several in one process.
+
+For DROID, the joint-position, absolute-IK and relative-IK registration functions
+also accept `lighting_selection`:
+
+```python
+from robolab.registrations.droid.auto_env_registrations_jointpos import auto_register_droid_envs
+
+auto_register_droid_envs(
+    task="GrabAFruitTask",
+    lighting_selection="window_neutral",
+)
+```
+
+The same argument works with `auto_register_droid_abs_ik_envs` and
+`auto_register_droid_rel_ik_envs` in their respective registration modules.
+Omitting it preserves the original lights and background behavior. A selection
+cannot be combined with `randomize_background=True`, or with the joint-position
+wrapper's `lighting_intensity` argument, because each preset fixes its HDR dome
+and light intensities. Select lighting before creating the environment.
+
+For other embodiments, pass the complete lighting config through the factory;
+registrations that hardcode their background need the same opt-in wiring.
+
+The breakfast comparison image is the retained documentation gallery. Source
+scene assets and materials are unchanged.
