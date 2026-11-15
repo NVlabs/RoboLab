@@ -7,7 +7,7 @@ import atexit
 import importlib.metadata
 import json
 import os
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
@@ -16,6 +16,8 @@ import numpy as np
 import torch
 from isaaclab.utils.datasets import EpisodeData
 from isaaclab.utils.datasets.dataset_file_handler_base import DatasetFileHandlerBase
+
+from robolab.core.utils.hardware_utils import GPU_INFO_KEYS, get_gpu_info
 
 
 @dataclass
@@ -41,6 +43,7 @@ class StreamingHDF5DatasetFileHandler(DatasetFileHandlerBase):
         self._hdf5_data_group = None
         self._demo_count = 0
         self._env_args = {}
+        self._recording_info: dict[str, str] = {}
 
         # Multiple concurrent open episodes, keyed by episode index
         self._open_episodes: dict[int, _OpenEpisode] = {}
@@ -72,10 +75,30 @@ class StreamingHDF5DatasetFileHandler(DatasetFileHandlerBase):
         self._hdf5_data_group = self._hdf5_file_stream["data"]
         self._demo_count = len(self._hdf5_data_group)
 
-    def create(self, file_path: str, env_name: str = None):
-        """Create a new dataset file, or open existing file to resume."""
+    def create(self, file_path: str, env_name: str = None, gpu_info: Mapping[str, str] | None = None):
+        """Create a new dataset file, or open an existing file to resume.
+
+        Args:
+            file_path: Output HDF5 path.
+            env_name: Optional environment name stored in ``env_args``.
+            gpu_info: Information about the simulation GPU. When omitted, the
+                current CUDA device is queried on a best-effort basis. Pass an
+                empty mapping for a CPU simulation.
+        """
         if self._hdf5_file_stream is not None:
             raise RuntimeError("HDF5 dataset file stream is already in use")
+        queried_info = get_gpu_info() if gpu_info is None else gpu_info
+        self._recording_info = {}
+        for key in GPU_INFO_KEYS:
+            value = queried_info.get(key)
+            if value is not None and str(value).strip():
+                self._recording_info[key] = str(value).strip()
+        for package in ("isaaclab", "isaacsim"):
+            try:
+                self._recording_info[f"{package}_version"] = importlib.metadata.version(package)
+            except importlib.metadata.PackageNotFoundError:
+                pass
+        self._recording_info["recorded_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
         if not file_path.endswith(".hdf5"):
             file_path += ".hdf5"
         dir_path = os.path.dirname(file_path)
@@ -110,20 +133,16 @@ class StreamingHDF5DatasetFileHandler(DatasetFileHandlerBase):
     def _init_data_group(self, env_name: str | None):
         """Create the ``data`` group in a fresh file and stamp recording provenance.
 
-        The provenance attrs (simulator stack versions and recording date) let
-        replay tooling warn when a recording is replayed on a different
-        IsaacSim/IsaacLab stack, whose contact mechanics differ.
+        The recording information (simulator stack versions, GPU details, and
+        recording date) lets replay tooling and reviewers warn when a recording
+        is replayed on a different stack or GPU, whose contact mechanics differ.
         """
         self._hdf5_data_group = self._hdf5_file_stream.create_group("data")
         self._hdf5_data_group.attrs["total"] = 0
         self._demo_count = 0
         self.add_env_args({"env_name": env_name if env_name is not None else "", "type": 2})
-        for package in ("isaaclab", "isaacsim"):
-            try:
-                self._hdf5_data_group.attrs[f"{package}_version"] = importlib.metadata.version(package)
-            except importlib.metadata.PackageNotFoundError:
-                pass
-        self._hdf5_data_group.attrs["recorded_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        for key, value in self._recording_info.items():
+            self._hdf5_data_group.attrs[key] = value
 
     def __del__(self):
         self.close()
@@ -229,6 +248,11 @@ class StreamingHDF5DatasetFileHandler(DatasetFileHandlerBase):
 
         group = self._hdf5_data_group.create_group(demo_name)
         group.attrs["num_samples"] = 0
+        # A resumed file can receive episodes from a different simulator stack,
+        # machine, or GPU. Per-episode attrs describe newly written episodes;
+        # readers fall back to file-level attrs for older recordings.
+        for key, value in self._recording_info.items():
+            group.attrs[key] = value
 
         ep = _OpenEpisode(group=group, seed=seed, index=episode_index)
         if seed is not None:

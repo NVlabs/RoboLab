@@ -13,9 +13,8 @@ what is being restored or checked (see ``docs/replay.md`` for the user guide):
 - :mod:`~robolab.core.replay.scene_state` — reset the scene to the recorded
   initial state, and validate per-step sim state against the recorded states.
 
-For warning when the current IsaacSim/IsaacLab stack differs from the one an
-episode was recorded on, see
-:func:`robolab.core.utils.version_utils.warn_on_stack_mismatch`.
+For warnings when the current simulator stack or GPU differs from the recording,
+see :func:`robolab.core.utils.version_utils.warn_on_recording_mismatch`.
 
 Typical driver flow:
 

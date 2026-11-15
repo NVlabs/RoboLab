@@ -26,7 +26,7 @@ from robolab.core.logging.results import extract_initial_state_info, extract_sub
 from robolab.core.observations.observation_utils import unpack_image_obs, unpack_viewport_cams
 from robolab.core.replay import StateValidator, restore_recorded_initial_state
 from robolab.core.utils.isaaclab_compat import as_torch
-from robolab.core.utils.version_utils import warn_on_stack_mismatch
+from robolab.core.utils.version_utils import warn_on_recording_mismatch
 from robolab.core.utils.video_utils import VideoWriter
 
 
@@ -156,7 +156,7 @@ def run_prerecorded_episode_hdf5(env, hdf5_path: str, episode=0, save_videos=Tru
     from robolab.core.utils.file_utils import load_hdf5_episode_data
     print(f"Loading actions from {hdf5_path} for episode {episode}")
     actions = load_hdf5_episode_data(hdf5_path, episode, 'actions')
-    warn_on_stack_mismatch(hdf5_path)
+    warn_on_recording_mismatch(hdf5_path, episode=episode, device=str(env.device))
     if env.num_envs > 1:
         print(f"\033[93mNOTE: replaying with {env.num_envs} envs. Parallel envs share one batched "
               "physics scene, so trajectories evolve slightly differently than in a single-env "

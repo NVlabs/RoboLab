@@ -13,6 +13,7 @@ from isaaclab.managers.recorder_manager import DatasetExportMode, RecorderManage
 from isaaclab.utils.datasets import EpisodeData
 
 from robolab.core.logging.streaming_hdf5_handler import StreamingHDF5DatasetFileHandler
+from robolab.core.utils.hardware_utils import get_gpu_info
 
 logger = logging.getLogger(__name__)
 
@@ -125,6 +126,8 @@ class RobolabRecorderManager(RecorderManager):
             self._streaming_active[env_id] = False
 
         self._env_name = getattr(env.cfg, "env_name", None)
+        self._recording_device = str(env.device)
+        self._gpu_info: dict[str, str] | None = None
 
         # HDF5 file handlers — created lazily on first write or when set_hdf5_file() is called.
         # This avoids creating empty data.hdf5 files that are never written to.
@@ -187,6 +190,12 @@ class RobolabRecorderManager(RecorderManager):
         if filename is None:
             filename = cfg.dataset_filename
 
+        # Query once, after the environment exists and only when a recording
+        # file is actually needed. The simulation device is explicit so a
+        # multi-GPU run does not accidentally describe CUDA device 0.
+        if self._gpu_info is None:
+            self._gpu_info = get_gpu_info(self._recording_device)
+
         # Close existing handler if switching files
         if self._dataset_file_handler is not None:
             self._dataset_file_handler.close()
@@ -194,7 +203,7 @@ class RobolabRecorderManager(RecorderManager):
             self._dataset_file_handler = StreamingHDF5DatasetFileHandler()
 
         filepath = os.path.join(cfg.dataset_export_dir_path, filename)
-        self._dataset_file_handler.create(filepath, env_name=self._env_name)
+        self._dataset_file_handler.create(filepath, env_name=self._env_name, gpu_info=self._gpu_info)
 
         if cfg.dataset_export_mode == DatasetExportMode.EXPORT_SUCCEEDED_FAILED_IN_SEPARATE_FILES:
             if self._failed_episode_dataset_file_handler is not None:
@@ -202,7 +211,9 @@ class RobolabRecorderManager(RecorderManager):
             else:
                 self._failed_episode_dataset_file_handler = StreamingHDF5DatasetFileHandler()
             failed_path = os.path.join(cfg.dataset_export_dir_path, f"{filename}_failed")
-            self._failed_episode_dataset_file_handler.create(failed_path, env_name=self._env_name)
+            self._failed_episode_dataset_file_handler.create(
+                failed_path, env_name=self._env_name, gpu_info=self._gpu_info
+            )
 
         self._hdf5_initialized = True
 

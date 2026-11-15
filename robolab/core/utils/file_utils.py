@@ -157,19 +157,33 @@ def load_hdf5_episode_data(filepath: str, episode: int, key: str) -> np.ndarray:
     return actions
 
 
-def load_hdf5_provenance(filepath: str) -> dict:
-    """Load recording provenance attrs (simulator stack versions, record date) from an HDF5 file.
+def load_hdf5_provenance(filepath: str, episode: int | None = None) -> dict:
+    """Load simulator and GPU information from an HDF5 recording.
 
     Returns a dict with whichever of ``isaaclab_version``, ``isaacsim_version``,
-    and ``recorded_at`` were stamped at record time; empty dict for files that
-    predate provenance stamping.
+    ``gpu_name``, ``cuda_version``, ``driver_version``, and ``recorded_at`` were
+    stamped at record time. When ``episode`` is provided, per-episode values
+    override file-level values. This lets resumed files describe episodes made
+    on different GPUs while remaining compatible with older recordings.
     """
-    keys = ("isaaclab_version", "isaacsim_version", "recorded_at")
+    keys = (
+        "isaaclab_version",
+        "isaacsim_version",
+        "gpu_name",
+        "cuda_version",
+        "driver_version",
+        "recorded_at",
+    )
     with h5py.File(filepath, 'r') as f:
         data = f.get('data')
         if data is None:
             return {}
-        return {key: data.attrs[key] for key in keys if key in data.attrs}
+        info = {key: data.attrs[key] for key in keys if key in data.attrs}
+        if episode is not None:
+            episode_group = data.get(f"demo_{episode}")
+            if episode_group is not None:
+                info.update({key: episode_group.attrs[key] for key in keys if key in episode_group.attrs})
+        return info
 
 
 def _load_hdf5_group_tree(filepath: str, episode: int, group_name: str) -> dict:
