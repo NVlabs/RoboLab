@@ -79,3 +79,9 @@ RoboLab bundles 3D objects, backgrounds, materials, fixtures, scenes, and robots
 | `assets/scenes` | CC BY-NC-SA 4.0 | © 2026 NVIDIA Corporation. |
 | `assets/robots` (except locally licensed subfolders) | CC BY-NC-SA 4.0 | © 2026 NVIDIA Corporation. |
 | `assets/robots/kinova_gen3_robotiq_2f85` | BSD-3-Clause | Derived from [Kinova `ros2_kortex`](https://github.com/Kinovarobotics/ros2_kortex) and [PickNik `ros2_robotiq_gripper`](https://github.com/PickNikRobotics/ros2_robotiq_gripper). See the two license files in the asset directory. |
+
+## Bundled source code
+
+| Path | License | Source / Provenance |
+|---|---|---|
+| `policies/ai_native/orchestrated/` (files marked `SPDX-License-Identifier: MIT` and the agent prompts listed in its README) | MIT | Adapted from [GPT-as-Policy](https://github.com/anonymous-report-421/GPT-as-Policy), © 2026 Yu-Mool Shu and Lipxin Zheng. See [`policies/ai_native/orchestrated/LICENSE-MIT`](./policies/ai_native/orchestrated/LICENSE-MIT). |
