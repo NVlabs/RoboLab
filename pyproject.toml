@@ -3,7 +3,7 @@
 
 [project]
 name = "robolab"
-version = "0.3.2"
+version = "0.3.3"
 description = "A benchmark for simulation"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
@@ -88,6 +88,7 @@ exclude = ["policies.ai_native.dev", "policies.ai_native.dev.*", "policies.ai_na
 
 [tool.setuptools.package-data]
 dashboard = ["templates/*.html", "static/*"]
+"policies.ai_native.orchestrated" = ["LICENSE-MIT", "README.md", "agent/*.md", "agent/context/*.md"]
 
 # -- uv configuration --
 

@@ -7804,7 +7804,7 @@ wheels = [
 
 [[package]]
 name = "robolab"
-version = "0.3.2"
+version = "0.3.3"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi", version = "0.115.7", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-7-robolab-isaac60') or extra == 'extra-7-robolab-isaac50' or extra == 'extra-7-robolab-isaac51'" },

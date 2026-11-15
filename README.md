@@ -12,6 +12,7 @@
 
 ## News
 
+- **[2026/11/15]** 🚀 **v0.3.3** adds [initial-pose randomization](docs/init_pose_randomization.md) (`--init-pose-noise`) for a different collision-checked starting layout every episode, nine [lighting presets](docs/lighting.md), and GPU details in episode recordings. See the [Changelog](CHANGELOG.md).
 - **[2026/10/27]** 🚀 Added opt-in support for **Isaac Lab 3.0 beta and Isaac Sim 6.0.1**, including simulator compatibility updates and DROID rendering fixes. Isaac Sim 5.0 remains the default. See the [setup guide](docs/isaac_sim_6.md). Thanks to Meenal Parakh, Yannick Metz, and Finn Metz!
 - **[2026/10/18]** 🔥 Added [**Astranomy**](https://research.nvidia.com/labs/srl/projects/astranomy/) policy code, using general-purpose models (such as GPT-6 Astra) as a native robot policy.
 - **[2026/10/13]** 🔥 [**LADDER**](https://ladder.insait.ai/) introduces RoboLab-Long, a suite of 44 tasks for evaluating long-horizon manipulation, as part of a 145-task benchmark spanning three simulation suites. See [Task Libraries](docs/ecosystem.md#task-libraries).
@@ -26,6 +27,7 @@ For all updates, including minor improvements and bug fixes, see the [Changelog]
 - **Bring your own robot**: Tasks are not tied to a specific robot embodiment, so you can plug in any robot compatible with IsaacLab!
 - **Rich Asset Libraries**: See a list of [objects](assets/objects/README.md), [scenes](assets/scenes/README.md), and curated [backgrounds](assets/backgrounds/README.md) — everything you need to create new scenes and new tasks for your own evaluation needs.
 - **AI-Enabled Workflows**: Generate new scenes and tasks **in minutes** using natural language with the [/robolab-scenegen](skills/robolab-scenegen/) and [/robolab-taskgen](skills/robolab-taskgen/) Claude Code skills.
+- **Selectable Lighting**: Nine [lighting presets and visual choice cards](docs/lighting.md#lighting-choice-cards), configurable through `lighting_selection=` in the Python registration API. Policy runners keep DROID's original lighting by default.
 - **Multi-Environment Parallel Evaluation**: Run multiple episodes in parallel across environments with vectorized conditionals and per-environment termination.
 - **Results Dashboard with Episode Videos and Cross-Experiment Analysis**: A self-contained web [dashboard](docs/dashboard.md) for browsing scenes/tasks, replaying episode videos, and comparing results across experiments.
 
@@ -116,6 +118,10 @@ python policies/pi0_family/run.py --policy pi05 --disable-subtask
 
 # Resume a previous run (skips completed episodes)
 python policies/pi0_family/run.py --policy pi05 --output-folder-name my_previous_run
+
+# Randomize initial object poses: move each object up to 10 cm and turn it up to 60 degrees,
+# a different layout every episode (see docs/init_pose_randomization.md)
+python policies/pi0_family/run.py --policy pi05 --init-pose-noise 0.1
 ```
 
 ## Example Tasks
@@ -162,6 +168,7 @@ Full documentation is at **[docs/README.md](docs/README.md)**, covering:
 - [Environment Registration](docs/environment_registration.md) — Combining tasks with robot/observation/action configs
 - [Inference Clients](policies/README.md) — A list of supported open-source models and clients
 - [Replaying Recorded Episodes](docs/replay.md) — Playing back recorded HDF5 episodes faithfully
+- [Initial-Pose Randomization](docs/init_pose_randomization.md) — Giving each episode a different starting layout
 - [Analysis and Results](docs/analysis.md) — Summarizing, comparing, and auditing results
 - [Dashboard](docs/dashboard.md) — Interactive web viewer for benchmark, tasks, scenes, and eval results
 - [Subtask Checking](docs/subtask.md), [Conditionals](docs/task_conditionals.md), [Event Tracking](docs/event_tracking.md)

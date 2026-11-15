@@ -4,7 +4,7 @@
 
 RoboLab is a research project developed and maintained by the [Seattle Robotics Lab (SRL)](https://research.nvidia.com/labs/srl/) at NVIDIA Research, with contributions from across NVIDIA.
 
-NVIDIA contributors: Xuning Yang, Rishit Dagli, Jonathan Tremblay, Yu-Wei Chao, Alperen Degirmenci, Liang Hao, Fabio Ramos, Alex Zook, Siyi Chen, Renato Gasoto, Xiaotong Chen, Valts Blukis, Ashna Khetan, Shun Zhang, Maciej Bala.
+NVIDIA contributors: Xuning Yang, Rishit Dagli, Jonathan Tremblay, Yu-Wei Chao, Alperen Degirmenci, Liang Hao, Fabio Ramos, Alex Zook, Siyi Chen, Renato Gasoto, Xiaotong Chen, Valts Blukis, Ashna Khetan, Shun Zhang, Maciej Bala, Yuhang Lu.
 
 We thank the following additional contributors for their help in building RoboLab: Arhan Jain, Karl Pertsch.
 

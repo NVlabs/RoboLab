@@ -1,6 +1,6 @@
 # Changelog
 
-## Since last tag
+## [0.3.3] - 2026-11-15
 
 ### Added
 
@@ -8,13 +8,39 @@
   Python 3.12, a resolved dependency lock, setup documentation, and task
   preflight commands. Isaac Sim 5.0 remains the default.
   ([#47](https://github.com/NVlabs/RoboLab/pull/47))
+- New lighting presets (`lighting_selection=`): nine light-and-sky setups,
+  from the default sphere light to window, ceiling, dark, and spotlight scenes
+  (`docs/lighting.md`).
+- Orchestrated AI-native policy: a Cosmos Action model proposes joint
+  trajectories, and an agent reviews each chunk with camera views and robot
+  state before executing, editing, or replacing it with end-effector
+  corrections.
+- GPU details stored in recordings and compared during replay.
+- Initial-pose randomization (`--init-pose-noise`, with `--init-pose-objects`
+  and `--init-pose-workspace`): each episode starts objects in a different,
+  collision-checked layout that is reproducible per seed. Tasks can keep
+  objects together with `object_groups` or in place with `fixed_objects`
+  (`docs/init_pose_randomization.md`).
+
+### Changed
+
+- The `robolab/tasks/randomize_initial_pose/` task variants are removed; use
+  `--init-pose-noise` instead.
 
 ### Fixed
 
+- Removed a bowl and banana that were stuck inside the table in
+  WhiteMugInCenterOfTableTask's scene. Scores on that task may change.
 - DROID/Robotiq rendering and plate/fork USD hierarchies on Isaac Sim 6.
 - Quaternion conversion at simulator boundaries, including explicit WXYZ
   configuration defaults and consistent orientations in multi-camera resets.
 - Evaluation display-mode detection across Isaac Lab 2 and 3.
+- `env_spacing` passed to `create_env` / `parse_env_cfg` now changes the
+  spacing between parallel environments.
+  ([#41](https://github.com/NVlabs/RoboLab/pull/41))
+- The VoLo runner defaults `--open-loop-horizon` to 8, matching the 8-action
+  chunks the VoLo proxy serves; the old default crashed on the first tool
+  chunk. ([#37](https://github.com/NVlabs/RoboLab/pull/37))
 
 ## [0.3.2] - 2026-10-18
 
@@ -177,6 +203,7 @@ Initial public release: 100+ benchmark tasks,
 DROID and Franka embodiments, server-client policy evaluation (Pi0 family,
 GR00T, DreamZero), and HDF5 episode recording with analysis tools.
 
+[0.3.3]: https://github.com/NVlabs/RoboLab/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/NVlabs/RoboLab/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/NVlabs/RoboLab/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/NVlabs/RoboLab/compare/v0.2.1...v0.3.0
