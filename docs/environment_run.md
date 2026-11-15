@@ -116,6 +116,11 @@ end_episode(env)   # Exports recorded data to run_*.hdf5
 env.close()
 ```
 
+When sensor images have different heights, `unpack_image_obs()` keeps each
+individual view at its requested scale and pads shorter views at the bottom
+when building `combined_image`. This allows sensor-video recording without
+changing the images sent to a policy.
+
 ## Multi-Environment Configuration
 
 When running with `num_envs > 1`, IsaacLab spawns multiple copies of the scene in a grid layout. The `env_spacing` parameter controls the distance (in meters) between environment origins.
@@ -159,32 +164,15 @@ python policies/pi0_family/run.py --headless --num_envs 10 --num-runs 2
 
 ## Initial Condition Randomization
 
-To randomize object poses between episodes:
+To randomize where objects start between episodes, add `--init-pose-noise X` to any policy runner:
 
-1. Load the env config explicitly using `parse_env_cfg`
-2. Add your desired randomization as an `events` parameter
-3. Pass the modified config to `create_env`
-
-```python
-from robolab.core.environments.runtime import create_env
-from robolab.core.environments.config import parse_env_cfg
-from robolab.core.events.reset_pose import RandomizeInitPoseUniform
-
-env_cfg = parse_env_cfg("BananaInBowlTask",
-    device="cuda:0", seed=42, num_envs=1, use_fabric=True)
-
-env_cfg.events = RandomizeInitPoseUniform.from_params(
-    objects=["banana", "bowl"],
-    pose_range={"x": (-0.1, 0.1), "y": (-0.05, 0.05), "z": (0.0, 0.0)},
-)
-
-env, env_cfg = create_env(env_cfg,
-    device="cuda:0", seed=42, num_envs=1, use_fabric=True)
-
-# Between episodes, reset() will re-randomize poses according to the seed
+```bash
+python policies/pi0_family/run.py --policy pi05 --task BananaInBowlTask --init-pose-noise 0.1
 ```
 
-You can also pass events directly to `create_env` using the `events` parameter. This is not encouraged, however.
+Objects that touch move together, objects that cannot move safely stay put, and every episode's layout is reproducible from `--seed`. See [Initial-Pose Randomization](init_pose_randomization.md) for the options and how layouts are sampled.
+
+Other reset events, such as camera pose variation, can be passed to `create_env` through its `events` parameter. They run after the default scene reset, in the order given:
 
 ```python
 from robolab.core.events.reset_camera import RandomizeCameraPoseUniform

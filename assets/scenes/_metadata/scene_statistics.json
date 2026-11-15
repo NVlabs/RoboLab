@@ -1,7 +1,7 @@
 {
   "total_scenes": 61,
   "total_unique_objects": 79,
-  "average_objects_per_scene": 4.25,
+  "average_objects_per_scene": 4.21,
   "object_count_distribution": {
     "0": 4,
     "1": 11,
@@ -9,9 +9,8 @@
     "3": 4,
     "4": 6,
     "5": 4,
-    "6": 2,
+    "6": 3,
     "7": 11,
-    "8": 1,
     "11": 3,
     "12": 1,
     "13": 2
@@ -616,7 +615,7 @@
     "../objects/ycb/banana.usd": {
       "dataset": "ycb",
       "object_name": "banana",
-      "count": 11,
+      "count": 10,
       "scenes": [
         "bagel_plate_banana_bowl.usda",
         "banana_bowl.usda",
@@ -626,7 +625,6 @@
         "conditionals_test_scene.usda",
         "mug_banana_ketchup_bowl_rubiks3_bin.usda",
         "mugs2_bananas2_ketchup_rubiks3_bin.usda",
-        "objects_around_table.usda",
         "rubiks_cube_banana_bowl.usda",
         "rubiks_cube_banana_bowl_mug_bin.usda"
       ]
@@ -634,7 +632,7 @@
     "../objects/ycb/bowl.usd": {
       "dataset": "ycb",
       "object_name": "bowl",
-      "count": 19,
+      "count": 18,
       "scenes": [
         "bagel_plate_banana_bowl.usda",
         "banana_bowl.usda",
@@ -650,7 +648,6 @@
         "mugs2_bananas2_ketchup_rubiks3_bin.usda",
         "mugs4_measuringcup_drill_bowl.usda",
         "mugs4_measuringcup_drill_bowl_v2.usda",
-        "objects_around_table.usda",
         "rubiks_cube_2_bowl.usda",
         "rubiks_cube_banana_bowl.usda",
         "rubiks_cube_banana_bowl_mug_bin.usda",
@@ -875,7 +872,7 @@
     "mugs4_measuringcup_drill_bowl_v2.usda": 6,
     "mugs_on_shelf.usda": 2,
     "mustard_raisin_box.usda": 2,
-    "objects_around_table.usda": 8,
+    "objects_around_table.usda": 6,
     "rubiks_cube_2_bowl.usda": 2,
     "rubiks_cube_3.usda": 1,
     "rubiks_cube_banana_bowl.usda": 3,

@@ -74,6 +74,8 @@ class Task:
     terminations: TerminationCfg | Any = None
     subtasks: Any = None
     contact_object_list: list[str] | None = None
+    object_groups: list[list[str]] | None = None
+    fixed_objects: list[str] | None = None
 
     episode_length_s: int = 60*10  # 10 minutes
     attributes: list[str] = None
@@ -93,6 +95,8 @@ class Task:
 - **`subtasks`** — List of subtasks for granular progress tracking (see [Subtask Definition](#subtask-definition)).
 - **`attributes`** — Tags for categorizing tasks (e.g., `['pick_place', 'semantics']`). Automatically added as tags during environment registration.
 - **`task_name`** — Explicit name for grouping task variants. Defaults to the class name.
+- **`object_groups`** — Objects that keep their relative poses when the initial pose is randomized with `--init-pose-noise`, e.g. `[["fork", "plate", "knife"]]`. Only needed for arrangements whose objects do not touch; touching or stacked objects are grouped automatically. Names must match prim names in the scene. See [Initial-Pose Randomization](init_pose_randomization.md).
+- **`fixed_objects`** — Objects that `--init-pose-noise` never moves, e.g. `["shelf"]`. Objects touching them, or grouped with them in `object_groups`, stay in place too. Only the starting layout is affected; physics can still push them during the episode. Names must match prim names in the scene. See [Initial-Pose Randomization](init_pose_randomization.md).
 
 ## Importing Scenes
 
@@ -219,22 +223,23 @@ See [environment_run.md](environment_run.md) for how to select an instruction ty
 
 ## Task Variants with `task_name`
 
-When creating variations of a task (e.g., with different randomization settings), use `task_name` to group them under a common name:
+When creating variations of a task (e.g., the same goal in a different scene), use `task_name` to group them under a common name:
 
 ```python
 @dataclass
-class BananaInBowlUniformInitPose10cmTask(Task):
+class BananaInBowlClutteredTask(Task):
     contact_object_list = ["banana", "bowl", "table"]
-    scene = import_scene("banana_bowl.usda", contact_object_list)
+    scene = import_scene("banana_bowl_cluttered.usda", contact_object_list)
     terminations = BananaInBowlTerminations
-    events = RandomizeInitPoseUniform
     instruction: str = "Pick up the banana and place it in the bowl"
     episode_length_s: int = 50
     attributes = ['specific', 'recognition']
     task_name = "BananaInBowlTask" # This will set the task_name to the original task for easier analysis.
 ```
 
-`task_name` defaults to the class name automatically. Setting it explicitly is only needed to group variants under a common name — this matters in [results logging and analysis](analysis.md), where `task_name` is a field in every episode result and can be used to aggregate metrics across variants (e.g., all `*10cm`, `*20cm`, `*30cm` variants share the same `task_name`).
+`task_name` defaults to the class name automatically. Setting it explicitly is only needed to group variants under a common name — this matters in [results logging and analysis](analysis.md), where `task_name` is a field in every episode result and can be used to aggregate metrics across variants.
+
+Randomized initial poses need no task variant: use `--init-pose-noise` at run time (see [Initial-Pose Randomization](init_pose_randomization.md)).
 
 
 ## Subtask Definition

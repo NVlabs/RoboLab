@@ -2425,7 +2425,7 @@
     "episode_s": "30",
     "scene": "objects_around_table.usda",
     "filename": "benchmark/white_mug_in_center_of_table.py",
-    "contact_objects": "mug, bowl, table, alphabet_soup_can, orange_juice_carton, smartphone, milk_carton, banana, rubiks_cube",
+    "contact_objects": "mug, table, alphabet_soup_can, orange_juice_carton, smartphone, milk_carton, rubiks_cube",
     "terminations": "WhiteMugInCenterOfTableTerminations",
     "attributes": "color, spatial",
     "subtasks": "white_mug_in_center_of_table(groups=['group1', 'group2', 'group3'], logical=all) score=1.0",

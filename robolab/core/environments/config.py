@@ -215,6 +215,8 @@ def generate_task_env_cfg(task_class: Task,
             self.instruction = task_class.instruction
             self.terminations = task_class.terminations()
             self.contact_object_list = task_class.contact_object_list
+            self.object_groups = getattr(task_class, "object_groups", None)
+            self.fixed_objects = getattr(task_class, "fixed_objects", None)
 
             # Set optional rewards if provided by the task
             if getattr(task_class, 'rewards', None) is not None:

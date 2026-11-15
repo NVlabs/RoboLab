@@ -173,6 +173,9 @@ class RobolabDefaultEnvCfg(ManagerBasedRLEnvCfg):
     rerender_on_reset: bool = True
     seed: int | None = 0
     subtasks: list[dict[str, dict]] | None = None
+    # Task.object_groups and Task.fixed_objects, read by the initial-pose randomization event.
+    object_groups: list[list[str]] | None = None
+    fixed_objects: list[str] | None = None
     # Set from the robot cfg's mandatory ee_recorder_bodies label (HDF5 channel
     # name -> EE body name). No default; env generation fails if the robot cfg
     # omits the label. See docs/robots.md.

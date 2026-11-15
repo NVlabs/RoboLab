@@ -7,6 +7,7 @@ Agentic AI skills for automating common RoboLab workflows. Built on the [agentsk
 | Skill | Description |
 |-------|-------------|
 | [robolab-taskgen](robolab-taskgen/) | Generate task files from natural language descriptions of robot manipulation goals |
+| [robolab-init-pose-check](robolab-init-pose-check/) | Render randomized initial poses for new tasks and scenes, and review object groups |
 | [robolab-scenegen](robolab-scenegen/) | Generate USD scene files from natural language descriptions |
 | [robolab-github-pr](robolab-github-pr/) | Review, fix up, and merge external GitHub pull requests (DCO, SPDX, LFS, merge policy) |
 

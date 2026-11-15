@@ -4,9 +4,40 @@
 from isaaclab.utils import configclass
 
 
+def _is_event_term(value: object) -> bool:
+    return hasattr(value, "func") and hasattr(value, "mode")
+
+
+def _event_items(events: dict | object | None) -> list[tuple[str, object]]:
+    """``(name, EventTerm)`` pairs of a dict or events configclass, in declaration order."""
+    if events is None:
+        return []
+    if isinstance(events, dict):
+        items = events.items()
+    elif vars(events):
+        # Instance attributes keep declaration order; dir() would sort them.
+        items = vars(events).items()
+    else:
+        items = ((name, getattr(events, name)) for name in dir(events))
+    return [(name, value) for name, value in items if not name.startswith("_") and _is_event_term(value)]
+
+
+def _ordered_events_cfg(class_name: str, items: list[tuple[str, object]]) -> object:
+    """Events configclass whose terms run in the order of ``items``.
+
+    The event manager runs terms in the instance's attribute order. Declaring the
+    terms as annotated fields fixes that order; attributes set on an undecorated
+    class would instead be copied in alphabetical order by ``configclass``.
+    """
+    namespace = {"__annotations__": {name: type(term) for name, term in items}, **dict(items)}
+    return configclass(type(class_name, (), namespace))()
+
+
 def create_events_cfg_from_dict(events_dict: dict) -> object:
     """
     Create an events configclass from a dictionary of {event_name: EventTerm}.
+
+    Terms run in the dictionary's order.
 
     Args:
         events_dict: Dictionary mapping event names to EventTerm configurations.
@@ -27,15 +58,7 @@ def create_events_cfg_from_dict(events_dict: dict) -> object:
             )
         })
     """
-    @configclass
-    class DynamicEventsCfg:
-        pass
-
-    # Add each event as a class attribute
-    for event_name, event_term in events_dict.items():
-        setattr(DynamicEventsCfg, event_name, event_term)
-
-    return DynamicEventsCfg()
+    return _ordered_events_cfg("DynamicEventsCfg", _event_items(events_dict))
 
 
 def merge_events_cfg(existing_events_cfg: object, new_events: dict | object) -> object:
@@ -44,7 +67,9 @@ def merge_events_cfg(existing_events_cfg: object, new_events: dict | object) -> 
 
     This function copies all events from the existing config and adds/overrides with
     new events. This ensures that default events (like reset_scene_to_default) are
-    preserved when adding custom events.
+    preserved when adding custom events. Existing events keep their order and run
+    first; new events run after them in their given order (an overridden event keeps
+    its original position).
 
     Args:
         existing_events_cfg: The existing events configclass instance (e.g., BaseEventCfg()).
@@ -66,35 +91,8 @@ def merge_events_cfg(existing_events_cfg: object, new_events: dict | object) -> 
                 params={"camera_names": ["over_shoulder_left_camera"], "pose_range": {"x": (-0.05, 0.05)}}
             )
         })
-        # merged now has both 'reset' and 'randomize_camera' events
+        # merged now has both 'reset' and 'randomize_camera' events, 'reset' first
     """
-    @configclass
-    class MergedEventsCfg:
-        pass
-
-    # Copy existing events from the existing config
-    if existing_events_cfg is not None:
-        for attr_name in dir(existing_events_cfg):
-            # Skip private/magic attributes and methods
-            if attr_name.startswith('_'):
-                continue
-            attr_value = getattr(existing_events_cfg, attr_name)
-            # Only copy EventTerm-like objects (have 'func' and 'mode' attributes)
-            if hasattr(attr_value, 'func') and hasattr(attr_value, 'mode'):
-                setattr(MergedEventsCfg, attr_name, attr_value)
-
-    # Add/override with new events
-    if isinstance(new_events, dict):
-        for event_name, event_term in new_events.items():
-            setattr(MergedEventsCfg, event_name, event_term)
-    else:
-        # new_events is a configclass instance
-        for attr_name in dir(new_events):
-            if attr_name.startswith('_'):
-                continue
-            attr_value = getattr(new_events, attr_name)
-            if hasattr(attr_value, 'func') and hasattr(attr_value, 'mode'):
-                setattr(MergedEventsCfg, attr_name, attr_value)
-
-    return MergedEventsCfg()
-
+    merged = dict(_event_items(existing_events_cfg))
+    merged.update(_event_items(new_events))
+    return _ordered_events_cfg("MergedEventsCfg", list(merged.items()))

@@ -117,6 +117,53 @@ def add_common_eval_args(parser: argparse.ArgumentParser) -> None:
                               "RenderCfg.rendering_mode). Default: unset, which lets "
                               "IsaacLab fall back to 'balanced'. No effect under "
                               "--renderer pathtracing."))
+    parser.add_argument("--init-pose-noise", "--init_pose_noise", type=float, nargs="+", default=None,
+                        metavar="X", help=("Randomize initial object poses: `X [YAW_DEG]`. Each group of "
+                                           "objects moves up to X meters in x and y, and turns up to "
+                                           "YAW_DEG degrees (default: 180 * min(1, X / 0.3)). Objects "
+                                           "that touch, are stacked, or are not on the table stay put "
+                                           "unless the task groups them. Default: off."))
+    parser.add_argument("--init-pose-objects", "--init_pose_objects", nargs="+", default=None,
+                        metavar="NAME", help=("With --init-pose-noise: only these objects may move "
+                                              "(default: every simulated object)."))
+    parser.add_argument("--init-pose-workspace", "--init_pose_workspace", type=float, nargs=4, default=None,
+                        metavar=("X_MIN", "X_MAX", "Y_MIN", "Y_MAX"),
+                        help=("With --init-pose-noise: hard limit on where moved objects may end up, "
+                              "env-local meters (default: the table top)."))
+
+
+def init_pose_event_from_args(args: argparse.Namespace) -> dict | None:
+    """Build the initial-pose randomization event from the --init-pose-* flags, or None if off."""
+    values = getattr(args, "init_pose_noise", None)
+    if values is None:
+        if getattr(args, "init_pose_objects", None) or getattr(args, "init_pose_workspace", None):
+            raise ValueError("--init-pose-objects and --init-pose-workspace need --init-pose-noise")
+        return None
+    if len(values) > 2:
+        raise ValueError(f"--init-pose-noise takes X [YAW_DEG], got {values}")
+    from robolab.core.events.reset_pose import make_init_pose_event
+
+    return make_init_pose_event(
+        noise_m=values[0],
+        yaw_range_deg=values[1] if len(values) == 2 else None,
+        objects=args.init_pose_objects,
+        workspace=tuple(args.init_pose_workspace) if args.init_pose_workspace else None,
+    )
+
+
+def init_pose_label(args: argparse.Namespace) -> str:
+    """Short output-folder suffix describing the --init-pose-* settings, or '' if off."""
+    values = getattr(args, "init_pose_noise", None)
+    if values is None:
+        return ""
+    label = f"initpose{values[0]:g}"
+    if len(values) == 2:
+        label += f"_yaw{values[1]:g}"
+    if args.init_pose_objects:
+        label += "_" + "-".join(args.init_pose_objects)
+    if args.init_pose_workspace:
+        label += "_ws" + ",".join(f"{v:g}" for v in args.init_pose_workspace)
+    return label
 
 
 def run_evaluation(
@@ -166,12 +213,18 @@ def run_evaluation(
     if episode_runner is None:
         episode_runner = run_episode
 
+    # Validates the flags up front; a fresh event is built per task below because the
+    # event manager replaces the term's class with a per-env instance.
+    randomize_init_pose = init_pose_event_from_args(args) is not None
+
     if args.output_folder_name is not None:
         output_folder_name = args.output_folder_name
     else:
         output_folder_name = get_timestamp() + f"_{policy}"
         if requested_fields not in (None, ["default"]):
             output_folder_name += f"_{instruction_label}"
+        if randomize_init_pose:
+            output_folder_name += f"_{init_pose_label(args)}"
 
     output_dir = os.path.join(PACKAGE_DIR, "output", output_folder_name)
     os.makedirs(output_dir, exist_ok=True)
@@ -240,6 +293,7 @@ def run_evaluation(
             policy=policy,
             renderer=args.renderer,
             rendering_mode=args.rendering_type,
+            events=init_pose_event_from_args(args),
         )
 
         if robolab.constants.ENABLE_SUBTASK_PROGRESS_CHECKING and getattr(env_cfg, "subtasks", None) is None:
@@ -274,6 +328,7 @@ def run_evaluation(
                 # property and no longer supplies the legacy args.headless.
                 has_gui = env.sim.has_gui
                 headless = not (has_gui() if callable(has_gui) else has_gui)
+                env.run_index = run_idx
                 env_results, msgs, timing = episode_runner(
                     env=env,
                     env_cfg=env_cfg,

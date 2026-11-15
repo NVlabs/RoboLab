@@ -12923,50 +12923,6 @@
       "static_body": true
     },
     {
-      "description": "The bowls are round with a smooth, glossy surface and a vibrant red color. They feature a speckled design and a slightly raised rim, adding a decorative touch.",
-      "kinematic": false,
-      "name": "bowl",
-      "payload": [
-        "../objects/ycb/bowl.usd"
-      ],
-      "position": [
-        0.5317624807357788,
-        0.13779696822166443,
-        -123.10004425048828
-      ],
-      "prim_path": "/world/bowl",
-      "rigid_body": true,
-      "rotation": [
-        -0.7063235640525819,
-        0.7078891317600929,
-        0.0,
-        0.0
-      ],
-      "static_body": false
-    },
-    {
-      "description": "These bananas are long and curved, with a smooth yellow skin and slightly green tips. They are commonly known for their sweet taste and are often eaten raw or used in various dishes.",
-      "kinematic": false,
-      "name": "banana",
-      "payload": [
-        "../objects/ycb/banana.usd"
-      ],
-      "position": [
-        0.5188158750534058,
-        -0.140828937292099,
-        -123.09932708740234
-      ],
-      "prim_path": "/world/banana",
-      "rigid_body": true,
-      "rotation": [
-        1.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "static_body": false
-    },
-    {
       "description": "",
       "kinematic": false,
       "name": "PhysicsMaterial",

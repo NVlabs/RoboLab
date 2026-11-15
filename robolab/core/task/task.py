@@ -29,6 +29,14 @@ class Task:
     events: Any = None  # Optional event terms (e.g., randomization)
     subtasks: Any = None  # Subtasks for completion tracking
     contact_object_list: list[str] | None = None  # list of objects that can be in contact with the robot and will be tracked for contact sensors
+    # Optional: objects that keep their relative poses when the initial pose is randomized
+    # (--init-pose-noise), e.g. [["fork", "plate", "knife"]]. Adds to the groups detected
+    # automatically from objects that touch at their default poses.
+    object_groups: list[list[str]] | None = None
+    # Optional: objects the initial-pose randomization never moves, e.g. ["shelf"]. Objects linked to
+    # them (touching, or in the same object_groups entry) stay too. Physics is unaffected: they can
+    # still be pushed during the episode.
+    fixed_objects: list[str] | None = None
 
     episode_length_s: int = 60*10 # 10 minutes
     attributes: list[str] = None
@@ -83,6 +91,10 @@ def verify_task_valid(task_class: type[Task]) -> tuple[bool, str]:
         error = f"Contact list is not valid: {error}"
         return False, error
 
+    init_pose_fields_valid, error = verify_init_pose_fields(task_class)
+    if not init_pose_fields_valid:
+        return False, error
+
     # Check terminations
     terminations = task_class.terminations()
     termination_success_func = getattr(terminations, 'success', None)
@@ -113,6 +125,27 @@ def verify_task_valid(task_class: type[Task]) -> tuple[bool, str]:
                         error = f"Object used in termination '{obj}' under argument '{obj_args}' is not in contact object list: {task_class.contact_object_list}"
                         return False, error
 
+    return True, None
+
+
+def verify_init_pose_fields(task_class: type[Task]) -> tuple[bool, str | None]:
+    """Verify ``object_groups`` and ``fixed_objects``: the right shape, and every name is a scene object."""
+    name = task_class.__name__
+    groups = getattr(task_class, "object_groups", None)
+    fixed = getattr(task_class, "fixed_objects", None)
+    if groups is not None and (not isinstance(groups, list) or not all(
+            isinstance(group, list) and group and all(isinstance(n, str) for n in group) for group in groups)):
+        return False, f"Task class {name} object_groups must be a list of non-empty lists of names: {groups}"
+    if fixed is not None and (not isinstance(fixed, list) or not all(isinstance(n, str) for n in fixed)):
+        return False, f"Task class {name} fixed_objects must be a list of names: {fixed}"
+    names = sorted({n for group in groups or [] for n in group} | set(fixed or []))
+    usd_path = getattr(getattr(getattr(task_class.scene, "scene", None), "spawn", None), "usd_path", None)
+    if not names or usd_path is None:
+        return True, None
+    from robolab.core.scenes.utils import verify_objects_in_scene
+    valid, error = verify_objects_in_scene(names, usd_path)
+    if not valid:
+        return False, f"Task class {name} object_groups/fixed_objects: {error}"
     return True, None
 
 

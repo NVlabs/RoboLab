@@ -12,7 +12,7 @@ import os
 import pytest
 
 from robolab.constants import DEFAULT_TASK_SUBFOLDERS, TASK_DIR
-from robolab.core.task.task import verify_task_valid
+from robolab.core.task.task import verify_init_pose_fields, verify_task_valid
 from robolab.core.task.task_utils import find_task_files, load_task_from_file
 
 
@@ -52,3 +52,32 @@ def test_no_duplicate_task_class_names():
         name_to_files.setdefault(name, []).append(task_file)
     duplicates = {name: files for name, files in name_to_files.items() if len(files) > 1}
     assert not duplicates, f"Duplicate task class names: {duplicates}"
+
+
+def _banana_in_bowl_variant(**fields):
+    """BananaInBowlTask (scene objects include banana and bowl) with some class fields overridden."""
+    task_class = load_task_from_file(os.path.join(TASK_DIR, "benchmark", "banana_in_bowl_task.py"),
+                                     allow_multiple=False)
+    return type("VariantTask", (task_class,), fields)
+
+
+@pytest.mark.parametrize("fields", [
+    {},
+    {"fixed_objects": ["bowl"]},
+    {"object_groups": [["banana", "bowl"]], "fixed_objects": ["bowl"]},
+])
+def test_init_pose_fields_valid(fields):
+    assert verify_init_pose_fields(_banana_in_bowl_variant(**fields)) == (True, None)
+
+
+@pytest.mark.parametrize("fields, message", [
+    ({"fixed_objects": "bowl"}, "fixed_objects must be a list of names"),
+    ({"fixed_objects": ["bowl", 3]}, "fixed_objects must be a list of names"),
+    ({"fixed_objects": ["teapot"]}, "teapot"),
+    ({"object_groups": [[]]}, "non-empty lists"),
+    ({"object_groups": [["banana", "teapot"]]}, "teapot"),
+])
+def test_init_pose_fields_invalid(fields, message):
+    valid, error = verify_init_pose_fields(_banana_in_bowl_variant(**fields))
+    assert not valid
+    assert message in error

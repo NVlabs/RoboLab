@@ -40,6 +40,9 @@ class RobolabEnv(ManagerBasedRLEnv):
         self._env_results: dict[int, bool] = {}      # env_id -> True (success) / False (truncated)
         self._env_term_step: dict[int, int] = {}      # env_id -> episode step when terminated
         self._has_stepped = False                     # tracks whether step() has been called
+        # Index of the current run (batch of num_envs episodes); set by the eval runner.
+        # Episode index = run_index * num_envs + env_id, used to seed per-episode randomization.
+        self.run_index = 0
 
     def load_managers(self):
         """Load managers; replace upstream RecorderManager with the streaming-

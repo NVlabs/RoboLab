@@ -45,7 +45,7 @@ Data sources:
 
 ### Tasks
 
-Browse benchmark tasks defined under `robolab/tasks/<folder>/`. The folder dropdown defaults to `constants.DEFAULT_TASK_SUBFOLDERS[0]` (i.e. `benchmark`); any other subfolder with `.py` files (e.g. `test_tasks`, `randomize_initial_pose`) can be selected.
+Browse benchmark tasks defined under `robolab/tasks/<folder>/`. The folder dropdown defaults to `constants.DEFAULT_TASK_SUBFOLDERS[0]` (i.e. `benchmark`); any other subfolder with `.py` files (e.g. `test_tasks`) can be selected.
 
 Above the task list, a summary card shows aggregate counts (Tasks · Unique scenes · Avg variants/task · Avg episode length) plus stackable **mini-card filters**: click a difficulty (simple / moderate / complex) or attribute (semantics, spatial, color, …) to filter the list. `Ctrl/Cmd-click` stacks multiple selections (OR within a kind, AND across kinds).
 

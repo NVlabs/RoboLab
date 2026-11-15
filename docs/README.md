@@ -35,6 +35,7 @@ The core concepts are:
 - **[Environment Registration](environment_registration.md)** — How tasks are combined with robot/observation/action configs into runnable Gymnasium environments
 - **[Environment Generation](environment_generation.md)** — Contact sensor creation, subtask trackers, and runtime environment internals
 - **[Running Environments](environment_run.md)** — Creating environments, evaluation scripts, CLI reference, and robustness testing
+- **[Initial-Pose Randomization](init_pose_randomization.md)** — Randomize where objects start with `--init-pose-noise`; grouping, workspace limits, and the scene check
 - **[`num_envs` VRAM size guide](env_vram_size_guide.md)** — Per-task `num_envs` ceiling on L40, measured against pi05
 #### Policy
 - **[Inference Clients](../policies/README.md)** — Built-in policy clients and server setup instructions

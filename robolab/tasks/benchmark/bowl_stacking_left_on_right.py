@@ -26,6 +26,9 @@ class BowlStackingLeftOnRightTerminations:
 class BowlStackingLeftOnRightTask(Task):
     contact_object_list = ["bowl_1", "bowl_2", "table"]
     scene = import_scene("bowls_2_table.usda", contact_object_list)
+    # The instruction tells the bowls apart by left/right, so they keep their arrangement
+    # under --init-pose-noise.
+    object_groups = [["bowl_1", "bowl_2"]]
     terminations = BowlStackingLeftOnRightTerminations
     instruction = {
         "default": "Stack the left bowl on the right bowl",

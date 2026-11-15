@@ -338,6 +338,11 @@ python robolab/tasks/_utils/generate_task_metadata.py \
 python examples/run_empty.py --task <TaskClassName>
 ```
 
+**4. Check initial-pose randomization** — renders randomized layouts from above and reports which objects move together (see the `robolab-init-pose-check` skill):
+```bash
+python examples/check_init_pose.py --headless --task <TaskClassName> --init-pose-noise 0.1
+```
+
 See [Task Libraries](../../docs/task_libraries.md) for metadata details and [Environment Registration](../../docs/environment_registration.md) for how to register and run your task with a policy.
 
 ---
