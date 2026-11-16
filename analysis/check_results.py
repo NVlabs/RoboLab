@@ -54,6 +54,23 @@ def get_available_demos(hdf5_path: str) -> list[str]:
         return []
 
 
+def get_episode_demo_location(env_dir: str, ep: dict) -> tuple[str, str]:
+    """Return (hdf5_path, demo_key) where an episode's demo is recorded.
+
+    Multi-env runs write one run_{run}.hdf5 per run with demo_{env_id} inside;
+    legacy runs write a single data.hdf5 with demo_{episode}.
+    """
+    episode = ep.get("episode")
+    legacy = os.path.join(env_dir, "data.hdf5")
+    run_idx = ep.get("run")
+    if run_idx is not None:
+        run_path = os.path.join(env_dir, f"run_{run_idx}.hdf5")
+        if os.path.exists(run_path) or not os.path.exists(legacy):
+            env_id = ep.get("env_id")
+            return run_path, f"demo_{env_id if env_id is not None else episode}"
+    return legacy, f"demo_{episode}"
+
+
 def get_demo_info(hdf5_path: str, demo_key: str) -> dict | None:
     """Get info about a specific demo in the HDF5 file."""
     if not os.path.exists(hdf5_path):
@@ -116,18 +133,16 @@ def diagnose_hdf5(folder_path: str):
             print(f"  {RED}No HDF5 files found!{RESET}")
             continue
 
-        # Collect all demos across all HDF5 files
-        available_demos = []
-        for hf in hdf5_files:
-            available_demos.extend(get_available_demos(hf))
-        demo_numbers = sorted([int(d.split("_")[1]) for d in available_demos if d.startswith("demo_")])
-
-        print(f"  Demos in HDF5: {available_demos}")
-        print(f"  Demo numbers: {demo_numbers}")
+        # Collect (file, demo) pairs: demo numbering restarts in every run_*.hdf5
+        available_demos = [(hf, demo) for hf in hdf5_files for demo in get_available_demos(hf)]
+        print(f"  Demos in HDF5: {[f'{os.path.basename(hf)}/{demo}' for hf, demo in available_demos]}")
 
         # Check for mismatches
-        missing_in_hdf5 = [e for e in episodes_in_json if e not in demo_numbers]
-        extra_in_hdf5 = [d for d in demo_numbers if d not in episodes_in_json]
+        expected = {get_episode_demo_location(env_dir, ep): ep.get("episode") for ep in envs[env_name]}
+        on_disk = set(available_demos)
+        missing_in_hdf5 = sorted(e for loc, e in expected.items() if loc not in on_disk)
+        extra_in_hdf5 = [f"{os.path.basename(hf)}/{demo}" for hf, demo in available_demos
+                         if (hf, demo) not in expected]
 
         if missing_in_hdf5:
             print(f"  {RED}Missing in HDF5: {missing_in_hdf5}{RESET}")
@@ -135,10 +150,10 @@ def diagnose_hdf5(folder_path: str):
             print(f"  {YELLOW}Extra in HDF5 (not in JSON): {extra_in_hdf5}{RESET}")
 
         # Show info for each demo
-        for demo_name in available_demos[:5]:  # Limit to first 5
-            info = get_demo_info(hdf5_path, demo_name)
+        for hf, demo_name in available_demos[:5]:  # Limit to first 5
+            info = get_demo_info(hf, demo_name)
             if info:
-                print(f"    {demo_name}: samples={info.get('num_samples', 'N/A')}, "
+                print(f"    {os.path.basename(hf)}/{demo_name}: samples={info.get('num_samples', 'N/A')}, "
                       f"success={info.get('success', 'N/A')}, "
                       f"actions_shape={info.get('actions_shape', 'N/A')}")
 
@@ -204,24 +219,27 @@ def check_folder(folder_path: str, verbose: bool = False) -> dict:
                 })
             continue
 
-        # Get available demos in HDF5
-        available_demos = get_available_demos(hdf5_path)
+        demos_by_file: dict[str, list[str]] = {}
 
         for ep in episodes:
             results["total"] += 1
             episode_num = ep.get("episode")
-            demo_key = f"demo_{episode_num}"
+            hdf5_path, demo_key = get_episode_demo_location(env_dir, ep)
+            if hdf5_path not in demos_by_file:
+                demos_by_file[hdf5_path] = get_available_demos(hdf5_path)
+            available_demos = demos_by_file[hdf5_path]
+            hdf5_name = os.path.basename(hdf5_path)
 
             if demo_key in available_demos:
                 results["valid"] += 1
                 if verbose:
-                    print(f"  {GREEN}✓{RESET} {env_name}/demo_{episode_num}")
+                    print(f"  {GREEN}✓{RESET} {env_name}/{hdf5_name}/{demo_key} (episode {episode_num})")
             else:
                 results["missing_demo"] += 1
                 results["corrupt_episodes"].append({
                     "env_name": env_name,
                     "episode": episode_num,
-                    "reason": f"demo_{episode_num} not in HDF5 (available: {available_demos})",
+                    "reason": f"{demo_key} not in {hdf5_name} (available: {available_demos})",
                     "data": ep,
                 })
 
@@ -257,9 +275,9 @@ def print_results(results: dict, folder_path: str):
         print(f"  {RED}Missing demo entry: {missing_demo}{RESET}")
 
     # Print missing HDF5 tasks
-    missing_hdf5_tasks = results.get("missing_hdf5_tasks", [])
+    missing_hdf5_tasks = results.get("missing_hdf5_envs", [])
     if missing_hdf5_tasks:
-        print(f"\n{BOLD}{RED}Tasks with missing data.hdf5:{RESET}")
+        print(f"\n{BOLD}{RED}Tasks with no HDF5 file:{RESET}")
         for task in missing_hdf5_tasks:
             print(f"  - {task}")
 
