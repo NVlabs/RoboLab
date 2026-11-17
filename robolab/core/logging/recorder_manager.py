@@ -14,6 +14,7 @@ from isaaclab.utils.datasets import EpisodeData
 
 from robolab.core.logging.streaming_hdf5_handler import StreamingHDF5DatasetFileHandler
 from robolab.core.utils.hardware_utils import get_gpu_info
+from robolab.core.utils.termination_utils import success_terms_fired
 
 logger = logging.getLogger(__name__)
 
@@ -382,13 +383,14 @@ class RobolabRecorderManager(RecorderManager):
         # termination term literally named "success". Tasks using the per-object
         # `success_<obj>` any-of-N pattern (e.g. GrabABagelTask, GrabAFruitTask)
         # have no such term, so upstream silently records success=False even when
-        # an episode genuinely succeeded. Re-derive from termination_manager.terminated
-        # (the OR of all non-timeout terms) — the same signal env.py uses for the
-        # canonical jsonl — so the HDF5 attr is correct regardless of term naming.
+        # an episode genuinely succeeded. Re-derive from the `success*` terms by
+        # name (success_terms_fired), the same signal env.py uses for the canonical
+        # jsonl, so the HDF5 attr is correct regardless of term naming and a failure
+        # termination is not recorded as success.
         # set_success_to_episodes only updates in-memory EpisodeData.success; export
         # runs later (env.py _reset_idx), so this re-set is picked up on write.
         if hasattr(self._env, "termination_manager"):
-            success = self._env.termination_manager.terminated[env_ids]
+            success = success_terms_fired(self._env.termination_manager, env_ids)
             self.set_success_to_episodes(env_ids, success)
 
     def record_post_reset(self, env_ids: Sequence[int] | None) -> None:
