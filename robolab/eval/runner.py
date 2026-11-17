@@ -356,6 +356,8 @@ def run_evaluation(
                     enable_subtask_progress=robolab.constants.ENABLE_SUBTASK_PROGRESS_CHECKING,
                     timing=timing,
                     instruction_type=requested_fields,
+                    # Mark rows from runs whose client could read privileged sim state.
+                    extra_fields={"gt_state_enabled": True} if args.enable_gt_state else None,
                 )
 
                 env.reset_eval_state()

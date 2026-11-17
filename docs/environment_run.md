@@ -477,6 +477,8 @@ One object entry exists per element of the task's `contact_object_list` (minus t
 
 The snapshot is deliberately raw: derived quantities (lift thresholds, grasp heuristics) are the consumer's business, computed client-side from the per-step stream; see [Evaluating a New Policy — Ground-Truth State in Your Client](policy.md#optional-ground-truth-state-in-your-client).
 
+**Provenance in the results.** A run with `--enable-gt-state` adds `"gt_state_enabled": true` to every row it writes to `episode_results.jsonl`, because the client could read privileged state, including live pass/fail for every subtask (`subtask.all_subtask_conditions`). Rows from runs without the flag have no such field and are unchanged, so results from the two kinds of run can be told apart downstream. Environments registered with `object_state_obs=True` (below) are not marked this way.
+
 **Ground truth through the observation pipeline.** Independently of `--enable-gt-state`, environments can be registered with `object_state_obs=True` (an argument to `auto_register_droid_envs`, not a CLI flag) to add an `object_state_obs` observation group with `<object>_pos` / `<object>_quat` / `<object>_vel` terms per task — same frame conventions, but batched, recorded to HDF5, and replayable like any other observation. Useful for consumers that want privileged object state inside the standard pipeline rather than on the inference side-channel.
 
 ## Robustness Evaluation Scripts
