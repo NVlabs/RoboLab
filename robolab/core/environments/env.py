@@ -17,6 +17,7 @@ from isaaclab.envs import ManagerBasedRLEnv
 
 from robolab.core.logging.recorder_manager import RobolabRecorderManager
 from robolab.core.utils.isaaclab_compat import prepare_env_cfg
+from robolab.core.utils.termination_utils import success_terms_fired
 from robolab.core.world.world_state import get_world
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class RobolabEnv(ManagerBasedRLEnv):
     - Custom recorder manager (RobolabRecorderManager)
     - Frozen terminated envs: when an env terminates, it holds its final state
       instead of auto-resetting. Actions for frozen envs are zeroed out.
-    - Per-env result tracking (success/truncated, termination step)
+    - Per-env result tracking (success/failure, termination step)
     """
 
     def __init__(self, cfg, **kwargs):
@@ -37,7 +38,7 @@ class RobolabEnv(ManagerBasedRLEnv):
         super().__init__(cfg, **kwargs)
         self._frozen_envs = torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
         self._pre_step_frozen = self._frozen_envs.clone()  # snapshot before each step()
-        self._env_results: dict[int, bool] = {}      # env_id -> True (success) / False (truncated)
+        self._env_results: dict[int, bool] = {}      # env_id -> True (a success* term fired) / False
         self._env_term_step: dict[int, int] = {}      # env_id -> episode step when terminated
         self._has_stepped = False                     # tracks whether step() has been called
         # Index of the current run (batch of num_envs episodes); set by the eval runner.
@@ -105,7 +106,7 @@ class RobolabEnv(ManagerBasedRLEnv):
                     get_world(self).reset_predicate_state(artifact_ids)
                     continue
                 self._frozen_envs[eid] = True
-                self._env_results[eid] = bool(self.termination_manager.terminated[eid])
+                self._env_results[eid] = bool(success_terms_fired(self.termination_manager, [eid])[0])
                 self._env_term_step[eid] = ep_len
                 # Auto-export recording for this env
                 if self.recorder_manager is not None:

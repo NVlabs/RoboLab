@@ -174,6 +174,27 @@ class MyTerminations:
 
 The `params` dict names must match the object names in `contact_object_list`. See [Available Conditional Functions](#available-conditional-functions) below for the full list.
 
+How the episode result is recorded:
+
+- **Success** is decided by the terms whose names start with `success`. The episode is recorded as a success (`"success": true` in `episode_results.jsonl` and in the HDF5 recording) if any of them fired, so a task can define several (for example `success_bagel_01`, `success_bagel_02` in `grab_a_bagel.py`).
+- **`time_out`** (marked `time_out=True`) ends the episode as a failure.
+- **Any other non-timeout term** also ends the episode as a failure. Use this for ordinary Isaac Lab failure conditions:
+
+```python
+from isaaclab.managers import SceneEntityCfg
+
+@configclass
+class MyTerminations:
+    time_out = DoneTerm(func=mdp.time_out, time_out=True)
+    success = DoneTerm(func=object_in_container, params={...})
+    object_fell_off_table = DoneTerm(
+        func=mdp.root_height_below_minimum,
+        params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("apple")},
+    )
+```
+
+Here an episode that ends because `object_fell_off_table` fired is recorded as a failure. If a `success*` term and a failure term fire on the same step, the episode is recorded as a success.
+
 ## Instruction Variants
 
 A task can define a single instruction or multiple flat instruction fields. A
