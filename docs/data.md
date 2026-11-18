@@ -228,6 +228,7 @@ The main results file, located at the top level of the output folder. Uses JSONL
   - `OBJECT_MOVED`: Non-target object was significantly displaced
   - `OBJECT_OUT_OF_SCENE`: Object fell off table or moved outside workspace
   - `wrong_objects_grabbed`: List of wrong object names that were grabbed
+- `gt_state_enabled`: `true` when the run used `--enable-gt-state` (the policy client received privileged simulator state; see [Ground-Truth State Export](environment_run.md#ground-truth-state-export)); absent otherwise
 
 ## See Also
 

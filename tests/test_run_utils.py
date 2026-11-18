@@ -66,7 +66,7 @@ def test_adaptive_rejects_nonzero_offset():
 def runner_harness(monkeypatch, tmp_path):
     import robolab.constants as constants
 
-    state = SimpleNamespace(saved=[], executed=[], headless=[])
+    state = SimpleNamespace(saved=[], executed=[], headless=[], extra_fields=[])
     state.env = SimpleNamespace(close=Mock(), reset_eval_state=Mock(), sim=SimpleNamespace(has_gui=Mock(return_value=False)))
     state.client = SimpleNamespace(close=Mock())
     cfg = SimpleNamespace(sim=SimpleNamespace(dt=0.01), decimation=10, instruction='test')
@@ -79,6 +79,7 @@ def runner_harness(monkeypatch, tmp_path):
         return [], [], {}
 
     def summarize(**kwargs):
+        state.extra_fields.append(kwargs.get('extra_fields'))
         # Return a new list as the real summarizer may do; the runner must use it
         # for subsequent completion checks.
         ids = episode_ids_for_run(kwargs['run_idx'], kwargs['num_envs'])
@@ -172,3 +173,13 @@ def test_adaptive_precision_can_skip_simulator_creation(runner_harness):
     h.saved = results(range(10), success=True)
     h.run('--num-episodes-adaptive', '100', '--ci-pp-width', '0.5')
     h.create_env.assert_not_called()
+
+
+@pytest.mark.parametrize('cli, expected', [
+    ((), None),
+    (('--enable-gt-state',), {'gt_state_enabled': True}),
+])
+def test_runner_marks_results_from_gt_state_runs(runner_harness, cli, expected):
+    h = runner_harness
+    h.run('--num-runs', '2', *cli)
+    assert h.extra_fields == [expected, expected]
